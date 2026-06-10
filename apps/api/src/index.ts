@@ -66,9 +66,14 @@ const app = new Elysia()
   .use(market)
   .use(webhooks)
   .use(notifications)
-  .listen(PORT)
 
-console.log(`[api] TIKSPY API rodando em http://localhost:${app.server?.port}`)
+// Na Vercel a function recebe o fetch handler via export default — não há porta.
+if (!process.env.VERCEL) {
+  app.listen(PORT)
+  console.log(`[api] TIKSPY API rodando em http://localhost:${PORT}`)
+}
+
+export default app
 
 export type App = typeof app
 
