@@ -32,10 +32,14 @@ export function AppTopbar() {
         <BreadcrumbList>
           {match ? (
             <>
-              <BreadcrumbItem className="hidden text-muted-foreground md:block">
-                {match.group}
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
+              {match.group ? (
+                <>
+                  <BreadcrumbItem className="hidden text-muted-foreground md:block">
+                    {match.group}
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator className="hidden md:block" />
+                </>
+              ) : null}
               <BreadcrumbItem>
                 <BreadcrumbPage>{match.item.title}</BreadcrumbPage>
               </BreadcrumbItem>

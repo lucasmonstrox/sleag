@@ -51,9 +51,7 @@ export default function RootLayout({
       )}
     >
       <body>
-        <ThemeProvider defaultTheme="dark" enableSystem={false}>
-          {children}
-        </ThemeProvider>
+        <ThemeProvider forcedTheme="dark">{children}</ThemeProvider>
       </body>
     </html>
   )

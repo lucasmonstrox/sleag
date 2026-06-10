@@ -1,5 +1,5 @@
 import {
-  BellIcon,
+  BellRingIcon,
   ClapperboardIcon,
   GaugeIcon,
   LayoutDashboardIcon,
@@ -7,8 +7,10 @@ import {
   PackageSearchIcon,
   RadioIcon,
   SettingsIcon,
+  SlidersHorizontalIcon,
   StoreIcon,
   UsersIcon,
+  WalletIcon,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
@@ -19,37 +21,37 @@ export type NavItem = {
 }
 
 export type NavGroup = {
-  label: string
+  label?: string
   items: NavItem[]
 }
 
 export const NAV_GROUPS: NavGroup[] = [
   {
-    label: "Visão geral",
-    items: [
-      { title: "Dashboard", href: "/", icon: LayoutDashboardIcon },
-      { title: "Score & quadrante", href: "/score", icon: GaugeIcon },
-    ],
+    items: [{ title: "Dashboard", href: "/", icon: LayoutDashboardIcon }],
   },
   {
     label: "Descoberta",
     items: [
       { title: "Produtos", href: "/produtos", icon: PackageSearchIcon },
+      { title: "Lojas", href: "/lojas", icon: StoreIcon },
       { title: "Categorias", href: "/categorias", icon: LayoutGridIcon },
     ],
   },
   {
-    label: "Concorrência",
+    label: "Conteúdo",
     items: [
       { title: "Criadores", href: "/criadores", icon: UsersIcon },
-      { title: "Lojas", href: "/lojas", icon: StoreIcon },
       { title: "Vídeos & criativos", href: "/videos", icon: ClapperboardIcon },
       { title: "Lives", href: "/lives", icon: RadioIcon },
     ],
   },
   {
-    label: "Sua operação",
-    items: [{ title: "Monitoramento", href: "/monitoramento", icon: BellIcon }],
+    label: "Minha operação",
+    items: [
+      { title: "Desempenho", href: "/desempenho", icon: WalletIcon },
+      { title: "Regras", href: "/monitoramento", icon: SlidersHorizontalIcon },
+      { title: "Alertas", href: "/alertas", icon: BellRingIcon },
+    ],
   },
 ]
 
@@ -59,7 +61,11 @@ export const NAV_GROUPS: NavGroup[] = [
  */
 export const HIDDEN_NAV_GROUPS: NavGroup[] = [
   {
-    label: "Sua operação",
+    label: "Mercado",
+    items: [{ title: "Score & quadrante", href: "/score", icon: GaugeIcon }],
+  },
+  {
+    label: "Minha operação",
     items: [{ title: "Conta", href: "/conta", icon: SettingsIcon }],
   },
 ]

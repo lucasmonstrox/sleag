@@ -2,7 +2,7 @@ import { HIDDEN_NAV_GROUPS, NAV_GROUPS } from "../consts"
 import type { NavItem } from "../consts"
 
 export type NavMatch = {
-  group: string
+  group?: string
   item: NavItem
 }
 

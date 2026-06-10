@@ -97,6 +97,8 @@ flowchart TB
 
 Esta é a decisão fundante. Apresentamos as opções e recomendamos uma — **a decisão final é do usuário.**
 
+> **Registro de fornecedores:** os candidatos a fonte de dados (EchoTik como nº 1 em avaliação, Apify e demais) estão catalogados em [fornecedores.md](./fornecedores.md) — endpoints, auth, limites e pendências de validação de cada um. A fonte pode ser composta por mais de um fornecedor; nada está fechado até as validações de trial.
+
 ### 3.1 Trade-offs das opções
 
 | Opção | Cobertura de mercado | Custo | Legalidade / ToS | Confiabilidade | Esforço de engenharia |
@@ -222,7 +224,7 @@ Separar três cargas: **OLTP transacional**, **analítico/séries temporais** e 
 
 ## 7. Camada de Aplicação / Backend
 
-Stack atual: **Monorepo Turborepo + Bun 1.2.20** (decisão do projeto: usar **Bun também como runtime**, não só como package manager — ver §7.6), apps `web` (produto) e `site` (landing), ambos **Next.js 16.2.6 + React 19.2.4**, **shadcn/ui + Tailwind v4**, pacote `packages/ui`, TypeScript 5, ESLint 9, deploy Vercel.
+Stack atual: **Monorepo Turborepo + Bun 1.2.20** (decisão do projeto: usar **Bun também como runtime**, não só como package manager — ver §7.6), apps `web` (produto) e `site` (landing), ambos **Next.js 16.2.6 + React 19.2.4**, **shadcn/ui + Tailwind v4**, pacote `packages/ui`, TypeScript 5, ESLint 9, deploy Vercel. **`apps/api` (2026-06-10): API dedicada em Elysia rodando no runtime Bun (porta 3333)** — hospeda a camada `data-source` (adapter EchoTik + mock, seleção via `MARKET_DATA_SOURCE`), expõe rotas de domínio `/v1/market/*` (nomenclatura da UI, nunca do fornecedor; procedência no header `x-data-source`) e é consumida pelo `apps/web` via **Eden Treaty** (tipos end-to-end). Datas com **date-fns**, moeda com **currency.js**.
 
 ### 7.1 Arquitetura em duas camadas
 

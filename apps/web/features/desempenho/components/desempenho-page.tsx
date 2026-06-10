@@ -6,17 +6,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card"
+import { cn } from "@workspace/ui/lib/utils"
 
 import {
   DataTable,
-  Delta,
   EventList,
   KpiRow,
   MediaCell,
   PageHeader,
   PageShell,
-  ScorePill,
-  Sparkline,
   TrendChart,
 } from "@/shared"
 import type { DataColumn } from "@/shared"
@@ -24,14 +22,14 @@ import type { DataColumn } from "@/shared"
 import {
   ALERTAS_RECENTES,
   CHART_X_LABELS,
-  DASHBOARD_KPIS,
-  GMV_SERIES,
-  TOP_MOVERS,
-  VIDEOS_SERIES,
+  DESEMPENHO_KPIS,
+  LUCRO_SERIES,
+  MEUS_PRODUTOS,
+  RECEITA_SERIES,
 } from "../mocks"
-import type { TopMover } from "../mocks"
+import type { MeuProduto } from "../mocks"
 
-const TOP_MOVERS_COLUMNS: DataColumn<TopMover>[] = [
+const MEUS_PRODUTOS_COLUMNS: DataColumn<MeuProduto>[] = [
   {
     header: "#",
     className: "w-10",
@@ -46,40 +44,62 @@ const TOP_MOVERS_COLUMNS: DataColumn<TopMover>[] = [
     ),
   },
   {
-    header: "Aceleração",
+    header: "Vendas 7d",
     align: "right",
-    render: (row) => <Sparkline data={row.spark} up={row.up} />,
+    render: (row) => (
+      <span className="font-mono text-sm font-medium">{row.vendas}</span>
+    ),
   },
   {
-    header: "Variação 24h",
+    header: "Receita 7d",
     align: "right",
-    render: (row) => <Delta value={row.variacao} up={row.up} />,
+    render: (row) => (
+      <span className="font-mono text-sm text-muted-foreground">{row.receita}</span>
+    ),
   },
   {
-    header: "Score",
+    header: "Lucro 7d",
     align: "right",
-    render: (row) => <ScorePill value={row.score} />,
+    render: (row) => (
+      <span className="font-mono text-sm font-medium text-emerald-400">
+        {row.lucro}
+      </span>
+    ),
+  },
+  {
+    header: "Margem",
+    align: "right",
+    render: (row) => (
+      <span
+        className={cn(
+          "font-mono text-sm font-medium",
+          row.margemUp ? "text-emerald-400" : "text-amber-400",
+        )}
+      >
+        {row.margem}
+      </span>
+    ),
   },
 ]
 
-export function DashboardPage() {
+export function DesempenhoPage() {
   return (
     <PageShell>
       <PageHeader
-        title="Dashboard"
-        description="Visão geral do mercado TikTok Shop Brasil — estimativas em tempo quase real."
+        title="Desempenho"
+        description="Resultados da sua operação no TikTok Shop — receita, lucro e os alertas das suas regras."
       >
         <Badge variant="outline" className="gap-1.5 text-muted-foreground">
           <span className="size-1.5 animate-pulse rounded-full bg-emerald-400" />
-          Atualizado há 4 min
+          Loja conectada
         </Badge>
       </PageHeader>
-      <KpiRow items={DASHBOARD_KPIS} />
+      <KpiRow items={DESEMPENHO_KPIS} />
       <Card>
         <CardHeader>
-          <CardTitle>Tendência de conteúdo × venda</CardTitle>
+          <CardTitle>Receita × lucro</CardTitle>
           <CardDescription>
-            GMV estimado e volume de vídeos nos últimos 30 dias
+            Evolução diária da sua loja nos últimos 30 dias
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -88,17 +108,17 @@ export function DashboardPage() {
             xLabels={CHART_X_LABELS}
             series={[
               {
-                label: "GMV estimado",
-                data: GMV_SERIES,
+                label: "Receita",
+                data: RECEITA_SERIES,
                 strokeClassName: "stroke-[#25F4EE]",
                 fillClassName: "fill-[#25F4EE]/10",
                 dotClassName: "bg-[#25F4EE]",
               },
               {
-                label: "Vídeos publicados",
-                data: VIDEOS_SERIES,
-                strokeClassName: "stroke-[#FE2C55]",
-                dotClassName: "bg-[#FE2C55]",
+                label: "Lucro líquido",
+                data: LUCRO_SERIES,
+                strokeClassName: "stroke-emerald-400",
+                dotClassName: "bg-emerald-400",
               },
             ]}
           />
@@ -107,13 +127,13 @@ export function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-5">
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle>Top movers</CardTitle>
+            <CardTitle>Seus produtos</CardTitle>
             <CardDescription>
-              Maiores acelerações de venda nas últimas 24h
+              Receita, lucro e margem por produto nos últimos 7 dias
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <DataTable bare columns={TOP_MOVERS_COLUMNS} rows={TOP_MOVERS} />
+            <DataTable bare columns={MEUS_PRODUTOS_COLUMNS} rows={MEUS_PRODUTOS} />
           </CardContent>
         </Card>
         <Card className="lg:col-span-2">

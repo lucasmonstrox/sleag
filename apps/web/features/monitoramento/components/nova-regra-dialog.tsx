@@ -26,6 +26,7 @@ import { Switch } from "@workspace/ui/components/switch"
 const CANAIS = [
   { nome: "Email", ativo: true },
   { nome: "Telegram", ativo: true },
+  { nome: "WhatsApp", ativo: true },
   { nome: "Push", ativo: false },
 ]
 

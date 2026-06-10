@@ -9,106 +9,104 @@ import {
 
 import type { EventItem, Kpi } from "@/shared"
 
-export const DASHBOARD_KPIS: Kpi[] = [
+export const DESEMPENHO_KPIS: Kpi[] = [
   {
-    label: "GMV monitorado (7d)",
-    value: "R$ 4,8M",
-    delta: "+18,2%",
+    label: "Lucro líquido (7d)",
+    value: "R$ 18,4 mil",
+    delta: "+12,6%",
     deltaUp: true,
     hint: "vs. semana anterior",
   },
   {
-    label: "Emergentes hoje",
-    value: "27",
-    delta: "+9",
+    label: "Receita (7d)",
+    value: "R$ 61,2 mil",
+    delta: "+9,8%",
     deltaUp: true,
-    hint: "novos sinais",
+    hint: "212 pedidos/dia em média",
   },
   {
-    label: "Alertas disparados (24h)",
-    value: "143",
-    delta: "+31%",
+    label: "Pedidos (24h)",
+    value: "342",
+    delta: "+41",
     deltaUp: true,
-    hint: "12 críticos",
+    hint: "vs. ontem",
   },
   {
-    label: "Score médio do mercado",
-    value: "61",
-    delta: "-2,4",
+    label: "Margem média",
+    value: "30,1%",
+    delta: "-1,2pp",
     deltaUp: false,
-    hint: "saturação subindo",
+    hint: "custo de tráfego subiu",
   },
 ]
 
-export const GMV_SERIES = [
-  12, 14, 13, 17, 19, 18, 22, 26, 24, 29, 33, 31, 38, 42, 40, 47, 52, 49, 55,
-  61, 58, 66, 71, 69, 76, 83, 80, 88, 95, 92,
+export const RECEITA_SERIES = [
+  18, 21, 19, 24, 27, 25, 31, 29, 34, 38, 36, 42, 40, 46, 51, 48, 54, 59, 56,
+  63, 61, 68, 66, 73, 71, 78, 76, 84, 81, 88,
 ]
 
-export const VIDEOS_SERIES = [
-  8, 9, 11, 10, 14, 16, 15, 19, 22, 20, 26, 24, 30, 28, 35, 33, 38, 44, 41,
-  48, 45, 52, 58, 55, 61, 59, 67, 72, 70, 78,
+export const LUCRO_SERIES = [
+  5, 6, 5, 7, 8, 7, 10, 9, 11, 12, 11, 14, 13, 15, 17, 16, 18, 20, 19, 22,
+  21, 24, 23, 26, 25, 28, 27, 30, 29, 32,
 ]
 
 export const CHART_X_LABELS = ["11 mai", "16 mai", "21 mai", "26 mai", "31 mai", "5 jun", "10 jun"]
 
-export type TopMover = {
+export type MeuProduto = {
   produto: string
   categoria: string
-  spark: number[]
-  variacao: string
-  up: boolean
-  score: number
+  vendas: string
+  receita: string
+  lucro: string
+  margem: string
+  margemUp: boolean
 }
 
-export const TOP_MOVERS: TopMover[] = [
+export const MEUS_PRODUTOS: MeuProduto[] = [
   {
     produto: "Fone Bluetooth ANC X12",
     categoria: "Eletrônicos",
-    spark: [20, 24, 31, 38, 52, 70, 92],
-    variacao: "+212%",
-    up: true,
-    score: 88,
-  },
-  {
-    produto: "Sérum Vitamina C 30ml",
-    categoria: "Beleza",
-    spark: [35, 38, 44, 51, 63, 72, 84],
-    variacao: "+140%",
-    up: true,
-    score: 82,
+    vendas: "1,2 mil",
+    receita: "R$ 22,6 mil",
+    lucro: "R$ 7,9 mil",
+    margem: "35%",
+    margemUp: true,
   },
   {
     produto: "Luminária LED Galaxy",
     categoria: "Casa & decoração",
-    spark: [12, 15, 14, 22, 31, 44, 58],
-    variacao: "+128%",
-    up: true,
-    score: 79,
-  },
-  {
-    produto: "Escova Alisadora 5 em 1",
-    categoria: "Beleza",
-    spark: [40, 44, 49, 47, 58, 66, 71],
-    variacao: "+64%",
-    up: true,
-    score: 74,
+    vendas: "860",
+    receita: "R$ 14,1 mil",
+    lucro: "R$ 4,8 mil",
+    margem: "34%",
+    margemUp: true,
   },
   {
     produto: "Mini Liquidificador Portátil",
     categoria: "Cozinha",
-    spark: [28, 31, 30, 36, 41, 39, 47],
-    variacao: "+48%",
-    up: true,
-    score: 68,
+    vendas: "540",
+    receita: "R$ 11,8 mil",
+    lucro: "R$ 3,2 mil",
+    margem: "27%",
+    margemUp: false,
   },
   {
-    produto: "Película Hidrogel HD",
-    categoria: "Acessórios",
-    spark: [55, 52, 49, 47, 44, 40, 38],
-    variacao: "-22%",
-    up: false,
-    score: 41,
+    produto: "Organizador de Maquiagem Acrílico",
+    categoria: "Beleza",
+    vendas: "410",
+    receita: "R$ 7,4 mil",
+    lucro: "R$ 1,9 mil",
+    margem: "26%",
+    margemUp: false,
+  },
+  {
+    produto: "Garrafa Térmica Smart 1L",
+    categoria: "Cozinha",
+    vendas: "330",
+    receita: "R$ 5,3 mil",
+    lucro: "R$ 1,1 mil",
+    margem: "21%",
+    margemUp: false,
   },
 ]
 

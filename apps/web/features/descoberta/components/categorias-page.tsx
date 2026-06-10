@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 import {
   Card,
   CardAction,
@@ -19,27 +21,32 @@ export function CategoriasPage() {
       />
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {CATEGORIAS.map((categoria) => (
-          <Card key={categoria.nome} size="sm">
-            <CardHeader>
-              <CardTitle className="text-sm">{categoria.nome}</CardTitle>
-              <CardAction>
-                <Delta value={categoria.crescimento} up={categoria.up} />
-              </CardAction>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-4">
-              <MiniBars data={categoria.bars} highlightLast={categoria.up} />
-              <div className="grid grid-cols-2 gap-2">
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-xs text-muted-foreground/70">GMV 7d</span>
-                  <span className="text-sm font-medium">{categoria.gmv}</span>
+          <Link key={categoria.slug} href={`/categorias/${categoria.slug}`}>
+            <Card
+              size="sm"
+              className="h-full transition-colors hover:border-foreground/20 hover:bg-accent/30"
+            >
+              <CardHeader>
+                <CardTitle className="text-sm">{categoria.nome}</CardTitle>
+                <CardAction>
+                  <Delta value={categoria.crescimento} up={categoria.up} />
+                </CardAction>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-4">
+                <MiniBars data={categoria.bars} highlightLast={categoria.up} />
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-muted-foreground/70">GMV 7d</span>
+                    <span className="text-sm font-medium">{categoria.gmv}</span>
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-muted-foreground/70">Produtos</span>
+                    <span className="text-sm font-medium">{categoria.produtos}</span>
+                  </div>
                 </div>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-xs text-muted-foreground/70">Produtos</span>
-                  <span className="text-sm font-medium">{categoria.produtos}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
     </PageShell>

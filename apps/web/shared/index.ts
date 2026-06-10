@@ -1,6 +1,10 @@
 export { PageShell } from "./components/page-shell"
 export { PageHeader } from "./components/page-header"
 
+// Utils
+export { getInitials } from "./utils/chart"
+export { THUMB_TONES } from "./consts"
+
 // Dados mockados
 export { KpiRow, type Kpi } from "./components/data/kpi-row"
 export { DataTable, type DataColumn } from "./components/data/data-table"

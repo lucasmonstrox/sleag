@@ -1,0 +1,1 @@
+{"code":500,"message":"product_rank_field：Failed to convert property value of type 'java.lang.String' to required type 'java.lang.Integer' for property 'product_rank_field'; For input string: \"total_sale_gmv_1d_amt\", ","data":null,"requestId":null}
