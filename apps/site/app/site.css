@@ -1,0 +1,293 @@
+/*
+ * Design system TIKSPY — "tipo TikTok":
+ * preto absoluto, branco, aqua #25F4EE e razz #FE2C55 (a dupla cromática da marca),
+ * aberração cromática como assinatura visual e mono pra tudo que é dado.
+ */
+:root {
+  --tt-black: #010101;
+  --tt-surface: #0a0a0c;
+  --tt-panel: #111114;
+  --tt-line: rgba(255, 255, 255, 0.05);
+  --tt-white: #fafafa;
+  --tt-aqua: #25f4ee;
+  --tt-razz: #fe2c55;
+  --tt-amber: #ffb224;
+}
+
+::selection {
+  background: var(--tt-aqua);
+  color: var(--tt-black);
+}
+
+.font-display {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+}
+
+/* Aberração cromática — assinatura da marca */
+.tt-glitch {
+  text-shadow:
+    -0.045em 0 rgba(37, 244, 238, 0.85),
+    0.045em 0 rgba(254, 44, 85, 0.85);
+}
+
+.tt-glitch-soft {
+  text-shadow:
+    -0.03em 0 rgba(37, 244, 238, 0.45),
+    0.03em 0 rgba(254, 44, 85, 0.45);
+}
+
+/* Texto vazado — cartaz TikTok */
+.tt-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.45);
+}
+
+.tt-outline-aqua {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(37, 244, 238, 0.6);
+}
+
+.tt-outline-razz {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(254, 44, 85, 0.6);
+}
+
+/* Grão global — tira o aspecto "flat de IA" */
+.tt-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Slider do simulador — thumb custom no lugar do nativo */
+.tt-range {
+  appearance: none;
+  height: 6px;
+  border-radius: 9999px;
+  outline: none;
+}
+
+.tt-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: #fafafa;
+  border: 3px solid #25f4ee;
+  cursor: grab;
+  transition: transform 120ms ease;
+}
+
+.tt-range::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.tt-range::-webkit-slider-thumb:active {
+  cursor: grabbing;
+}
+
+.tt-range::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: #fafafa;
+  border: 3px solid #25f4ee;
+  cursor: grab;
+}
+
+.tt-grid-bg {
+  background-image:
+    linear-gradient(var(--tt-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--tt-line) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+.tt-scanlines {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.025) 0 1px,
+    transparent 1px 3px
+  );
+}
+
+@keyframes tt-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.tt-marquee {
+  animation: tt-marquee 36s linear infinite;
+}
+
+.tt-marquee-slow {
+  animation: tt-marquee 70s linear infinite;
+}
+
+@keyframes tt-progress {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.tt-progress {
+  animation: tt-progress 5s linear both;
+}
+
+@keyframes tt-sweep {
+  0% {
+    left: -12%;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    left: 106%;
+    opacity: 0;
+  }
+}
+
+.tt-sweep {
+  animation: tt-sweep 5s ease-in-out infinite;
+}
+
+@keyframes tt-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.tt-blink {
+  animation: tt-blink 1.1s step-end infinite;
+}
+
+@keyframes tt-pulse-dot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 244, 238, 0.55);
+  }
+  60% {
+    box-shadow: 0 0 0 6px rgba(37, 244, 238, 0);
+  }
+}
+
+.tt-pulse-dot {
+  animation: tt-pulse-dot 1.8s ease-out infinite;
+}
+
+@keyframes tt-pulse-razz {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(254, 44, 85, 0.55);
+  }
+  60% {
+    box-shadow: 0 0 0 6px rgba(254, 44, 85, 0);
+  }
+}
+
+.tt-pulse-razz {
+  animation: tt-pulse-razz 1.8s ease-out infinite;
+}
+
+@keyframes tt-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.tt-row-in {
+  animation: tt-row-in 0.45s ease-out both;
+}
+
+@keyframes tt-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.tt-radar-sweep {
+  animation: tt-spin 10s linear infinite;
+}
+
+/* Ganhos flutuando — presente de live do TikTok */
+@keyframes tt-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.9) rotate(var(--tt-rot, 0deg));
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-240px) scale(1.05) rotate(var(--tt-rot, 0deg));
+  }
+}
+
+.tt-rise {
+  animation: tt-rise 4.2s ease-out forwards;
+}
+
+@keyframes tt-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-1deg);
+  }
+}
+
+.tt-float {
+  animation: tt-float 5s ease-in-out infinite;
+}
+
+@keyframes tt-alert-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.tt-alert-in {
+  animation: tt-alert-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tt-marquee,
+  .tt-marquee-slow,
+  .tt-progress,
+  .tt-sweep,
+  .tt-blink,
+  .tt-pulse-dot,
+  .tt-row-in,
+  .tt-radar-sweep,
+  .tt-rise,
+  .tt-float,
+  .tt-alert-in {
+    animation: none;
+  }
+}
