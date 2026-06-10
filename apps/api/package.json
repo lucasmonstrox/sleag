@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "bun run --watch src/index.ts",
     "start": "bun run src/index.ts",
-    "build": "bun build src/index.ts --target bun --outdir dist",
+    "build": "bun build src/index.ts --target bun --outdir dist --external elysia --external @elysiajs/cors",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
