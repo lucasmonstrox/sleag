@@ -22,7 +22,7 @@ function toRankDate(daysAgo: number): string {
 }
 
 async function fetchRankPage(date: string, page: number): Promise<RankItem[]> {
-  const data = await echotikFetch("/api/v2/product/ranklist", {
+  const data = await echotikFetch("/api/v3/echotik/product/ranklist", {
     region: REGION,
     page_num: page,
     page_size: RANK_PAGE_SIZE,
@@ -55,17 +55,37 @@ async function fetchDailyRank(daysAgo: number): Promise<{
   return { date: toRankDate(daysAgo), items: [] }
 }
 
-async function fetchVideos(): Promise<VideoItem[]> {
-  const pages = await Promise.all(
-    Array.from({ length: VIDEO_PAGES }, (_, index) =>
-      echotikFetch("/api/v2/video/list", {
-        region: REGION,
-        page_num: index + 1,
-        page_size: VIDEO_PAGE_SIZE,
-      }).then((data) => videoItemSchema.array().parse(data ?? [])),
-    ),
-  )
-  return pages.flat()
+async function fetchVideoRankPage(
+  date: string,
+  page: number,
+): Promise<VideoItem[]> {
+  const data = await echotikFetch("/api/v3/echotik/video/ranklist", {
+    region: REGION,
+    page_num: page,
+    page_size: VIDEO_PAGE_SIZE,
+    video_rank_field: 1, // 1 = trending (por views); 2 = vendas
+    rank_type: 1, // diário
+    date,
+  })
+  return videoItemSchema.array().parse(data ?? [])
+}
+
+/**
+ * Ranking diário de vídeos trending, já ordenado pelo servidor. O rank de
+ * "ontem" pode ainda não existir (T+1) — recua até 3 dias, igual ao de produtos.
+ */
+async function fetchDailyVideoRank(daysAgo: number): Promise<VideoItem[]> {
+  for (let attempt = daysAgo; attempt <= daysAgo + 2; attempt++) {
+    const date = toRankDate(attempt)
+    const pages = await Promise.all(
+      Array.from({ length: VIDEO_PAGES }, (_, index) =>
+        fetchVideoRankPage(date, index + 1),
+      ),
+    )
+    const items = pages.flat()
+    if (items.length > 0) return items
+  }
+  return []
 }
 
 export const echotikSource: MarketDataSource = {
@@ -83,7 +103,7 @@ export const echotikSource: MarketDataSource = {
 
   async getTrendingCreatives(options?: ListOptions) {
     const limit = options?.limit ?? 10
-    const videos = await fetchVideos()
+    const videos = await fetchDailyVideoRank(1)
     return toMarketCreatives(videos).slice(0, limit)
   },
 
@@ -91,7 +111,7 @@ export const echotikSource: MarketDataSource = {
     const [today, yesterday, videos] = await Promise.all([
       fetchDailyRank(1),
       fetchDailyRank(2),
-      fetchVideos(),
+      fetchDailyVideoRank(1),
     ])
 
     const countBestsellers = (items: RankItem[]) =>
@@ -117,7 +137,7 @@ export const echotikSource: MarketDataSource = {
       },
       trendingCreatives: {
         count: videos.filter(
-          (video) => video.total_views_1d_cnt >= VIRAL_MIN_VIEWS_24H,
+          (video) => video.total_views_cnt >= VIRAL_MIN_VIEWS_24H,
         ).length,
         delta: null,
       },

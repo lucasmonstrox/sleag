@@ -35,15 +35,14 @@ export function toMarketProducts(
 }
 
 export function toMarketCreatives(videos: VideoItem[]): MarketCreative[] {
+  // video/ranklist já vem ordenado pelo servidor (trending) — não reordenamos.
   return videos
     .filter((video) => video.unique_id)
-    .sort((a, b) => b.total_views_1d_cnt - a.total_views_1d_cnt)
-    .map((video, index) => ({
-      id: `${video.user_id}-${index}`,
-      // TODO: /video/list não traz título — buscar no detalhe do vídeo
-      title: `Vídeo de @${video.unique_id}`,
+    .map((video) => ({
+      id: video.video_id,
+      title: video.video_desc?.trim() || `Vídeo de @${video.unique_id}`,
       creatorHandle: `@${video.unique_id}`,
-      views: video.total_views_1d_cnt || video.total_views_cnt,
+      views: video.total_views_cnt,
       estimatedGmv: video.total_video_sale_gmv_amt,
     }))
 }

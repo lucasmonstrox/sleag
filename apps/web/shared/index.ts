@@ -3,6 +3,14 @@ export { PageHeader } from "./components/page-header"
 
 // Utils
 export { getInitials } from "./utils/chart"
+export {
+  formatBrl,
+  formatBrlCompact,
+  formatCompact,
+  formatDeltaPct,
+  formatInteger,
+  formatSignedInteger,
+} from "./utils/format"
 export { THUMB_TONES } from "./consts"
 
 // Dados mockados

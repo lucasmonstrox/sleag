@@ -1,6 +1,11 @@
 export const REGION = "BR"
 
-export const CACHE_TTL_MS = 5 * 60 * 1000
+// Cache lazy por URL (client.ts): refaz a chamada no 1º request após expirar,
+// nunca em background — protege a cota. Default 5min para poupar o trial de
+// 100 chamadas; sobreponha via env (ver docs/fornecedores.md §1.1).
+export const CACHE_TTL_MS = Number(
+  process.env.ECHOTIK_CACHE_TTL_MS ?? 5 * 60 * 1000,
+)
 
 /** Trial da EchoTik limita page_size a 10 — profundidade vem de mais páginas. */
 export const RANK_PAGE_SIZE = 10

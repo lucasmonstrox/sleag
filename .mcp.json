@@ -3,6 +3,25 @@
     "chrome-devtools": {
       "command": "cmd",
       "args": ["/c", "npx", "-y", "chrome-devtools-mcp@latest"]
+    },
+    "supabase": {
+      "command": "cmd",
+      "args": [
+        "/c", "npx", "-y", "mcp-remote", "https://mcp.supabase.com/mcp?project_ref=leydusfhqhuharfecofu"
+      ]
+    },
+    "trigger": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "trigger.dev@4.4.6",
+        "mcp",
+        "--project-ref",
+        "proj_grlsnmejoweszxtgclvr",
+        "--profile",
+        "default"
+      ]
     }
   }
 }

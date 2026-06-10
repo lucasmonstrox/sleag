@@ -1,0 +1,5 @@
+export { LoginPage } from "./components/login/login-page"
+export { RegistroPage } from "./components/registro/registro-page"
+export { RecuperarSenhaPage } from "./components/recuperar-senha/recuperar-senha-page"
+export { DefinirSenhaPage } from "./components/definir-senha/definir-senha-page"
+export { signIn, signUp, definirSenha } from "./actions/auth"

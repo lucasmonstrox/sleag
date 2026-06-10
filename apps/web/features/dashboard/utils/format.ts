@@ -1,50 +1,16 @@
-import currency from "currency.js"
 import { format, parseISO } from "date-fns"
 import { ptBR } from "date-fns/locale"
 
-const BRL = { symbol: "R$ ", separator: ".", decimal: "," }
-
-const compactNumber = new Intl.NumberFormat("pt-BR", {
-  notation: "compact",
-  maximumFractionDigits: 1,
-})
-
-const integer = new Intl.NumberFormat("pt-BR")
-
-export function formatCompact(value: number): string {
-  return compactNumber.format(value)
-}
-
-export function formatInteger(value: number): string {
-  return integer.format(value)
-}
-
-export function formatSignedInteger(value: number): string {
-  return `${value >= 0 ? "+" : ""}${integer.format(value)}`
-}
-
-export function formatBrl(value: number): string {
-  return currency(value, BRL).format()
-}
-
-/** "R$ 4,8M", "R$ 184 mil", "R$ 932,50" */
-export function formatBrlCompact(value: number): string {
-  const abs = Math.abs(value)
-  if (abs >= 1_000_000) {
-    return `${currency(value / 1_000_000, { ...BRL, precision: 1 }).format().replace(",0", "")}M`
-  }
-  if (abs >= 1_000) {
-    return `${currency(value / 1_000, { ...BRL, precision: 1 }).format().replace(",0", "")} mil`
-  }
-  return currency(value, BRL).format()
-}
-
-export function formatDeltaPct(fraction: number): string {
-  const pct = (fraction * 100).toLocaleString("pt-BR", {
-    maximumFractionDigits: 1,
-  })
-  return `${fraction >= 0 ? "+" : ""}${pct}%`
-}
+// Formatadores genéricos de número/moeda vivem em shared/ (usados por 2+
+// features). Re-exportados aqui para não quebrar os imports do dashboard.
+export {
+  formatBrl,
+  formatBrlCompact,
+  formatCompact,
+  formatDeltaPct,
+  formatInteger,
+  formatSignedInteger,
+} from "@/shared"
 
 // Aceita string ISO ou Date: o Eden Treaty revive strings de data do JSON
 // como objetos Date em runtime, apesar do tipo inferido ser string.

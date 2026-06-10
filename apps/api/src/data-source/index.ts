@@ -1,4 +1,8 @@
-import { echotikSource, isEchotikConfigured } from "./adapters/echotik"
+import {
+  echotikSource,
+  EchotikApiError,
+  isEchotikConfigured,
+} from "./adapters/echotik"
 import { mockSource } from "./adapters/mock"
 import type { MarketDataSource, SourceName } from "./types"
 
@@ -46,9 +50,11 @@ function getPrimary(): Primary {
 }
 
 /**
- * Executa no fornecedor primário e cai no mock por bloco quando o método
- * ainda não está mapeado (ou falha) — a resposta carrega `source` para a
- * UI poder sinalizar dado real vs demonstração.
+ * Executa no fornecedor primário. Fallback para mock SÓ no 501 (endpoint que
+ * o EchoTik ainda não mapeou — ex.: série de mercado): aí mock é a única
+ * opção legítima. Falha real (cota, 429, 500) PROPAGA — nada de mascarar dado
+ * que existe e só não conseguimos. A resposta carrega `source` para a UI
+ * poder sinalizar a procedência.
  */
 export async function fromMarketSource<T>(
   call: (source: MarketDataSource) => Promise<T>,
@@ -61,7 +67,9 @@ export async function fromMarketSource<T>(
   try {
     return { source: primary.name, data: await call(primary.source) }
   } catch (error) {
-    console.error("[data-source] fallback para mock:", error)
-    return { source: "mock", data: await call(mockSource) }
+    if (error instanceof EchotikApiError && error.status === 501) {
+      return { source: "mock", data: await call(mockSource) }
+    }
+    throw error
   }
 }

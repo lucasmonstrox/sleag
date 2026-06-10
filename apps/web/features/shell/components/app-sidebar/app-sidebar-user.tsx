@@ -26,7 +26,17 @@ import {
   useSidebar,
 } from "@workspace/ui/components/sidebar"
 
-function UserAvatar({ className }: { className?: string }) {
+import { signOut } from "@/lib/supabase/sign-out"
+import type { SessionUser } from "@/lib/supabase/user"
+import { getInitials } from "@/shared/utils/chart"
+
+function UserAvatar({
+  initials,
+  className,
+}: {
+  initials: string
+  className?: string
+}) {
   return (
     <div
       className={
@@ -34,13 +44,14 @@ function UserAvatar({ className }: { className?: string }) {
         (className ?? "")
       }
     >
-      AS
+      {initials}
     </div>
   )
 }
 
-export function AppSidebarUser() {
+export function AppSidebarUser({ user }: { user: SessionUser }) {
   const { isMobile } = useSidebar()
+  const initials = getInitials(user.name)
 
   return (
     <SidebarMenu>
@@ -51,11 +62,11 @@ export function AppSidebarUser() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <UserAvatar />
+              <UserAvatar initials={initials} />
               <div className="flex flex-1 flex-col gap-0.5 text-left leading-tight group-data-[collapsible=icon]:hidden">
-                <span className="truncate text-sm font-medium">Ana Souza</span>
+                <span className="truncate text-sm font-medium">{user.name}</span>
                 <span className="truncate text-xs text-muted-foreground">
-                  ana@exemplo.com.br
+                  {user.email}
                 </span>
               </div>
               <ChevronsUpDownIcon className="ml-auto size-4 group-data-[collapsible=icon]:hidden" />
@@ -69,11 +80,13 @@ export function AppSidebarUser() {
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5">
-                <UserAvatar />
+                <UserAvatar initials={initials} />
                 <div className="flex flex-1 flex-col gap-0.5 text-left leading-tight">
-                  <span className="truncate text-sm font-medium">Ana Souza</span>
+                  <span className="truncate text-sm font-medium">
+                    {user.name}
+                  </span>
                   <span className="truncate text-xs text-muted-foreground">
-                    ana@exemplo.com.br
+                    {user.email}
                   </span>
                 </div>
                 <Badge variant="secondary">Pro</Badge>
@@ -100,10 +113,14 @@ export function AppSidebarUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOutIcon />
-              Sair
-            </DropdownMenuItem>
+            <form action={signOut}>
+              <DropdownMenuItem asChild>
+                <button type="submit" className="w-full cursor-pointer">
+                  <LogOutIcon />
+                  Sair
+                </button>
+              </DropdownMenuItem>
+            </form>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

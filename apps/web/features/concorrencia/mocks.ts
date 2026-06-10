@@ -1,4 +1,4 @@
-import type { Kpi, VideoItem } from "@/shared"
+import type { Kpi } from "@/shared"
 
 export type Criador = {
   nome: string
@@ -43,21 +43,6 @@ export const LOJAS: Loja[] = [
   { nome: "Duda Cosméticos", categoria: "Beleza", produtos: "89", criadores: "634", gmv30d: "R$ 580 mil", crescimento: "+7%", up: true, spark: [40, 41, 43, 42, 45, 47, 49] },
   { nome: "Fit Store BR", categoria: "Fitness", produtos: "76", criadores: "298", gmv30d: "R$ 340 mil", crescimento: "-4%", up: false, spark: [48, 47, 45, 44, 42, 41, 40] },
   { nome: "Mega Imports", categoria: "Acessórios", produtos: "203", criadores: "187", gmv30d: "R$ 210 mil", crescimento: "-16%", up: false, spark: [55, 51, 48, 44, 40, 37, 34] },
-]
-
-export const VIDEOS: VideoItem[] = [
-  { title: "ESSE fone cancela TUDO 😱", creator: "@techdoluca", views: "2,4M", gmv: "R$ 86 mil" },
-  { title: "Skincare que VENDE: rotina completa", creator: "@camilamakes", views: "2,1M", gmv: "R$ 74 mil" },
-  { title: "Transformei meu quarto com R$ 70", creator: "@casadajuh", views: "1,9M", gmv: "R$ 61 mil" },
-  { title: "Testei o fone viral do TikTok", creator: "@reviewsdopedro", views: "1,8M", gmv: "R$ 54 mil" },
-  { title: "Achadinho: sérum por R$ 49", creator: "@achadinhosdaduda", views: "1,6M", gmv: "R$ 52 mil" },
-  { title: "Look do dia com body modelador", creator: "@modacomlais", views: "1,4M", gmv: "R$ 47 mil" },
-  { title: "Mini liquidificador na rotina fit", creator: "@fitcomnanda", views: "1,2M", gmv: "R$ 39 mil" },
-  { title: "Luminária que viralizou ✨", creator: "@casadajuh", views: "1,1M", gmv: "R$ 36 mil" },
-  { title: "Escova alisadora: vale a pena?", creator: "@camilamakes", views: "980 mil", gmv: "R$ 31 mil" },
-  { title: "5 achados de cozinha até R$ 60", creator: "@cozinhapratica", views: "870 mil", gmv: "R$ 24 mil" },
-  { title: "Smartwatch bom e barato", creator: "@techdoluca", views: "760 mil", gmv: "R$ 22 mil" },
-  { title: "Kit pincéis: review sincera", creator: "@camilamakes", views: "640 mil", gmv: "R$ 18 mil" },
 ]
 
 export const LIVES_KPIS: Kpi[] = [
