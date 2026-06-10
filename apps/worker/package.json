@@ -15,7 +15,9 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.58.0",
     "@trigger.dev/sdk": "4.4.6",
+    "@workspace/notifications": "workspace:*",
     "zod": "^4.4.3"
   }
 }

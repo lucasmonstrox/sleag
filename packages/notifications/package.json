@@ -1,0 +1,18 @@
+{
+  "name": "@workspace/notifications",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./providers/evolution/webhook": "./src/providers/evolution/webhook.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@workspace/typescript-config": "workspace:*",
+    "@types/bun": "^1.2.20",
+    "typescript": "^5"
+  }
+}

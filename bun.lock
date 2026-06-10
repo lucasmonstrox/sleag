@@ -17,6 +17,8 @@
       "version": "0.0.1",
       "dependencies": {
         "@elysiajs/cors": "^1.4.2",
+        "@supabase/supabase-js": "^2.58.0",
+        "@workspace/notifications": "workspace:*",
         "elysia": "^1.4.28",
         "zod": "^4.4.3",
       },
@@ -82,7 +84,9 @@
       "name": "worker",
       "version": "0.0.1",
       "dependencies": {
+        "@supabase/supabase-js": "^2.58.0",
         "@trigger.dev/sdk": "4.4.6",
+        "@workspace/notifications": "workspace:*",
         "zod": "^4.4.3",
       },
       "devDependencies": {
@@ -109,6 +113,15 @@
         "globals": "^17.6.0",
         "typescript": "^5",
         "typescript-eslint": "^8.60.0",
+      },
+    },
+    "packages/notifications": {
+      "name": "@workspace/notifications",
+      "version": "0.0.0",
+      "devDependencies": {
+        "@types/bun": "^1.2.20",
+        "@workspace/typescript-config": "workspace:*",
+        "typescript": "^5",
       },
     },
     "packages/typescript-config": {
@@ -795,6 +808,8 @@
     "@typescript-eslint/visitor-keys": ["@typescript-eslint/visitor-keys@8.61.0", "", { "dependencies": { "@typescript-eslint/types": "8.61.0", "eslint-visitor-keys": "^5.0.0" } }, "sha512-QVLZu3ZPQEE+HICQyAMZ2yLQhxf0meY/wx6Hx14YcTNj13JB3qHlX3lJ02L3fLGHgERRH71kvYDwiXIguT3AjQ=="],
 
     "@workspace/eslint-config": ["@workspace/eslint-config@workspace:packages/eslint-config"],
+
+    "@workspace/notifications": ["@workspace/notifications@workspace:packages/notifications"],
 
     "@workspace/typescript-config": ["@workspace/typescript-config@workspace:packages/typescript-config"],
 

@@ -19,20 +19,5 @@ export const WATCHLIST: WatchlistItem[] = [
   { nome: "Película Hidrogel HD", tipo: "Produto", score: 41, spark: [55, 52, 49, 47, 44, 40, 38], up: false, variacao: "-22%", frequencia: "1 dia" },
 ]
 
-export type Regra = {
-  nome: string
-  entidade: "Produto" | "Categoria" | "Criador" | "Loja"
-  condicao: string
-  canais: string[]
-  frequencia: string
-  ativa: boolean
-}
-
-export const REGRAS: Regra[] = [
-  { nome: "Emergentes de beleza", entidade: "Categoria", condicao: "score > 70 e aceleração > 2σ", canais: ["Email", "Telegram", "WhatsApp"], frequencia: "15 min", ativa: true },
-  { nome: "Watchlist crítica", entidade: "Produto", condicao: "variação 24h > 100%", canais: ["Telegram", "WhatsApp", "Push"], frequencia: "Tempo real", ativa: true },
-  { nome: "Concorrente baixou preço", entidade: "Loja", condicao: "queda de preço > 10%", canais: ["Email"], frequencia: "1 h", ativa: true },
-  { nome: "Criadores em ascensão", entidade: "Criador", condicao: "eficiência > 85 e GMV +30%", canais: ["Email"], frequencia: "1 dia", ativa: true },
-  { nome: "Lives acima de R$ 30 mil/h", entidade: "Loja", condicao: "GMV de live > R$ 30 mil/h", canais: ["Telegram", "WhatsApp", "Push"], frequencia: "Tempo real", ativa: false },
-  { nome: "Saturação na watchlist", entidade: "Produto", condicao: "score < 45 por 3 dias", canais: ["Email"], frequencia: "1 dia", ativa: true },
-]
+// Regras agora são reais (services/regras.ts + alert_rules no Supabase).
+// A watchlist acima segue mock até a feature de watchlist ser wirada.

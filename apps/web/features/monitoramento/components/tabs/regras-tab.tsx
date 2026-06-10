@@ -1,16 +1,15 @@
-import { MoreHorizontalIcon } from "lucide-react"
+import { BellPlusIcon } from "lucide-react"
 
 import { Badge } from "@workspace/ui/components/badge"
-import { Button } from "@workspace/ui/components/button"
-import { Switch } from "@workspace/ui/components/switch"
+import { Card, CardContent } from "@workspace/ui/components/card"
 
 import { DataTable } from "@/shared"
 import type { DataColumn } from "@/shared"
 
-import { REGRAS } from "../../mocks"
-import type { Regra } from "../../mocks"
+import type { RegraRow } from "../../types"
+import { RegraSwitch } from "./regra-switch"
 
-const COLUMNS: DataColumn<Regra>[] = [
+const COLUMNS: DataColumn<RegraRow>[] = [
   {
     header: "Regra",
     render: (row) => <span className="text-sm font-medium">{row.nome}</span>,
@@ -52,21 +51,27 @@ const COLUMNS: DataColumn<Regra>[] = [
   {
     header: "Ativa",
     align: "right",
-    render: (row) => <Switch defaultChecked={row.ativa} />,
-  },
-  {
-    header: "",
-    align: "right",
-    className: "w-14",
-    render: () => (
-      <Button variant="ghost" size="icon" className="size-8">
-        <MoreHorizontalIcon className="size-4" />
-        <span className="sr-only">Ações</span>
-      </Button>
-    ),
+    render: (row) => <RegraSwitch id={row.id} ativa={row.ativa} />,
   },
 ]
 
-export function RegrasTab() {
-  return <DataTable columns={COLUMNS} rows={REGRAS} />
+export function RegrasTab({ regras }: { regras: RegraRow[] }) {
+  if (regras.length === 0) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
+          <div className="flex size-12 items-center justify-center rounded-full bg-muted/50">
+            <BellPlusIcon className="size-5 text-muted-foreground" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-sm font-medium">Nenhuma regra ainda</span>
+            <span className="text-sm text-muted-foreground">
+              Crie a primeira em “Nova regra” — o motor avalia o mercado todo dia.
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+  return <DataTable columns={COLUMNS} rows={regras} />
 }

@@ -3,6 +3,8 @@ import { Elysia, t } from "elysia"
 
 import { fromMarketSource } from "./data-source"
 import type { MarketDataSource } from "./data-source"
+import { notifications } from "./notifications"
+import { webhooks } from "./webhooks"
 
 const PORT = Number(process.env.PORT ?? 3333)
 const CORS_ORIGIN = process.env.CORS_ORIGIN ?? "http://localhost:3000"
@@ -62,6 +64,8 @@ const app = new Elysia()
   .use(cors({ origin: CORS_ORIGIN }))
   .get("/health", () => ({ status: "ok" }))
   .use(market)
+  .use(webhooks)
+  .use(notifications)
   .listen(PORT)
 
 console.log(`[api] TIKSPY API rodando em http://localhost:${app.server?.port}`)

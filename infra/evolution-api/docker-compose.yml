@@ -1,0 +1,76 @@
+name: tikspy-evolution
+
+# Gateway WhatsApp (Evolution API) para os ALERTAS da TIKSPY.
+#
+# Diferente do menupiloto: aqui é UM número TIKSPY que dispara alertas para os
+# assinantes (broadcast outbound), não uma instância por tenant. Por isso o .env
+# desliga a persistência de contatos/chats/histórico — o gateway só precisa enviar
+# e reportar status de entrega.
+#
+# Dev: API exposta só em 127.0.0.1:8081 (host 8081 → 8080 no container, p/ não
+# colidir com o Evolution do menupiloto em 8080). Postgres/Redis ficam internos ao
+# compose (sem porta no host) — não encostam no Supabase nem nos outros containers.
+# Produção: rodar este mesmo compose num VPS atrás de um proxy TLS (Caddy), com a
+# API alcançável pela internet (o motor de alertas roda no Trigger.dev, na nuvem).
+
+services:
+  evolution-api:
+    image: evoapicloud/evolution-api:latest
+    container_name: tikspy_evolution_api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:8080"
+    env_file:
+      - .env
+    volumes:
+      - evolution_instances:/evolution/instances
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - evolution
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: tikspy_evolution_postgres
+    restart: unless-stopped
+    command: ["postgres", "-c", "max_connections=200", "-c", "listen_addresses=*"]
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-evolution}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-evolution}
+      POSTGRES_DB: ${POSTGRES_DB:-evolution}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-evolution} -d ${POSTGRES_DB:-evolution}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks:
+      - evolution
+
+  redis:
+    image: redis:7-alpine
+    container_name: tikspy_evolution_redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    networks:
+      - evolution
+
+volumes:
+  evolution_instances:
+  postgres_data:
+  redis_data:
+
+networks:
+  evolution:
+    driver: bridge

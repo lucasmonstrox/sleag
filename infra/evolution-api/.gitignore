@@ -1,0 +1,6 @@
+# Segredos locais — cada dev gera o seu a partir do .env.example
+# (o .gitignore raiz já ignora .env*, isto é redundância de segurança)
+.env
+# Artefatos de pareamento (QR expira em ~60s; o JSON carrega o hash da instância)
+qr-*.png
+instance-create.json

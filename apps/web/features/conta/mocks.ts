@@ -5,12 +5,7 @@ export const PERFIL = {
   plano: "Pro",
 }
 
-export const CANAIS_NOTIFICACAO = [
-  { nome: "Email", descricao: "Digest diário e alertas críticos", ativo: true },
-  { nome: "Telegram", descricao: "Alertas em tempo quase real", ativo: true },
-  { nome: "WhatsApp", descricao: "Disponível nos planos superiores", ativo: false },
-  { nome: "Push", descricao: "Notificações no navegador", ativo: true },
-]
+// Canais de notificação agora são reais (services/canais.ts + notification_channels).
 
 export const PREFERENCIAS = [
   { label: "Idioma", valor: "Português (Brasil)" },

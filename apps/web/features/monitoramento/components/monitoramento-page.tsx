@@ -7,11 +7,13 @@ import {
 
 import { PageHeader, PageShell } from "@/shared"
 
+import { listarRegras } from "../services/regras"
 import { NovaRegraDialog } from "./nova-regra-dialog"
 import { RegrasTab } from "./tabs/regras-tab"
 import { WatchlistTab } from "./tabs/watchlist-tab"
 
-export function MonitoramentoPage() {
+export async function MonitoramentoPage() {
+  const regras = await listarRegras()
   return (
     <PageShell>
       <PageHeader
@@ -29,7 +31,7 @@ export function MonitoramentoPage() {
           <WatchlistTab />
         </TabsContent>
         <TabsContent value="regras" className="flex flex-col gap-6">
-          <RegrasTab />
+          <RegrasTab regras={regras} />
         </TabsContent>
       </Tabs>
     </PageShell>

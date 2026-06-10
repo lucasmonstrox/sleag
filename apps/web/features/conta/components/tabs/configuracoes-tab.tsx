@@ -4,18 +4,19 @@ import { Button } from "@workspace/ui/components/button"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card"
 import { Input } from "@workspace/ui/components/input"
-import { Switch } from "@workspace/ui/components/switch"
 
 import { getInitials } from "@/shared/utils/chart"
 
-import { CANAIS_NOTIFICACAO, PERFIL, PREFERENCIAS } from "../../mocks"
+import { PERFIL, PREFERENCIAS } from "../../mocks"
+import { listarCanais } from "../../services/canais"
+import { CanaisCard } from "./canais-card"
 
-export function ConfiguracoesTab() {
+export async function ConfiguracoesTab() {
+  const canais = await listarCanais()
   return (
     <div className="flex max-w-3xl flex-col gap-6">
       <Card>
@@ -48,30 +49,7 @@ export function ConfiguracoesTab() {
           </div>
         </CardContent>
       </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Notificações</CardTitle>
-          <CardDescription>
-            Consentimento por canal, conforme a LGPD — cada canal é opt-in separado.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col divide-y divide-border/60">
-          {CANAIS_NOTIFICACAO.map((canal) => (
-            <div
-              key={canal.nome}
-              className="flex items-center gap-4 py-4 first:pt-0 last:pb-0"
-            >
-              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span className="text-sm font-medium">{canal.nome}</span>
-                <span className="text-sm text-muted-foreground">
-                  {canal.descricao}
-                </span>
-              </div>
-              <Switch defaultChecked={canal.ativo} />
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+      <CanaisCard canais={canais} />
       <Card>
         <CardHeader>
           <CardTitle>Preferências</CardTitle>
