@@ -100,7 +100,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` (e HTTP 20
 - Vendas/GMV do vídeo são **ESTIMATIVAS**; unidade do GMV não documentada.
 - `page_size` máx. 10; dado T+1.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - **Criativos em alta** (métrica nº 1 do dashboard, junto com produtos mais vendidos): ranquear vídeos por views/vendas/GMV.
 - Engenharia reversa de criativos vencedores: hashtags, descrição, duração, formato.
 - Página de detalhe do produto (aba "vídeos") e descoberta de criadores via `user_id`.

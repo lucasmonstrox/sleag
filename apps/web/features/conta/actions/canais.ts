@@ -18,10 +18,10 @@ import type { CanalActionResult, CanalTipo } from "../types"
 const POLICY_VERSION = "v1"
 const CONSENT_TEXT: Record<CanalTipo, string> = {
   whatsapp:
-    "Aceito receber alertas do TIKSPY por WhatsApp neste número. Confirmarei respondendo SIM e posso cancelar respondendo PARAR a qualquer momento.",
-  email: "Aceito receber alertas e o digest diário do TIKSPY por email. Posso cancelar a qualquer momento.",
-  telegram: "Aceito receber alertas do TIKSPY por Telegram. Posso cancelar a qualquer momento.",
-  push: "Aceito receber notificações do TIKSPY no navegador. Posso cancelar a qualquer momento.",
+    "Aceito receber alertas do SLEAG por WhatsApp neste número. Confirmarei respondendo SIM e posso cancelar respondendo PARAR a qualquer momento.",
+  email: "Aceito receber alertas e o digest diário do SLEAG por email. Posso cancelar a qualquer momento.",
+  telegram: "Aceito receber alertas do SLEAG por Telegram. Posso cancelar a qualquer momento.",
+  push: "Aceito receber notificações do SLEAG no navegador. Posso cancelar a qualquer momento.",
 }
 
 const telefoneSchema = z

@@ -220,7 +220,7 @@ Exemplo real do opendoc (1 produto; campos de métrica zerados omitidos por brev
 - `last_crawl_dt` aparece no exemplo mas não no schema declarado — trate como opcional.
 - Dado T+1: nunca é "ao vivo"; pode estar ~1 dia atrasado.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - **Motor de descoberta de produtos** (página de produtos / "produtos mais vendidos" do dashboard — métrica nº 1 do produto): filtrar por categoria + faixa de vendas/GMV + tendência.
 - **Análise de concorrência e de mercado**: ver quantos criadores/vídeos/lives empurram cada produto e a quebra vídeo vs live.
 - Fonte de catálogo para enriquecer outras telas via `product_id` (detalhes, vídeos, lives, criadores, tendência).

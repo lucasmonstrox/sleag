@@ -100,7 +100,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - Discrepância da doc: ignore `product_rank_field` mencionado na descrição; use **`seller_rank_field`**.
 - **GMV estimado**. Dado **offline T+1**.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - É a fonte direta do **ranking de lojas** (Top lojas por vendas/GMV) na área de Lojas/Concorrência, com recortes diário/semanal/mensal por categoria e região.
 - O critério `seller_rank_field=2` (nº de criadores) destaca lojas com forte rede de afiliados — útil para benchmark de estratégia de creator marketing.
 - `seller_id` liga ao detalhe, tendência, produtos, criadores, vídeos e lives da loja.

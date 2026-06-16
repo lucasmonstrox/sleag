@@ -44,7 +44,7 @@ export function WidgetAlerts() {
         </span>
         <div className="min-w-0">
           <p className="flex items-center gap-2 text-sm font-semibold text-white">
-            TIKSPY Alertas
+            SLEAG Alertas
             <span className="rounded border border-[#25f4ee]/40 px-1 font-mono text-[8px] tracking-wider text-[#25f4ee] uppercase">
               bot
             </span>
@@ -65,7 +65,7 @@ export function WidgetAlerts() {
               type="button"
               className="mt-2 w-full rounded-md border border-[#25f4ee]/40 py-1 font-mono text-[10px] font-bold text-[#25f4ee] transition-colors hover:bg-[#25f4ee]/10"
             >
-              Abrir no TIKSPY →
+              Abrir no SLEAG →
             </button>
             <p className="mt-1 flex items-center justify-end gap-1 font-mono text-[9px] text-zinc-500">
               {message.time}

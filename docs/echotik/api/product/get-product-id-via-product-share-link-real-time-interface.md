@@ -53,7 +53,7 @@ Confirmado pela página renderizada (Example real abaixo). `data` é um objeto e
 - `requestId` pode vir `null` neste endpoint.
 - Use uma vez para resolver o ID e depois siga com os endpoints offline (mais baratos e estáveis) por `product_id`.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - **Onboarding por colagem de link:** usuário cola um link de produto do TikTok → resolvemos o `product_id` → carregamos a página de detalhe do produto inteira (vendas, vídeos, lives, criadores, tendência).
 - Ponte essencial entre o input humano (link) e a base estruturada da EchoTik.
 

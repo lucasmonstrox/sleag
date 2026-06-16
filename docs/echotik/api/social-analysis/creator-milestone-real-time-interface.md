@@ -134,7 +134,7 @@ Envelope: `{ code, message, data, requestId }` — `code = 0` (HTTP 200) = suces
 - URLs de avatar/cover/play são assinadas e expiram (`x-expires`); `play_addr` pode exigir token/headers do TikTok.
 - Use o `user_id` numérico do TikTok; o `@handle` não funciona aqui.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - **Enriquecimento de perfil de criador:** linha do tempo de conquistas (prova social/credibilidade) + 3 melhores vídeos por marco para inspirar criativos.
 - `creator_info` dá um cabeçalho rápido (avatar, nick, handle, seguidores, curtidas) sem chamar outro endpoint.
 - Secundário/futuro para uma página de detalhe de criador; não para os fluxos de mercado do dashboard principal.

@@ -82,7 +82,7 @@ Envelope real: `{ code, message, data, requestId }` — `code = 0` significa suc
 - Valores de venda/GMV são **estimados**.
 - IDs vêm como **strings numéricas**.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Alimenta o gráfico de **evolução de um criador** dentro da ficha de criador (seguidores, curtidas, vendas ao longo do tempo).
 - Secundário em relação ao ranking; é o drill-down temporal de um perfil já selecionado.
 

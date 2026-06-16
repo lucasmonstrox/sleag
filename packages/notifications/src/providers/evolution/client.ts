@@ -1,5 +1,5 @@
 /**
- * Cliente OUTBOUND do Evolution API, aparado para o caso da TIKSPY (broadcast de
+ * Cliente OUTBOUND do Evolution API, aparado para o caso da SLEAG (broadcast de
  * alertas a partir de UMA instância). Espelha o cliente do menupiloto, mas mantém
  * só o que o motor precisa: enviar texto + checar saúde da conexão. O pareamento
  * (QR/restart/logout) é ação de ops via o /manager do gateway, não vive aqui.

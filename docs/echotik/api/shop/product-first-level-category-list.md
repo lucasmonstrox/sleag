@@ -18,7 +18,7 @@ Retorna a árvore de categorias de produto de **primeiro nível** (categorias-ra
 ### Query params
 | Param | Tipo | Obrigatório | Valores / Default | O que faz |
 |---|---|---|---|---|
-| `language` | string | Sim | `th-TH`, `en-US`, `id-ID`, `zh-CN`, `ms-MY`, `vi-VN` | Idioma em que `category_name` será retornado. Não há `pt-BR` na lista — para o TIKSPY use `en-US` e traduza/mapeie internamente. |
+| `language` | string | Sim | `th-TH`, `en-US`, `id-ID`, `zh-CN`, `ms-MY`, `vi-VN` | Idioma em que `category_name` será retornado. Não há `pt-BR` na lista — para o SLEAG use `en-US` e traduza/mapeie internamente. |
 
 ### Exemplo de chamada
 ```bash
@@ -44,7 +44,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - Dado de dimensão e estável: vale a pena **cachear** localmente (não conta como dado transacional e evita gastar cota a cada request).
 - Sem paginação: retorna a lista completa do nível 1.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Resolve o `category: "—"` no mapper de produtos e de lojas: com o dicionário l1/l2/l3 cacheado, traduzimos qualquer `category_id` em nome exibível na UI.
 - Alimenta os filtros de categoria (dropdown em cascata) das áreas de Produtos, Lojas e Concorrência.
 

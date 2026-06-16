@@ -55,7 +55,7 @@ A página declara o schema apenas como `object`; pelo **Example**, `data` é uma
 - Multilíngue: a mesma chamada pode trazer vários itens (`lang`) com scripts em idiomas diferentes. Pode vir vazio para vídeos sem fala/legenda detectável.
 - `code=500` = risk control → retry com backoff. Sem QPS alto.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Alimenta análise de copy dos criativos: extrair hooks, CTAs e estrutura de roteiro dos vídeos em alta para inspirar/replicar.
 - Base para features de tradução e busca por texto falado dentro de vídeos.
 

@@ -114,7 +114,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - GMV/vendas são **estimados**; `avatar` **expira**.
 - `page_size` máximo é **10**.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - **Endpoint-chave do Dashboard de mercado (/):** monta direto o "ranking de criadores em alta" por seguidores ou por vendas, por região e período.
 - Sustenta uma das métricas nº 1 do dashboard (criadores em alta) sem precisar varrer a Influencer List inteira.
 

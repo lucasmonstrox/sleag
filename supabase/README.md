@@ -1,4 +1,4 @@
-# Supabase — TIKSPY
+# Supabase — SLEAG
 
 Projeto: **`leydusfhqhuharfecofu`** (`https://leydusfhqhuharfecofu.supabase.co`).
 

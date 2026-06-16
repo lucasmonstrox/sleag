@@ -23,8 +23,8 @@ const fontMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "TIKSPY — Console",
-    template: "%s · TIKSPY",
+    default: "SLEAG — Console",
+    template: "%s · SLEAG",
   },
   description:
     "Inteligência de mercado para o TikTok Shop Brasil: descoberta de produtos, concorrência, score de viabilidade e alertas.",

@@ -53,7 +53,7 @@ products/
 
 ## SocratiCode — Code Intelligence
 
-This project is indexed by SocratiCode as **tikspy**. Use the SocratiCode MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by SocratiCode as **sleag**. Use the SocratiCode MCP tools to understand code, assess impact, and navigate safely.
 
 > Run `codebase_status` to check index freshness. Run `codebase_update` to catch up on recent changes.
 

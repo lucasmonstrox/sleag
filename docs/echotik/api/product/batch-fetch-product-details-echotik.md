@@ -51,7 +51,7 @@ Mesmo schema do endpoint **Lista de Produtos** (`product-list-echotik.md`) — v
 - Este schema **não declara** `from_flag`, `is_hot`, `shop_type`, `shipping_price` (presentes na Lista) — podem não vir ou vir sem garantia formal.
 - Vendas/GMV são ESTIMATIVAS; dado T+1.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - **Hidratação de detalhe de produto**: pega IDs do ranking / vídeos / lives e busca o bloco completo de métricas em uma chamada.
 - Eficiência de cota: 10 produtos por request, ideal para popular cards do dashboard e a página de detalhe do produto.
 

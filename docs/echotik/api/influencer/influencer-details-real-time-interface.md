@@ -39,7 +39,7 @@ A página declara o schema apenas como `object`; pelo **Example**, `data` traz:
 | `data.status_msg` | string | Mensagem de status. |
 | `data.user` | object | **Objeto bruto do usuário do TikTok** (não normalizado pela EchoTik): avatares em vários tamanhos (`avatar_168x168`, `avatar_300x300`, `avatar_larger`, `avatar_medium`, `avatar_thumb`, cada um `{ uri, url_list[], url_prefix }`), `account_type`, `ad_virtual`, e — segundo o objeto user do TikTok — `unique_id`, `nickname`, `signature`, `follower_count`, `following_count`, `aweme_count`, `total_favorited`, etc. |
 
-> O Example vem **truncado**; `data.user` é o objeto user completo do TikTok (dezenas de campos). Inspecione um retorno real para mapear os contadores exatos que o TIKSPY precisa.
+> O Example vem **truncado**; `data.user` é o objeto user completo do TikTok (dezenas de campos). Inspecione um retorno real para mapear os contadores exatos que o SLEAG precisa.
 
 ### Exemplo de resposta
 ```json
@@ -77,7 +77,7 @@ A página declara o schema apenas como `object`; pelo **Example**, `data` traz:
 - **Risk control:** `code=500` é esperado de tempos em tempos — implemente retry com backoff. Não fazer QPS alto.
 - `unique_id` é o handle; aqui não há fallback por `user_id`.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Complementa a ficha de criador com o **número ao vivo** (quando o T+1 não basta, ex.: validar um pico recente).
 - Secundário ao fluxo offline; usar sob demanda no detalhe de um criador específico.
 

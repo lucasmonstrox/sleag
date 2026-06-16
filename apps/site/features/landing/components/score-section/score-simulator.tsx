@@ -65,7 +65,7 @@ export function ScoreSimulator() {
         <span className="size-2.5 rounded-full bg-[#ffb224]/80" aria-hidden />
         <span className="size-2.5 rounded-full bg-[#25f4ee]/80" aria-hidden />
         <span className="ml-3 hidden truncate rounded-md border border-white/10 bg-[#010101] px-3 py-1 font-mono text-[10px] text-zinc-500 sm:block">
-          app.tikspy.com.br/score
+          app.sleag.com.br/score
         </span>
       </div>
 

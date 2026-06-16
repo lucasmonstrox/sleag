@@ -74,7 +74,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - `most_product_category_list` / `product_category_list` são **strings JSON** a parsear.
 - Dado **offline T+1**.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Fonte do **perfil/cabeçalho da página de loja** na área de Concorrência (nome, capa, categoria, GMV, nº de produtos/criadores/lives/vídeos).
 - Combinado com `seller/trend`, monta o painel de uma loja concorrente (snapshot + série temporal).
 

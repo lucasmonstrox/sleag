@@ -83,5 +83,5 @@ export function presentEvent(
 
 /** Corpo da mensagem WhatsApp. O rodapé PARAR é exigência de opt-out + sinal anti-spam. */
 export function renderWhatsappMessage(title: string, description: string): string {
-  return `🚨 TIKSPY — ${title}\n${description}\n\nResponda PARAR para deixar de receber alertas.`
+  return `🚨 SLEAG — ${title}\n${description}\n\nResponda PARAR para deixar de receber alertas.`
 }

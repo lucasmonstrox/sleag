@@ -59,7 +59,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - Vendas/GMV **estimados**.
 - Dado **offline T+1**.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Alimenta a aba **Lives por loja** na área de Concorrência: identificar quais transmissões geram mais GMV para um concorrente e a cadência de lives.
 - Cruzado com `seller/influencer/list`, mostra quais criadores fazem as lives mais lucrativas de uma loja.
 

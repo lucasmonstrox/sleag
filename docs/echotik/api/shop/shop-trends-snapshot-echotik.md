@@ -56,7 +56,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - **GMV estimado**.
 - Dado **offline T+1**.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Gera os **gráficos de tendência** da página de loja na área de Concorrência (curva de GMV/vendas, crescimento de catálogo, atividade de lives/vídeos/criadores).
 - Permite detectar lojas em aceleração/desaceleração para alertas e ranking dinâmico.
 

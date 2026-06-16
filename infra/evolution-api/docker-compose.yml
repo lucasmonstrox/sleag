@@ -1,8 +1,8 @@
-name: tikspy-evolution
+name: sleag-evolution
 
-# Gateway WhatsApp (Evolution API) para os ALERTAS da TIKSPY.
+# Gateway WhatsApp (Evolution API) para os ALERTAS da SLEAG.
 #
-# Diferente do menupiloto: aqui é UM número TIKSPY que dispara alertas para os
+# Diferente do menupiloto: aqui é UM número SLEAG que dispara alertas para os
 # assinantes (broadcast outbound), não uma instância por tenant. Por isso o .env
 # desliga a persistência de contatos/chats/histórico — o gateway só precisa enviar
 # e reportar status de entrega.
@@ -16,7 +16,7 @@ name: tikspy-evolution
 services:
   evolution-api:
     image: evoapicloud/evolution-api:latest
-    container_name: tikspy_evolution_api
+    container_name: sleag_evolution_api
     restart: unless-stopped
     ports:
       - "127.0.0.1:8081:8080"
@@ -34,7 +34,7 @@ services:
 
   postgres:
     image: postgres:15-alpine
-    container_name: tikspy_evolution_postgres
+    container_name: sleag_evolution_postgres
     restart: unless-stopped
     command: ["postgres", "-c", "max_connections=200", "-c", "listen_addresses=*"]
     environment:
@@ -53,7 +53,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: tikspy_evolution_redis
+    container_name: sleag_evolution_redis
     restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes"]
     volumes:

@@ -116,7 +116,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - GMV e vendas por vídeo são **estimados**.
 - `video_products` no exemplo é array dentro de string — precisa de parse.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Alimenta a análise de **criativos por criador** ("criativos em alta" no nível do perfil) e o cruzamento vídeo→produto.
 - Apoia a métrica nº 1 do dashboard (criativos em alta) quando aplicada a um criador específico.
 

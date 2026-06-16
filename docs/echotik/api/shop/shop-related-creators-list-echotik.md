@@ -54,7 +54,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - Para perfil completo do criador (séries, todos os produtos vendidos etc.), consultar os endpoints de creator.
 - Dado **offline T+1**.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Mostra **quais afiliados/criadores impulsionam um concorrente** — insumo para a área de Lojas/Concorrência e para descobrir criadores a recrutar.
 - Ordenar por GMV revela os "top sellers" de afiliados de cada loja, cruzável com a lista de criadores.
 

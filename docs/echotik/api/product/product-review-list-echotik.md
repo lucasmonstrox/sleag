@@ -68,7 +68,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` (e HTTP 20
 - `page_size` máx. 10.
 - Notas são inteiras (0–5), sem casas decimais.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - **Análise de sentimento / prova social** na página de detalhe do produto.
 - Insight de produto: entender por que um item vende (ou não) — objeções, elogios recorrentes.
 - Uso secundário comparado a vendas/criativos, mas útil para validação de produtos vencedores.

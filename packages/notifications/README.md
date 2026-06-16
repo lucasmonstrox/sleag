@@ -1,6 +1,6 @@
 # @workspace/notifications
 
-Adapter de canal de notificação **provider-agnóstico** para os alertas da TIKSPY.
+Adapter de canal de notificação **provider-agnóstico** para os alertas da SLEAG.
 O motor (apps/worker) e o webhook receiver (apps/api) falam só com esta camada — qual
 gateway WhatsApp está por trás é decisão de **env**, não de código.
 
@@ -10,7 +10,7 @@ gateway WhatsApp está por trás é decisão de **env**, não de código.
 import { getWhatsappChannel } from "@workspace/notifications"
 
 const channel = getWhatsappChannel()           // seleciona por WHATSAPP_PROVIDER
-const result = await channel.sendText("5511999999999", "TIKSPY: Fone ANC X12 virou emergente 🚀")
+const result = await channel.sendText("5511999999999", "SLEAG: Fone ANC X12 virou emergente 🚀")
 if (result.ok) {
   // result.providerMessageId (wamid) → notification_deliveries.provider_message_id
 }
@@ -21,7 +21,7 @@ if (result.ok) {
 | valor | comportamento | env extra |
 |---|---|---|
 | `log` (default) | **dry-run** — só loga, não envia. Seguro pra dev/CI. | — |
-| `evolution` | envia via Evolution API (não-oficial) | `EVOLUTION_API_URL`, `EVOLUTION_API_KEY`, `EVOLUTION_INSTANCE` (default `tikspy-alerts`) |
+| `evolution` | envia via Evolution API (não-oficial) | `EVOLUTION_API_URL`, `EVOLUTION_API_KEY`, `EVOLUTION_INSTANCE` (default `sleag-alerts`) |
 | `cloud-api` | WhatsApp Cloud API oficial — **stub**, ainda não implementado | (futuro: BSP 360dialog/Twilio) |
 
 > Default é `log` de propósito: mesmo princípio do `MARKET_DATA_SOURCE=mock` na apps/api —

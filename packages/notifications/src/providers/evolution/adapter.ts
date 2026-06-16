@@ -2,9 +2,9 @@ import type { ChannelHealth, DeliveryResult, NotificationChannel } from "../../c
 import { normalizePhone } from "../../format"
 import { connectionState as evoConnectionState, sendText as evoSendText } from "./client"
 
-/** Nome da instância única da TIKSPY (broadcast). Override por env. */
+/** Nome da instância única da SLEAG (broadcast). Override por env. */
 function instance(): string {
-  return process.env.EVOLUTION_INSTANCE ?? "tikspy-alerts"
+  return process.env.EVOLUTION_INSTANCE ?? "sleag-alerts"
 }
 
 export const evolutionChannel: NotificationChannel = {

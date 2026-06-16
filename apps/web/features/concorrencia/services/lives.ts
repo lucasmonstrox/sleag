@@ -11,7 +11,7 @@ export const getLives = cache(async () => {
   })
   if (error) {
     throw new Error(
-      `API do TIKSPY indisponível (status ${String(error.status)}) — suba o apps/api com \`bun dev\``,
+      `API do SLEAG indisponível (status ${String(error.status)}) — suba o apps/api com \`bun dev\``,
     )
   }
   return data

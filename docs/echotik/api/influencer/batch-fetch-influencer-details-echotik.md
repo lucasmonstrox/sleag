@@ -143,7 +143,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - Mesmas ressalvas da List: GMV estimado, avatares expiram, IDs em string, campos JSON-em-string.
 - Para histórico use `influencer/trend`; este endpoint dá o estado atual (T+1).
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Endpoint de **hidratação em lote** de criadores monitorados/favoritados, sem custo de varrer a List.
 - Útil para sincronizar a base local de criadores acompanhados pelo usuário (até 10 por chamada).
 

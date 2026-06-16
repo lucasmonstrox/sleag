@@ -99,7 +99,7 @@ A resposta tem **aninhamento `data.data`**: o objeto bruto da LiveRoom do TikTok
 - URLs de avatar são assinadas e expiram (`x-expires`).
 - Tempo-real: `code=500` → retry; sem QPS alto.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - **Monitor de lives ao vivo:** base para um painel que acompanha transmissões em andamento (espectadores, ritmo de engajamento).
 - Por depender da live estar no ar e do par de IDs, é recurso pontual/avançado — provável segunda onda, após os fluxos de produtos/criativos do dashboard.
 

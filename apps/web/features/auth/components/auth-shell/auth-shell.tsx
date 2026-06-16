@@ -33,7 +33,7 @@ export function AuthShell({
               <CrosshairIcon className="size-5" />
             </div>
             <span className="font-heading text-lg font-semibold tracking-[0.2em]">
-              TIKSPY
+              SLEAG
             </span>
           </div>
 

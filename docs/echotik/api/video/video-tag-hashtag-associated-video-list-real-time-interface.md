@@ -80,7 +80,7 @@ A página declara o schema apenas como `object`; pelo **Example**, `data` traz:
 - `code=500` = risk control → retry com backoff. Sem QPS alto.
 - Requer descobrir o `hashtag_id` antes (não aceita o texto da hashtag diretamente).
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Permite explorar criativos por hashtag/tendência de tema em tempo real, complementando os rankings offline por região.
 - Útil para monitorar campanhas/tags específicas e descobrir criadores que aderiram a uma trend.
 

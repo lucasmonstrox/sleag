@@ -41,7 +41,7 @@ export function AppSidebar({ user }: { user: SessionUser }) {
                   </div>
                   <div className="grid flex-1 text-left leading-tight">
                     <span className="font-heading text-sm font-semibold tracking-[0.2em]">
-                      TIKSPY
+                      SLEAG
                     </span>
                     <span className="text-xs text-muted-foreground">
                       TikTok Shop Intel

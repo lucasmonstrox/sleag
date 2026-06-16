@@ -95,7 +95,7 @@ A página declara o schema apenas como `object`; pelo **Example**, `data` traz `
 - `create_time` é **integer** (segundos). Avatares (`avatar_thumb.url_list`) trazem `x-expires`/`x-signature` e **expiram**.
 - `code=500` = risk control → retry com backoff. Sem QPS alto.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Completa a análise de comentários de um criativo: além do comentário-topo, ler o sub-thread (dúvidas respondidas, interações do criador com a audiência).
 - Útil para entender objeções de compra e respostas do vendedor em criativos de TikTok Shop.
 

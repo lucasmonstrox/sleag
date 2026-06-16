@@ -83,7 +83,7 @@ Ordem conforme o exemplo oficial da EchoTik:
 - `region` vazio = sem filtro (cuidado para não misturar mercados sem querer).
 - Este endpoint é Offline (T+1, dados do índice EchoTik) — diferente das interfaces `/realtime/...` que consultam o TikTok ao vivo.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Candidato natural para o campo de busca global do app (autocomplete unificado de criador/produto/loja/vídeo/live).
 - Para listas paginadas e métricas completas (ex: tabela de produtos mais vendidos do dashboard), prefira os endpoints de listagem/detalhe específicos; esta busca é para "achar rápido", não para relatórios.
 

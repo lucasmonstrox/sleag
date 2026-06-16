@@ -76,7 +76,7 @@ Envelope real: `{ code, message, data, requestId }` — `code = 0` = sucesso (no
 - `extra.now` está em **milissegundos**; demais timestamps do conjunto influencer costumam ser em segundos.
 - Identificação por `user_id` (não por handle).
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Recurso utilitário/de UI: gerar QR para compartilhar/abrir o perfil de um criador.
 - Periférico em relação ao core de dados (ranking/criativos/produtos); baixa prioridade.
 

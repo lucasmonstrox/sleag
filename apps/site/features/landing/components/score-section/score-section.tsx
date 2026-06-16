@@ -7,7 +7,7 @@ export function ScoreSection() {
       <div className="mx-auto max-w-4xl px-6">
         <SectionHeading
           align="center"
-          kicker="// a prova — score tikspy"
+          kicker="// a prova — score sleag"
           title={
             <>
               Demanda × concorrência × retorno.{" "}

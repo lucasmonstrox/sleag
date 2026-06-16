@@ -142,7 +142,7 @@ A resposta é o payload bruto da busca de vídeos do TikTok (canal `musically_vi
 - URLs de avatar/capa são assinadas e expiram (`x-expires`); não cacheie a URL crua.
 - Muito campo de UI/AB (`global_doodle_config`, `feedback_survey`) ignorável.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Alimenta pesquisa de vídeos e, combinado com `sort_type=1` + `publish_time` curto, ajuda a achar "criativos em alta" — uma das métricas-chave do dashboard.
 - Ponto de entrada para depois cruzar com produtos/criadores associados a cada vídeo.
 

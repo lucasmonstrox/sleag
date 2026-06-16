@@ -85,7 +85,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` (e HTTP 20
 - As janelas `_1d/_7d/_30d` são incrementos do período, úteis para detectar aceleração; `total_*_cnt` sem sufixo é o acumulado.
 - Cobertura parcial: nem todo vídeo do TikTok está aqui. `page_size` máx 10 — paginação obrigatória para volume.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Base direta da listagem `/videos`: filtros (região, duração, views, IA, anúncio), ordenação (`video_sort_field`/`sort_type`), título via `video_desc`, GMV/vendas estimadas e janelas de views.
 - As janelas `total_views_1d/7d/30d_cnt` e `total_digg_*` alimentam a deteção de aceleração ("Criativos em alta").
 - `sales_flag` e `video_products` distinguem criativos de venda (TikTok Shop) dos orgânicos.

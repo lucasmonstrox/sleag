@@ -20,7 +20,7 @@ Retorna a lista de produtos de uma loja **em tempo real**, espelhando o feed nat
 |---|---|---|---|---|
 | `seller_id` | string | **Sim** | id da loja (ex.: `7495045046260173699`) | Loja-alvo. |
 | `offset` | string | Não | vazio na 1ª chamada; depois `next_scroll_param` | Cursor de paginação. Deixe em branco na primeira chamada; quando `data.has_more=true`, use o `data.next_scroll_param` retornado para buscar a próxima página. |
-| `region` | string | **Sim** | `US`, `GB`, `DE`, `FR`, `IT`, `ID`, `MY`, `MX`, `PH`, `SG`, `ES`, `TH`, `VN`, `BR`, `JP`, `IE` | Região do mercado. Para o TIKSPY: `BR`. |
+| `region` | string | **Sim** | `US`, `GB`, `DE`, `FR`, `IT`, `ID`, `MY`, `MX`, `PH`, `SG`, `ES`, `TH`, `VN`, `BR`, `JP`, `IE` | Região do mercado. Para o SLEAG: `BR`. |
 
 ### Exemplo de chamada
 ```bash
@@ -78,7 +78,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - URLs de imagem em `url_list` são **CDN com query assinada** — podem expirar.
 - `region` aceita lista fixa de 16 mercados, incluindo `BR`.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Permite mostrar o **catálogo ao vivo** de uma loja (preço atual, desconto, flash sale, frete grátis, rating, "X sold") — ideal para a página de loja em tempo real, validando o que o cliente vê no app.
 - Complementa o endpoint offline `echotik/seller/product/list`: offline traz métricas históricas de GMV/vendas; este traz o **estado de venda agora** (preço/promo/selos).
 - `pdp_schema`/`now_buy_button.jump_schema` dão links diretos para o produto no TikTok.

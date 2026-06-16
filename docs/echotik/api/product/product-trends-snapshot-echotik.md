@@ -52,7 +52,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` (e HTTP 20
 - `page_size` máx. 10 → para 180 dias serão 18 páginas.
 - Dado T+1.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - **Gráfico de evolução de um produto** na página de detalhe do produto (vendas/GMV ao longo do tempo).
 - Detectar momentum / produtos "estourando" comparando incrementos diários recentes.
 - Insumo para timelines do dashboard de mercado (produtos mais vendidos com histórico).

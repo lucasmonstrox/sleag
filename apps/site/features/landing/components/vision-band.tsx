@@ -6,7 +6,7 @@ export function VisionBand() {
           <span className="block text-zinc-700">Todo mundo assiste aos mesmos vídeos.</span>
           <span className="block text-zinc-700">Quase ninguém vê o que eles vendem.</span>
           <span className="block text-white">
-            O TIKSPY vê. <span className="text-[#25f4ee]">Antes.</span>
+            O SLEAG vê. <span className="text-[#25f4ee]">Antes.</span>
           </span>
         </div>
       </div>

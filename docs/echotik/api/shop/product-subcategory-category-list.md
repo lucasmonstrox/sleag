@@ -45,7 +45,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - Dado de dimensão estável: **cachear** localmente. A árvore completa = l1 + l2 (por `parent_id`) + l3 (por `parent_id`).
 - Sem paginação explícita na spec.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Compõe o terceiro/último nível do filtro de categoria em cascata (Produtos / Lojas / Concorrência).
 - Resolve `category_l3_id` para nome exibível, completando o dicionário que elimina o `category: "—"` no mapper.
 

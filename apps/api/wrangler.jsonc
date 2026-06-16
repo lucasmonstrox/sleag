@@ -2,13 +2,13 @@
 // Rodar local: bunx wrangler dev (lê o .env para segredos).
 // Sem `hyperdrive`: a API é toda HTTP (supabase-js + fetch), nativa no workerd.
 {
-  "name": "tikspy-api",
+  "name": "sleag-api",
   "main": "src/worker.ts",
   "compatibility_date": "2026-06-01",
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
     // Origem do app web (CORS). Ajustar para o domínio custom quando existir.
-    "CORS_ORIGIN": "https://tikspy-web.joao-galiano-silva.workers.dev"
+    "CORS_ORIGIN": "https://sleag-web.joao-galiano-silva.workers.dev"
   },
   "dev": {
     "port": 8787

@@ -110,7 +110,7 @@ export function NovaRegraDialog() {
         <DialogHeader>
           <DialogTitle>Nova regra de alerta</DialogTitle>
           <DialogDescription>
-            Defina a condição e os canais — o TIKSPY avisa quando o mercado se mexer.
+            Defina a condição e os canais — o SLEAG avisa quando o mercado se mexer.
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-5">

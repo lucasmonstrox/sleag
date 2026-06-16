@@ -143,7 +143,7 @@ export function CanaisCard({ canais }: { canais: CanalNotificacao[] }) {
                   </button>
                 )}
                 <p className="text-xs text-muted-foreground/80">
-                  Aceito receber alertas do TIKSPY por WhatsApp neste número. Confirmo respondendo
+                  Aceito receber alertas do SLEAG por WhatsApp neste número. Confirmo respondendo
                   SIM e posso cancelar respondendo PARAR a qualquer momento.
                 </p>
               </div>

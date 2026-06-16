@@ -8,7 +8,7 @@ export function SiteFooter() {
         <div className="flex flex-wrap items-start justify-between gap-10">
           <div>
             <p className="tt-glitch-soft font-mono text-lg font-extrabold tracking-tighter">
-              TIKSPY
+              SLEAG
             </p>
             <p className="mt-2 font-mono text-xs text-zinc-500">
               // o dinheiro deixa rastro
@@ -30,7 +30,7 @@ export function SiteFooter() {
 
         <p className="mt-10 text-[11px] leading-relaxed text-zinc-600">
           Plataforma independente, sem vínculo com o TikTok ou a ByteDance. Métricas exibidas são
-          estimativas sobre dados públicos. © 2026 TIKSPY · Feito no Brasil.
+          estimativas sobre dados públicos. © 2026 SLEAG · Feito no Brasil.
         </p>
       </div>
 
@@ -39,7 +39,7 @@ export function SiteFooter() {
           className="tt-outline font-display pointer-events-none mt-6 -mb-[0.22em] text-center text-[22vw] leading-none font-extrabold tracking-tight uppercase opacity-50 select-none"
           aria-hidden
         >
-          TIKSPY
+          SLEAG
         </p>
       </Parallax>
     </footer>

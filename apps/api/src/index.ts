@@ -245,7 +245,7 @@ export const app = new Elysia(
 // importado pelo worker.ts (workerd) ou pelo Eden (tipos), não escuta porta.
 if (import.meta.main) {
   app.listen(PORT)
-  console.log(`[api] TIKSPY API rodando em http://localhost:${PORT}`)
+  console.log(`[api] SLEAG API rodando em http://localhost:${PORT}`)
 }
 
 export type App = typeof app

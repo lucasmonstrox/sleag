@@ -1,5 +1,5 @@
 /**
- * Entry do tikspy-worker (Cloudflare Workers / workerd).
+ * Entry do sleag-worker (Cloudflare Workers / workerd).
  *
  * Um único script reúne os 3 primitivos:
  *   - Cron Trigger  → schedules no binding do Workflow (wrangler.jsonc), cria
@@ -8,7 +8,7 @@
  *   - Queue         → consumer whatsapp-send (handler `queue`, max_concurrency:1).
  *
  * Substitui integralmente o Trigger.dev. Disparo manual (ops): `wrangler workflows
- * trigger tikspy-evaluate-alerts`.
+ * trigger sleag-evaluate-alerts`.
  */
 import type { MessageBatch } from "@cloudflare/workers-types"
 

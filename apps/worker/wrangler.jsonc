@@ -1,15 +1,15 @@
-// tikspy-worker: motor de alertas no Cloudflare Workers (workerd).
+// sleag-worker: motor de alertas no Cloudflare Workers (workerd).
 // Cron (Workflow schedules) + Workflow durável + Queue serializada.
 // Local: bunx wrangler dev (lê .env). Deploy: bunx wrangler deploy.
 {
-  "name": "tikspy-worker",
+  "name": "sleag-worker",
   "main": "src/index.ts",
   "compatibility_date": "2026-06-01",
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
   "workflows": [
     {
-      "name": "tikspy-evaluate-alerts",
+      "name": "sleag-evaluate-alerts",
       "binding": "ALERTS_WORKFLOW",
       "class_name": "EvaluateAlertsWorkflow",
       // Cron diário: 09:30 UTC (T+1, 30min após o sync de mercado planejado).

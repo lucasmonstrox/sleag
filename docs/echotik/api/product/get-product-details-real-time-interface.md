@@ -65,7 +65,7 @@ Confirmado pela página: este endpoint **não retorna um schema normalizado pela
 - **`data` é passthrough do page-state do TikTok**, não um schema EchoTik — exige parsing e é frágil a mudanças do TikTok.
 - Mais caro/instável que o detalhe offline (`batch-fetch-product-details`); use só quando precisar de frescor (preço/estoque atuais).
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - **Frescor sob demanda** na página de detalhe do produto: preço/disponibilidade atuais quando o T+1 não basta.
 - Uso secundário/pontual — o grosso da análise vem dos endpoints offline; este é fallback "ao vivo".
 

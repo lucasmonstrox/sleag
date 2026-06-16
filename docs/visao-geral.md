@@ -1,12 +1,12 @@
-# TIKSPY — Visão Geral
+# SLEAG — Visão Geral
 
 > **"Descubra onde o dinheiro está antes dos outros."**
 
 ## O que é
 
-O **TIKSPY** é uma plataforma de inteligência de mercado para o ecossistema do **TikTok Shop**. Ela monitora continuamente dados de vendas, produtos, criativos e afiliados, e transforma esses dados em **oportunidades acionáveis** — apontando o que está vendendo, o que está começando a crescer e o que ainda vale a pena explorar.
+O **SLEAG** é uma plataforma de inteligência de mercado para o ecossistema do **TikTok Shop**. Ela monitora continuamente dados de vendas, produtos, criativos e afiliados, e transforma esses dados em **oportunidades acionáveis** — apontando o que está vendendo, o que está começando a crescer e o que ainda vale a pena explorar.
 
-Em uma frase: o TIKSPY mostra **onde o dinheiro está sendo gerado agora**, antes que o mercado inteiro perceba.
+Em uma frase: o SLEAG mostra **onde o dinheiro está sendo gerado agora**, antes que o mercado inteiro perceba.
 
 ## O problema
 
@@ -21,7 +21,7 @@ A informação existe, mas está espalhada, crua e fora de alcance. Quem descobr
 
 ## A solução
 
-O TIKSPY centraliza e processa esses dados, entregando inteligência pronta para decisão. A plataforma se apoia em quatro grandes capacidades:
+O SLEAG centraliza e processa esses dados, entregando inteligência pronta para decisão. A plataforma se apoia em quatro grandes capacidades:
 
 ### 1. Descoberta de produtos
 Identifica tanto os produtos que **já estão explodindo** quanto os **emergentes** — aqueles que ainda não viraram febre, mas cujos números indicam que vão virar. É aqui que mora a maior vantagem competitiva: chegar antes.
@@ -33,7 +33,7 @@ Permite entender **o que os melhores estão fazendo**: quais produtos promovem, 
 Nem toda tendência é oportunidade. A plataforma cruza **demanda e concorrência** para classificar mercados (oportunidade vs. saturado), estima retorno potencial e consolida tudo em um **score proprietário** que resume o potencial de cada produto.
 
 ### 4. Monitoramento contínuo e alertas
-Tendências nascem e morrem rápido. O TIKSPY acompanha múltiplas plataformas de conteúdo e venda simultaneamente, cruza tendências de conteúdo com tendências de venda e **avisa o usuário** quando algo relevante acontece — criando um hábito diário de uso.
+Tendências nascem e morrem rápido. O SLEAG acompanha múltiplas plataformas de conteúdo e venda simultaneamente, cruza tendências de conteúdo com tendências de venda e **avisa o usuário** quando algo relevante acontece — criando um hábito diário de uso.
 
 ## Para quem
 
@@ -43,9 +43,9 @@ Tendências nascem e morrem rápido. O TIKSPY acompanha múltiplas plataformas d
 
 ## Posicionamento
 
-O TIKSPY **não vende cursos, não vende promessas e não ensina a vender**. Ele entrega dados transformados em oportunidade — um instrumento de decisão, não de motivação.
+O SLEAG **não vende cursos, não vende promessas e não ensina a vender**. Ele entrega dados transformados em oportunidade — um instrumento de decisão, não de motivação.
 
-| O que o TIKSPY não é | O que o TIKSPY é |
+| O que o SLEAG não é | O que o SLEAG é |
 |---|---|
 | Curso ou mentoria | Ferramenta de inteligência de mercado |
 | Promessa de enriquecimento | Dados reais de venda, em tempo real |
@@ -61,4 +61,4 @@ SaaS por assinatura mensal, em planos escalonados: dos recursos essenciais de de
 
 ---
 
-*Este documento é a porta de entrada da documentação do TIKSPY. O detalhamento de cada módulo, dos planos e da arquitetura será feito em documentos específicos dentro de `docs/`.*
+*Este documento é a porta de entrada da documentação do SLEAG. O detalhamento de cada módulo, dos planos e da arquitetura será feito em documentos específicos dentro de `docs/`.*

@@ -16,7 +16,7 @@
 - Endpoints **"- EchoTik"** = biblioteca **offline T+1** (atualização diária). Estáveis, ideais para listas/rankings.
 - Endpoints **"Real-time Interface"** = puxam direto do TikTok. ⚠️ Sujeitos a **risk control**; se vier `code=500`, **retry**. Não suportam QPS alto.
 
-## Destaques para o TIKSPY
+## Destaques para o SLEAG
 
 | Feature do produto | Endpoint a usar |
 |---|---|

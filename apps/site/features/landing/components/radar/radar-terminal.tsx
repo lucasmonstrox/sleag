@@ -56,7 +56,7 @@ export function RadarTerminal({ frameless = false }: RadarTerminalProps) {
           <span className="size-2.5 rounded-full bg-[#ffb224]/80" aria-hidden />
           <span className="size-2.5 rounded-full bg-[#25f4ee]/80" aria-hidden />
           <span className="ml-2 truncate font-mono text-xs text-zinc-500">
-            tikspy://radar — monitoramento de alta frequência
+            sleag://radar — monitoramento de alta frequência
           </span>
           <span className="ml-auto flex items-center gap-1.5 font-mono text-[10px] font-bold text-[#25f4ee]">
             <span className="tt-pulse-dot size-1.5 rounded-full bg-[#25f4ee]" aria-hidden />

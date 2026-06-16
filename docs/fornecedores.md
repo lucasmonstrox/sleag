@@ -1,4 +1,4 @@
-# Fornecedores e Serviços Externos — TIKSPY
+# Fornecedores e Serviços Externos — SLEAG
 
 **Data:** 2026-06-10
 **Status:** Registro vivo de fornecedores de dados e serviços externos (o que usamos, o que avaliamos, o que descartamos)
@@ -80,7 +80,7 @@ Levantamento de 2026-06-10. Nenhuma API oficial entrega dados de mercado de terc
 
 - **Docs:** https://partner.tiktokshop.com/docv2/page/rate-limits
 - **Cobre:** produtos, pedidos, fulfillment, finanças, devoluções, promoções, afiliados, atendimento e webhooks — **somente de lojas que autorizaram o app via OAuth**.
-- **Uso no TIKSPY:** alimenta o `/desempenho` (operação própria do cliente), nunca o Radar.
+- **Uso no SLEAG:** alimenta o `/desempenho` (operação própria do cliente), nunca o Radar.
 - **Opcional:** conectar/configurar a loja do TikTok Shop **não é obrigatório**. Toda a inteligência de mercado (Radar, Dashboard) funciona sem nenhuma loja conectada — a conexão via OAuth só desbloqueia o `/desempenho` (operação própria). Sem ela, o cliente usa o produto normalmente, apenas sem a camada de dados da própria operação.
 - **Rate limit:** QPS **dinâmico** por `App ID × loja autorizada` — cresce com o número de lojas autorizadas; leituras ganham quota maior que escritas. Não há API para consultar a quota. Estouro → HTTP 429; retry com exponential backoff + jitter (1s dobrando até 60s). 503 = sobrecarga do backend, não rate limit. Para picos (datas de promoção), acionar o Account Manager antes.
 
@@ -88,12 +88,12 @@ Levantamento de 2026-06-10. Nenhuma API oficial entrega dados de mercado de terc
 
 - **Cobre:** perfil e vídeos do usuário autenticado (`/v2/user/info/`, `/v2/video/list/`, `/v2/video/query/`).
 - **Rate limit:** **600 req/min por endpoint**, janela deslizante de 1 min; 429 com `rate_limit_exceeded`; aumento negociável via suporte.
-- **Uso no TIKSPY:** enriquecer criativos já identificados (metadados públicos de vídeo) e feature "conecte sua conta".
+- **Uso no SLEAG:** enriquecer criativos já identificados (metadados públicos de vídeo) e feature "conecte sua conta".
 
 ### 2.3 Content Posting API
 
 - **Cobre:** publicar/agendar conteúdo em nome do usuário. ~**6 req/min por usuário**; apps não auditados só postam privado.
-- **Uso no TIKSPY:** nenhum no MVP.
+- **Uso no SLEAG:** nenhum no MVP.
 
 ### 2.4 Research API — **inelegível** ❌
 

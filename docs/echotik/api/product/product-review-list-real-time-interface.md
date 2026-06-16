@@ -109,7 +109,7 @@ Confirmado pela página renderizada (Example real abaixo). `data` é um objeto c
 - `review_timestamp` vem em **milissegundos como string**; URLs de imagem/avatar **expiram** (`x-expires`).
 - Vários campos trazem deep-links `aweme://` (abrem no app TikTok), não URLs web.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - **Reviews frescos** na página de detalhe do produto quando o offline (`product-review-list-echotik`) ainda não indexou.
 - Uso secundário: o offline cobre a maioria dos casos; este é para frescor/cobertura adicional de sentimento.
 

@@ -162,7 +162,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - `page_size` máximo é **10**; para varrer muitos criadores, itere `page_num`.
 - `gender` só é confiável na região US.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - É o motor da área de **Criadores/concorrência**: alimenta ranking de criadores, filtros por nicho/seguidores/GMV e prospecção em massa.
 - Combinado com `region=BR` e `influencer_sort_field_v2`, monta as listas de "criadores em alta" do mercado brasileiro.
 

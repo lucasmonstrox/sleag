@@ -60,7 +60,7 @@ Envelope real: `{ code, message, data, requestId }` — `code = 0` = sucesso (aq
 - Aceita tanto link curto (`vt.tiktok.com`) quanto completo (`www.tiktok.com/@user/video/ID`).
 - Real-time: sujeito a risk control; em erro, retry.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Resolve as capas/vídeos que os outros endpoints entregam como links expiráveis (`reflow_cover`, `avatar`, `play_addr`) — é o caminho oficial para exibir/armazenar a mídia dos criativos com estabilidade.
 - `no_watermark_download_url` e `dynamic_cover_url` permitem previews ricos (capa animada) nos cards de "Criativos em alta" e na página de detalhe do vídeo.
 

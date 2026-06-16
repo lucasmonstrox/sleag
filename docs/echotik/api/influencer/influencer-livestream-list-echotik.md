@@ -87,7 +87,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - `total_sale_gmv_amt` é **number** (pode ter decimais); `total_sale_cnt` é integer. Ambos **estimados**.
 - `room_id` e `user_id` vêm como **string**.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Alimenta a aba de **lives por criador** dentro da ficha de criador (histórico de transmissões e conversão).
 - Secundário frente a vídeos/produtos, mas relevante para nichos fortes em live commerce.
 

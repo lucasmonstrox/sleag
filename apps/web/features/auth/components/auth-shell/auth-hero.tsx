@@ -61,7 +61,7 @@ export function AuthHero() {
           <CrosshairIcon className="size-5" />
         </div>
         <span className="font-heading text-base font-semibold tracking-[0.25em]">
-          TIKSPY
+          SLEAG
         </span>
       </div>
 

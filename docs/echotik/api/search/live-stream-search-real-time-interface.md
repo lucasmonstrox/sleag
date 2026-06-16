@@ -106,7 +106,7 @@ A resposta é o payload bruto da busca de lives do TikTok. Note o aninhamento `d
 - Por ser live (estado volátil), os resultados refletem o momento da chamada — sem histórico.
 - URLs de avatar/capa são assinadas e expiram (`x-expires`).
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Alimenta pesquisa de lives (descobrir transmissões ativas em torno de um termo/nicho).
 - Secundário em relação a produto/criador; útil para monitoramento de lives de venda em tempo-real.
 

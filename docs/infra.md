@@ -1,4 +1,4 @@
-# Infraestrutura e Arquitetura Técnica — TIKSPY
+# Infraestrutura e Arquitetura Técnica — SLEAG
 
 **Data:** 2026-06-09
 **Status:** Documento de arquitetura (decisões fundantes + roadmap MVP enxuto → escala)
@@ -10,7 +10,7 @@
 
 ## 1. Princípios de Arquitetura
 
-O TIKSPY é um SaaS de inteligência de mercado para o ecossistema do TikTok Shop. A infraestrutura é guiada por quatro princípios:
+O SLEAG é um SaaS de inteligência de mercado para o ecossistema do TikTok Shop. A infraestrutura é guiada por quatro princípios:
 
 1. **MVP enxuto → escala.** Começar barato e rápido de validar; só pagar por infra dedicada quando o volume e a margem justificarem.
 2. **Barato de validar.** Maximizar *free tiers* e serviços *scale-to-zero* (Neon, Vercel, Upstash, Inngest). O gasto dominante no MVP deve ser a **aquisição de dados** — exatamente o que se quer medir na validação — e não a plataforma.
@@ -23,7 +23,7 @@ O ponto mais crítico e de maior risco **não é tecnológico, é de fonte de da
 
 > **A API oficial do TikTok Shop (Partner / Affiliate / Seller API) é escopada à conta/loja autorizada via OAuth.** Ela entrega dados da *sua* loja (produtos, pedidos, inventário, finanças, performance de afiliado próprio) e permite *busca de criadores no marketplace por GMV/keywords/demografia* e *busca de produtos com colaboração aberta*. **Mas NÃO entrega inteligência competitiva ampla** — não há endpoint de "todos os produtos vendendo no mercado", GMV de lojas concorrentes, ranking de virais cross-market ou criativos de terceiros.
 
-Logo, o **núcleo do TIKSPY** (descoberta de produtos explodindo/emergentes de terceiros, espionagem competitiva de criativos, SCORE proprietário) **depende de dados públicos coletados** — via **dados de terceiros** (EchoTik/Kalodata/FastMoss/Apify) ou **scraping próprio**. Ambos carregam risco de ToS, anti-bot e LGPD que precisa de mitigação arquitetural e jurídica.
+Logo, o **núcleo do SLEAG** (descoberta de produtos explodindo/emergentes de terceiros, espionagem competitiva de criativos, SCORE proprietário) **depende de dados públicos coletados** — via **dados de terceiros** (EchoTik/Kalodata/FastMoss/Apify) ou **scraping próprio**. Ambos carregam risco de ToS, anti-bot e LGPD que precisa de mitigação arquitetural e jurídica.
 
 > **Observação de posicionamento (compliance, não opcional).** Todos os fornecedores de dados de terceiros entregam **estimativas** de canais públicos; nenhum garante 100% de acurácia (a própria Kalodata admite variação e desaconselha uso de alta precisão, ficando ~12–15% atrás em GMV de live). O copy "**dados reais de venda em tempo real**" é juridicamente arriscado. Use algo defensável como "**estimativas de venda em tempo quase real**".
 
@@ -115,7 +115,7 @@ Esta é a decisão fundante. Apresentamos as opções e recomendamos uma — **a
 
 **Creative Center + Commercial Content API — camada complementar.** O **Creative Center** (`ads.tiktok.com/business/creativecenter`) é **gratuito, sem login**, com "Top Products" e "Top Ads" filtráveis por região/categoria/período — excelente **semente de tendências de criativo**. Porém **não tem API** (só UI). A **Commercial Content API** é oficial para metadados de anúncios, mas **exige aplicação/aprovação** (~2 dias úteis) e **cobre só dados de anúncios da UE** nesta fase — não é acesso aberto, e cobre ads, não GMV orgânico.
 
-**Dados de terceiros — a via pragmática para o MVP.** Já resolveram o scraping em escala e entregam a visão de mercado que o TIKSPY precisa. **EchoTik** tem **API formal documentada** (`echotik.live/en/api-service`): endpoints de Creator, Video, Live, Product, Shop e Market Trends; **100 chamadas grátis** para teste; custo por requisição tão baixo quanto **¥0,001 no plano anual**. FastMoss e Kalodata oferecem API enterprise (custom). **Apify** tem actors prontos de TikTok Shop (~US$2–10/1.000 resultados — trate como ordem de grandeza, varia por actor).
+**Dados de terceiros — a via pragmática para o MVP.** Já resolveram o scraping em escala e entregam a visão de mercado que o SLEAG precisa. **EchoTik** tem **API formal documentada** (`echotik.live/en/api-service`): endpoints de Creator, Video, Live, Product, Shop e Market Trends; **100 chamadas grátis** para teste; custo por requisição tão baixo quanto **¥0,001 no plano anual**. FastMoss e Kalodata oferecem API enterprise (custom). **Apify** tem actors prontos de TikTok Shop (~US$2–10/1.000 resultados — trate como ordem de grandeza, varia por actor).
 
 **Scraping próprio — moat de escala, não MVP.** O TikTok é classificado **"Very Hard" (5/5)** em anti-bot: WAF customizado, fingerprint de dispositivo/TLS, "device integrity", ML comportamental, fraud scoring em tempo real, headers criptografados. Bloqueia IPs de datacenter facilmente; exige **proxies residenciais/móveis** + browser headless stealth; volume seguro ~100–200 perfis/dia por IP. O ToS proíbe scraping explicitamente (Seção 3.4 do ToS US: *"scrape, crawl, export or otherwise extract any data or content ... using any automated system ... except as approved in writing"*). `robots.txt` bloqueia `/shop/view/product/`, `/search`, etc.
 
@@ -127,7 +127,7 @@ Esta é a decisão fundante. Apresentamos as opções e recomendamos uma — **a
 
 **Escala — evolua em três frentes** para reduzir dependência, baixar custo unitário e ganhar dados exclusivos: (1) **pipeline de scraping próprio** fora da Vercel, começando pelas áreas de maior valor e priorizando a **cobertura BR** onde os concorrentes são fracos; (2) **API oficial "conecte sua loja"** como diferencial premium legalmente sólido; (3) **Commercial Content API** para enriquecer inteligência de anúncios. Mantenha o fornecedor de terceiro como *fallback*/baseline.
 
-> O diferencial do TIKSPY **não é a posse do dado bruto** — é o **SCORE proprietário** e o **cruzamento conteúdo × venda** em cima dele, mais a **UX em PT-BR** para o público brasileiro.
+> O diferencial do SLEAG **não é a posse do dado bruto** — é o **SCORE proprietário** e o **cruzamento conteúdo × venda** em cima dele, mais a **UX em PT-BR** para o público brasileiro.
 
 ### 3.4 Riscos legais (resumo)
 

@@ -93,7 +93,7 @@ Envelope: `{ code, message, data, requestId }` — `code = 0` (HTTP 200) = suces
 - Janela fixa de 14 dias; sem parâmetro para ajustar o período.
 - `current_interaction` traz os totais "ao vivo" (snapshot), enquanto `14d_interaction` é a série; os nomes diferem (`favorites` vs salvos).
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - **Enriquecimento de criativo:** sparkline/gráfico de crescimento mostra *quando* e *quão rápido* um vídeo viralizou — base para destacar "criativos em alta", métrica nº 1 do dashboard.
 - Insumo direto para gráfico de tendência na ficha/detalhe de um vídeo.
 

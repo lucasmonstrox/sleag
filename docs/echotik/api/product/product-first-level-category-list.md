@@ -41,7 +41,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` (e HTTP 20
 - É dado de referência estático na prática — cacheie agressivamente; não precisa rebater a cada request de produto.
 - `parent_id` em L1 não tem uso prático (a raiz não tem pai); ele existe pra manter o mesmo schema de L2/L3.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Alimenta os **filtros de categoria** de qualquer tela que liste/ranqueie produtos (descoberta, produtos em alta, concorrência).
 - Bootstrap: carregar L1 → L2 → L3 uma vez e montar o seletor de categoria em cascata da UI.
 

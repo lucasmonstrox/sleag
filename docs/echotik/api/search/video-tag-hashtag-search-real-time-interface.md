@@ -150,7 +150,7 @@ A resposta é o payload bruto da busca de challenges (hashtags) do TikTok (canal
 - `view_count`/`use_count` vêm como números grandes (int64) — pode haver perda de precisão em JS; trate como string se necessário.
 - O termo aqui é `keyword` (não `sk`); há o parâmetro `count` para tamanho de página.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Alimenta pesquisa/descoberta de hashtags em alta (`use_count`/`view_count`) para planejamento de conteúdo e tendências.
 - Secundário em relação a produto/criador; complementa análise de criativos.
 

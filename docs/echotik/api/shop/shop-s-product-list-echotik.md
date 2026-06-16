@@ -89,7 +89,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - **Strings numéricas**: `product_id`, `seller_id`, ids de categoria como string.
 - Métricas `*_1d/7d/15d/30d/60d/90d` são **incrementais**; `total_*_cnt`/`total_*_amt` (sem janela) são acumuladas. **GMV estimado**. Dado **offline T+1**.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Alimenta a aba **Produtos por loja** na área de Concorrência: ver o catálogo de um concorrente ordenado por GMV/vendas e por janela recente (7d).
 - As métricas por janela alimentam o sinal "produtos mais vendidos" do dashboard quando recortado por loja.
 - `product_id` liga ao detalhe/tendência de produto; `category_*` resolvem nomes via `category/l*`.

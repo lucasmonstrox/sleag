@@ -42,7 +42,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` (e HTTP 20
 - Dado de referência quase estático — cacheie.
 - Sem `parent_id` o volume pode ser grande; prefira sempre filtrar por L1.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Segundo nível do seletor de categoria em cascata (L1 → L2 → L3) usado nos filtros de produto/ranking/descoberta.
 - Permite drill-down de mercado por nicho (ex.: "Skincare" dentro de "Beauty").
 

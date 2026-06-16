@@ -71,7 +71,7 @@ Envelope real: `{ code, message, data, requestId }` — `code = 0` significa suc
 - `total_video_sale_cnt` e `total_video_sale_gmv_amt` vêm como **string** (e são estimativas) — parseie no cliente.
 - Janela limitada a **180 dias**; datas anteriores não retornam dados.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Alimenta o gráfico de evolução de um criativo na página de detalhe do vídeo (curva de views/vendas no tempo).
 - Combinado com `video/list`, permite confirmar aceleração real de um "Criativo em alta" olhando a inclinação da curva nos últimos dias.
 

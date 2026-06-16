@@ -1,7 +1,7 @@
 /**
  * Parsers do INBOUND do Evolution API (webhook), provider-específicos mas de shape
  * provider-agnóstico — o receiver (apps/api) consome estes e grava no Supabase sem
- * saber que veio do Evolution. Portado do menupiloto, aparado pra TIKSPY: aqui não há
+ * saber que veio do Evolution. Portado do menupiloto, aparado pra SLEAG: aqui não há
  * agente conversacional; o único inbound que importa é SIM (opt-in) / PARAR (opt-out).
  *
  * O Evolution dispara vários eventos na mesma URL. Tratamos três:
@@ -106,7 +106,7 @@ const OPT_IN_WORDS = new Set(["SIM", "CONFIRMAR", "CONFIRMO", "ACEITO"])
 
 /**
  * Detecta SIM/PARAR num `messages.upsert`. null quando não é comando reconhecido
- * (nada de conversa livre — a TIKSPY não responde mensagens, só processa opt-in/out).
+ * (nada de conversa livre — a SLEAG não responde mensagens, só processa opt-in/out).
  */
 export function parseInboundCommand(body: EvolutionWebhookBody): InboundCommandEvent | null {
   if (body.event !== "messages.upsert") return null

@@ -42,9 +42,9 @@ Envelope **`{ code, message, data }`** — atenção: este endpoint **não traz 
 - **Não consome cota** — pode ser usado livremente para hidratar thumbnails.
 - O formato exato do `data` (mapa origem→destino) não tem schema formal limpo na spec — confirme inspecionando a resposta real.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - **Pipeline de thumbnails:** essencial para exibir capas de vídeos/criativos e avatares no produto sem links quebrados — todo URL de imagem vindo da EchoTik precisa passar por aqui (ou por cache próprio) antes de ir pra UI.
-- Como os links valem 24h, vale considerar **cache/proxy próprio de imagens** no backend do TIKSPY (rebaixar e servir do nosso storage) para estabilidade e performance.
+- Como os links valem 24h, vale considerar **cache/proxy próprio de imagens** no backend do SLEAG (rebaixar e servir do nosso storage) para estabilidade e performance.
 
 ---
 

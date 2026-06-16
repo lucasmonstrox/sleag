@@ -86,7 +86,7 @@ A página declara o schema apenas como `object`; pelo **Example**, `data` traz:
 - `create_time` é **integer** (segundos). URLs de mídia trazem `x-expires`/`x-signature` e **expiram**.
 - **Risk control:** `code=500` é esperado; faça retry com backoff. Sem QPS alto.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Permite mostrar os **vídeos mais recentes ao vivo** de um criador na ficha de criador, sem o atraso T+1.
 - Secundário ao fluxo offline (que tem métricas estruturadas); usar para "últimos posts" em tempo-real.
 

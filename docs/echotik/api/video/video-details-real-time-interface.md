@@ -36,7 +36,7 @@ A página declara o schema da resposta apenas como `object` (sem lista de propri
 | `aweme_detail.ad_aweme_source` | integer | Origem/flag de anúncio do aweme. |
 | `aweme_detail.added_sound_music_info` | object | Música/áudio associado: `album`, `author`, `audition_duration`, `artists[]`, `binded_challenge_id`, `can_be_stitched`, `commercial_right_type`, e imagens (`avatar_medium`, `avatar_thumb`, `cover_large`, `cover_medium`, `cover_thumb`) — cada imagem é `{ data_size, height, width, uri, url_list[], url_prefix }`. |
 
-> O Example é muito grande e vem **truncado** na página renderizada; a estrutura segue o schema oficial do objeto `aweme` do TikTok (centenas de campos aninhados: autor, estatísticas, vídeo/playAddr, música, produtos, etc.). Inspecione um retorno real para mapear os campos exatos que o TIKSPY precisa.
+> O Example é muito grande e vem **truncado** na página renderizada; a estrutura segue o schema oficial do objeto `aweme` do TikTok (centenas de campos aninhados: autor, estatísticas, vídeo/playAddr, música, produtos, etc.). Inspecione um retorno real para mapear os campos exatos que o SLEAG precisa.
 
 ### Exemplo de resposta
 ```json
@@ -80,7 +80,7 @@ A página declara o schema da resposta apenas como `object` (sem lista de propri
 - `code=500` = risk control → faça retry com backoff. Não use QPS alto.
 - Por ser ao vivo, custa mais/conta diferente na cota do que os endpoints offline.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Fallback quando um `video_id` pesquisado não existe na base offline da EchoTik, garantindo que a página de detalhe do vídeo nunca fique vazia.
 - Estado mais fresco que o T+1 para um vídeo específico em foco.
 

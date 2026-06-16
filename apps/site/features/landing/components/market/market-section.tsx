@@ -27,7 +27,7 @@ export function MarketSection() {
         </div>
 
         <p className="mt-14 text-center font-mono text-xs text-zinc-600">
-          // as gringas não falam português — o TIKSPY nasceu aqui
+          // as gringas não falam português — o SLEAG nasceu aqui
         </p>
       </div>
     </section>

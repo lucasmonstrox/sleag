@@ -57,7 +57,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - `avatar` e `reflow_cover` exigem o fluxo de download da EchoTik (links diretos podem expirar/ter controle de acesso).
 - Dado **offline T+1**.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Alimenta a aba **Vídeos por loja** na área de Concorrência: descobrir quais criativos em vídeo geram vendas para um concorrente.
 - Cruzado com a memória "criativos em alta" do dashboard, ajuda a identificar formatos/ângulos vencedores por loja.
 

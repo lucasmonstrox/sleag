@@ -1,9 +1,9 @@
-# Evolution API — WhatsApp (alertas TIKSPY)
+# Evolution API — WhatsApp (alertas SLEAG)
 
 Gateway WhatsApp ([Evolution API](https://doc.evolution-api.com)) em Docker para
-**entregar alertas** da TIKSPY aos assinantes. Embrulha o Baileys numa REST API + manager web.
+**entregar alertas** da SLEAG aos assinantes. Embrulha o Baileys numa REST API + manager web.
 
-> **Modelo:** UM número TIKSPY (instância `tikspy-alerts`) dispara alertas para muitos
+> **Modelo:** UM número SLEAG (instância `sleag-alerts`) dispara alertas para muitos
 > assinantes — broadcast **outbound**. O assinante **não pareia nada**: só informa o número
 > + consentimento (LGPD). Inbound é mínimo (só `SIM`/`PARAR`). Nada de agente conversacional.
 
@@ -27,14 +27,14 @@ docker compose logs -f evolution-api   # acompanhar boot (Prisma roda as migrati
 - **API base:** http://localhost:8081
 - **Auth:** header `apikey: <AUTHENTICATION_API_KEY do .env>` em toda request.
 - Porta **8081** no host (8080 dentro do container) para não colidir com o Evolution do
-  menupiloto (8080) nem com a `apps/api` da TIKSPY (3333).
+  menupiloto (8080) nem com a `apps/api` da SLEAG (3333).
 
-## Parear o número TIKSPY (ação única de ops)
+## Parear o número SLEAG (ação única de ops)
 
 O pareamento é feito **uma vez**, pela equipe — não é fluxo de produto.
 
 **Pela UI (mais fácil):** abra o `/manager`, cole a apikey, **Create Instance** →
-nome `tikspy-alerts` → leia o **QR** no celular do número TIKSPY
+nome `sleag-alerts` → leia o **QR** no celular do número SLEAG
 (WhatsApp ▸ Aparelhos conectados ▸ Conectar aparelho).
 
 **Pela API:**
@@ -43,11 +43,11 @@ nome `tikspy-alerts` → leia o **QR** no celular do número TIKSPY
 # cria a instância já pedindo o QR
 curl -X POST http://localhost:8081/instance/create \
   -H "apikey: <SUA_APIKEY>" -H "Content-Type: application/json" \
-  -d '{"instanceName":"tikspy-alerts","integration":"WHATSAPP-BAILEYS","qrcode":true}'
+  -d '{"instanceName":"sleag-alerts","integration":"WHATSAPP-BAILEYS","qrcode":true}'
 
 # rega o QR de novo / estado da conexão
-curl http://localhost:8081/instance/connect/tikspy-alerts -H "apikey: <SUA_APIKEY>"
-curl http://localhost:8081/instance/connectionState/tikspy-alerts -H "apikey: <SUA_APIKEY>"
+curl http://localhost:8081/instance/connect/sleag-alerts -H "apikey: <SUA_APIKEY>"
+curl http://localhost:8081/instance/connectionState/sleag-alerts -H "apikey: <SUA_APIKEY>"
 ```
 
 O QR vem em base64 no campo `qrcode.base64` — cole num viewer de data-URL, ou use a UI.
@@ -55,16 +55,16 @@ O QR vem em base64 no campo `qrcode.base64` — cole num viewer de data-URL, ou 
 ## Enviar uma mensagem de teste
 
 ```bash
-curl -X POST http://localhost:8081/message/sendText/tikspy-alerts \
+curl -X POST http://localhost:8081/message/sendText/sleag-alerts \
   -H "apikey: <SUA_APIKEY>" -H "Content-Type: application/json" \
-  -d '{"number":"5599999999999","text":"TIKSPY: alerta de teste no ar 🚀"}'
+  -d '{"number":"5599999999999","text":"SLEAG: alerta de teste no ar 🚀"}'
 ```
 
 `number` = DDI+DDD+número, só dígitos (ex.: `55` + `11` + `9XXXXXXXX`).
 
 ## Webhook (recibos + opt-out)
 
-O `.env` já configura o **webhook global** apontando para o receiver da TIKSPY
+O `.env` já configura o **webhook global** apontando para o receiver da SLEAG
 (`WEBHOOK_GLOBAL_URL`). Em dev, o gateway roda em container e a `apps/api` no host —
 por isso o default usa `host.docker.internal:3333`. Eventos tratados:
 
@@ -86,9 +86,9 @@ O motor de alertas roda no **Trigger.dev (nuvem pública)**, então a instância
 
 - **1 VPS pequeno** (Hetzner CX22 / DigitalOcean, ~€4–6/mês) rodando este mesmo compose.
 - **Caddy** na frente para TLS automático; Evolution segue em `127.0.0.1:8080`, só o Caddy
-  escuta publicamente. Defina `SERVER_URL=https://evolution.tikspy.com`.
+  escuta publicamente. Defina `SERVER_URL=https://evolution.sleag.com`.
 - **Volume persistente** para `evolution_instances` (a sessão pareada vive aí — perder = re-parear).
   Faça backup. Evite plataformas que recriam container (scale-to-zero / redeploy) — derrubam a
   sessão e geram sinal de ban; IP de egress **estável** (de preferência no BR) protege o número.
-- `EVOLUTION_API_URL` (= URL https pública), `EVOLUTION_API_KEY` e `EVOLUTION_INSTANCE=tikspy-alerts`
+- `EVOLUTION_API_URL` (= URL https pública), `EVOLUTION_API_KEY` e `EVOLUTION_INSTANCE=sleag-alerts`
   viram env do **Trigger.dev** e da **apps/api**; re-aponte `WEBHOOK_GLOBAL_URL` para a api de prod.

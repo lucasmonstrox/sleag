@@ -25,7 +25,7 @@ export async function AlertasPage() {
     <PageShell>
       <PageHeader
         title="Alertas"
-        description="Tudo que as suas regras dispararam — o TIKSPY avisa antes dos outros."
+        description="Tudo que as suas regras dispararam — o SLEAG avisa antes dos outros."
       >
         <Badge variant="outline" className="gap-1.5 text-muted-foreground">
           <span className="size-1.5 animate-pulse rounded-full bg-emerald-400" />

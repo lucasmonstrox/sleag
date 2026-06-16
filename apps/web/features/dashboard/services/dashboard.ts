@@ -7,7 +7,7 @@ const DATA_SOURCE_HEADER = "x-data-source"
 
 function apiUnavailable(status: unknown): never {
   throw new Error(
-    `API do TIKSPY indisponível (status ${String(status)}) — suba o apps/api com \`bun dev\``,
+    `API do SLEAG indisponível (status ${String(status)}) — suba o apps/api com \`bun dev\``,
   )
 }
 

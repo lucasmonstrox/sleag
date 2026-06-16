@@ -127,7 +127,7 @@ A página declara o schema apenas como `object`; pelo **Example**, `data` traz:
 - URLs de avatar (`avatar_thumb.url_list`) trazem assinatura `x-expires`/`x-signature` e **expiram**.
 - `code=500` = risk control → retry com backoff. Sem QPS alto.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Análise de sentimento e feedback do público sobre um criativo em alta (o que funciona, objeções comuns).
 - Fornece os `comment_id` usados pelo endpoint de respostas para explorar threads completos.
 

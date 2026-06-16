@@ -114,7 +114,7 @@ A resposta é o payload bruto da busca de músicas do TikTok. Campos:
 - URLs de capa/áudio são assinadas e expiram (`x-expires`); não cacheie a URL crua.
 - `extra` é uma string JSON (precisa de segundo parse).
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Alimenta pesquisa de músicas/áudios (descobrir trilhas em alta para criativos).
 - Secundário em relação a produto/criador: útil para análise de tendências sonoras, não é métrica nº 1 do dashboard.
 

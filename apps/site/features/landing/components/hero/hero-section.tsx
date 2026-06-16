@@ -27,7 +27,7 @@ export function HeroSection() {
           </p>
           <h1 className="font-display mt-5 text-5xl leading-[1.02] font-extrabold tracking-tight text-balance md:text-7xl">
             Você vê um vídeo.
-            <br />O TIKSPY vê o <span className="text-[#25f4ee]">dinheiro.</span>
+            <br />O SLEAG vê o <span className="text-[#25f4ee]">dinheiro.</span>
           </h1>
           <p className="mt-6 max-w-md text-lg leading-relaxed text-zinc-400">
             Veja o que ninguém vê — antes de virar febre.

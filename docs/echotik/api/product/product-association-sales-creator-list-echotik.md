@@ -57,7 +57,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` (e HTTP 20
 - Os campos `category`, `total_following_cnt`, `total_live_cnt`, `total_live_views_cnt` vêm sem descrição no spec — inferidos pelo nome.
 - `page_size` máx. 10; dado T+1.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - **Descoberta de criadores** que empurram um produto vencedor → quem contatar para afiliação/parceria.
 - Concorrência: ver quais influenciadores um concorrente usa por produto.
 - Alimenta a página de detalhe do produto (aba "criadores") e cruza com a seção de influenciadores via `user_id`.

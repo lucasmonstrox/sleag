@@ -7,7 +7,7 @@ export function SiteHeader() {
         <a href="#" className="flex items-center gap-2.5">
           <span className="tt-pulse-dot size-2 rounded-full bg-[#25f4ee]" aria-hidden />
           <span className="tt-glitch-soft font-mono text-lg font-extrabold tracking-tighter">
-            TIKSPY
+            SLEAG
           </span>
         </a>
 

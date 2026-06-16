@@ -23,7 +23,7 @@ Hoje o `apps/api` (Elysia/Bun :3333) **busca da EchoTik no momento em que a tela
 
 > **A EchoTik entrega "hoje", não "a história".** Os endpoints dão o ranking do dia (`product/ranklist`) e snapshots por entidade (`product/trend`, até 180 d retroativos, por `product_id` individual). **Não há endpoint de série temporal do *mercado*.**
 
-Mas o núcleo do TIKSPY — **aceleração**, **z-score de momentum**, classificação **emergente vs saturado**, o **SCORE** ([infra.md §8](./infra.md)) — **exige uma série**. Logo a sincronização **não é cache**: é **construir o nosso próprio histórico**, um snapshot diário de cada vez, no nosso banco. Esse é o real motivo de "alimentar o banco". Sem isso, o produto nunca passa de um espelho do dia atual.
+Mas o núcleo do SLEAG — **aceleração**, **z-score de momentum**, classificação **emergente vs saturado**, o **SCORE** ([infra.md §8](./infra.md)) — **exige uma série**. Logo a sincronização **não é cache**: é **construir o nosso próprio histórico**, um snapshot diário de cada vez, no nosso banco. Esse é o real motivo de "alimentar o banco". Sem isso, o produto nunca passa de um espelho do dia atual.
 
 ### 1.3 As três forças que empurram pra persistência
 
@@ -93,7 +93,7 @@ flowchart LR
 **Leitura do diagrama.** O Trigger.dev acorda de madrugada, dispara as páginas do ranking em leque, cada uma chama a EchoTik (via `packages/market-data`), normaliza e faz `UPSERT` no Supabase; ao terminar, encadeia o cálculo de scores. O `apps/api` **nunca toca a EchoTik** — só lê o Supabase com Drizzle e serve o `apps/web` (contrato Eden inalterado).
 
 > ### ⚠️ Distinção que evita o erro de modelagem nº 1
-> **Os dados de mercado são GLOBAIS, não multi-tenant.** O ranking BR de produtos é o mesmo pra todos os clientes do TIKSPY — `products` e `*_daily_snapshots` **não levam `tenant_id` nem RLS de tenant**; são tabelas de leitura compartilhada. O **RLS por tenant** ([infra.md §7.2](./infra.md)) aplica-se às tabelas de **usuário** (contas, *watchlists*, `alert_rules`) — que são outro documento. Não misture as duas camadas.
+> **Os dados de mercado são GLOBAIS, não multi-tenant.** O ranking BR de produtos é o mesmo pra todos os clientes do SLEAG — `products` e `*_daily_snapshots` **não levam `tenant_id` nem RLS de tenant**; são tabelas de leitura compartilhada. O **RLS por tenant** ([infra.md §7.2](./infra.md)) aplica-se às tabelas de **usuário** (contas, *watchlists*, `alert_rules`) — que são outro documento. Não misture as duas camadas.
 
 ---
 

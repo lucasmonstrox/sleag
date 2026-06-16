@@ -21,7 +21,7 @@ export function FinalCtaSection() {
         </p>
         <h2 className="font-display mt-5 text-5xl font-extrabold tracking-tight text-balance md:text-6xl">
           O dinheiro deixa rastro.{" "}
-          <span className="text-zinc-500">O TIKSPY mostra o mapa.</span>
+          <span className="text-zinc-500">O SLEAG mostra o mapa.</span>
         </h2>
 
         <div className="mt-10">

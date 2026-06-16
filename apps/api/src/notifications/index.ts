@@ -11,7 +11,7 @@ import { getWhatsappChannel, isPlausibleBrazilPhone, normalizePhone } from "@wor
 
 /** Texto da mensagem de confirmação do double-opt-in (LGPD). */
 const CONFIRMATION_COPY =
-  "TIKSPY: confirme o recebimento de alertas neste número. " +
+  "SLEAG: confirme o recebimento de alertas neste número. " +
   "Responda SIM para confirmar ou PARAR para sair. Você pode cancelar quando quiser."
 
 export const notifications = new Elysia({ prefix: "/v1/notifications" }).post(

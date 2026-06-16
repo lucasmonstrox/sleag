@@ -93,7 +93,7 @@ Envelope real: `{ code, message, data, requestId }` — `code = 0` significa suc
 - `total_video_sale_gmv_amt` é `number` (admite casas decimais), diferente de outros endpoints onde é inteiro.
 - Vendas/GMV são **estimativas**; `reflow_cover` e `play_addr` **expiram**.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Liga criativos a produtos: na página de detalhe de um produto, mostrar quais vídeos o vendem; na página de um vídeo, mostrar o produto promovido.
 - `total_video_sale_*` por par vídeo↔produto sustenta o ranking de "criativos que mais vendem cada produto".
 

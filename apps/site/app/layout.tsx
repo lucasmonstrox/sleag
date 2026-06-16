@@ -22,7 +22,7 @@ const fontMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "TIKSPY — Descubra onde o dinheiro está antes dos outros",
+  title: "SLEAG — Descubra onde o dinheiro está antes dos outros",
   description:
     "Inteligência de mercado para o TikTok Shop Brasil: produtos emergentes antes do pico, score de viabilidade 0–100 e alertas de alta frequência. Dados, não promessas.",
 }

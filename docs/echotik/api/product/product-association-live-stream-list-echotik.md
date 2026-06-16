@@ -83,7 +83,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` (e HTTP 20
 - Vendas/GMV são **ESTIMATIVAS**; unidade do GMV não documentada.
 - `cover_url` pode expirar. `page_size` máx. 10; dado T+1.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Cobre o canal **live commerce** na página de detalhe do produto (aba "lives").
 - Concorrência: identificar quais hosts/lives movem um produto e o desempenho de cada sessão.
 - Descoberta de criadores de live via `user_id` (cruza com seção de influenciadores).

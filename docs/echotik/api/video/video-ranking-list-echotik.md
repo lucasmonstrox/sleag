@@ -101,7 +101,7 @@ Envelope real: `{ code, message, data, requestId }` — `code = 0` significa suc
 - Vendas/GMV são **estimativas**; thumbnails (`avatar`, `reflow_cover`) **expiram**.
 - `product_category_list` e `video_products` vêm como **string JSON** — parseie no cliente.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - **Base nº 1 de "Criativos em alta"**: `video_rank_field=1` (trending) e `=2` (vendas), em janelas diária/semanal/mensal por região, é exatamente o feed de tendências do dashboard.
 - Já entrega ranking pronto sem precisar ordenar `video/list` no cliente; título via `video_desc`, GMV via `total_video_sale_gmv_amt`, criador via `unique_id`/`nick_name`/`avatar`.
 - `product_category_id` permite a visão de tendências por categoria (ex.: "vídeos em alta em beleza").

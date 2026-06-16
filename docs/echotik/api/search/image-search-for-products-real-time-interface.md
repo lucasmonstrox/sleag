@@ -82,7 +82,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - Os 6 itens retornados são aleatórios; não espere ordenação estável aqui.
 - `box_detection` é um array (pode haver mais de uma caixa); ao paginar, normalmente reenvia-se a string da caixa escolhida.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Habilita a feature "buscar produto por imagem" (upload de foto → produtos semelhantes no TikTok Shop). Provável feature futura.
 - Em par com o endpoint paginado para listar muitos resultados; o `product_id` extraído conecta com detalhes/métricas.
 

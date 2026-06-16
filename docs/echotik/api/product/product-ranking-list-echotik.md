@@ -66,7 +66,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` (e HTTP 20
 - `page_size` máx. 10; dado T+1.
 - O ranking traz um subconjunto enxuto de campos — para o bloco completo de métricas, hidrate via `batch-fetch-product-details` usando o `product_id`.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - **Fonte direta do "produtos mais vendidos"** do dashboard de mercado (métrica nº 1), por dia/semana/mês e por categoria/região.
 - Descoberta rápida de produtos em ascensão sem precisar montar filtros manuais.
 - Combina com detalhes em lote para enriquecer os cards do dashboard.

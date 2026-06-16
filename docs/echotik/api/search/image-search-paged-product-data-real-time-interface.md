@@ -80,7 +80,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - `offset` é cursor, **não** `page_num`; preserve também `to_next_page_param`/`return_to_server_content`/`cursor` para paginação consistente.
 - Resposta no formato de UI do TikTok: `init_state` traz muitos campos de tracking/render; filtre o que interessa (id, preço, moeda, imagem).
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Completa a feature "buscar produto por imagem", paginando além dos 6 resultados iniciais.
 - O `product_id` extraído conecta com detalhes/métricas em outro endpoint; planejar parse de `e_com_items[].shop_view_data.init_state` no `services/`.
 

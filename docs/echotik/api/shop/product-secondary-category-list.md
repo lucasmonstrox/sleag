@@ -45,7 +45,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - Dado de dimensão estável: **cachear** localmente. Para construir a árvore completa, busque l1 e depois l2 por `parent_id` de cada raiz (ou l2 sem filtro, se a API devolver tudo).
 - Sem paginação explícita na spec.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Compõe o segundo nível do filtro de categoria em cascata (Produtos / Lojas / Concorrência).
 - Resolve `category_l2_id` para nome exibível, eliminando ids crus na UI e no mapper.
 

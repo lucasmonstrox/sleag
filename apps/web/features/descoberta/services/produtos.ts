@@ -7,7 +7,7 @@ import type { ProductFilters } from "../schemas/produtos-filtros"
 
 function apiUnavailable(status: unknown): never {
   throw new Error(
-    `API do TIKSPY indisponível (status ${String(status)}) — suba o apps/api com \`bun dev\``,
+    `API do SLEAG indisponível (status ${String(status)}) — suba o apps/api com \`bun dev\``,
   )
 }
 

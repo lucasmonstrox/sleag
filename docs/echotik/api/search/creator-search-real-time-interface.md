@@ -148,7 +148,7 @@ A resposta é o payload bruto da busca do TikTok (estrutura `musically_user`). C
 - O `data` é o payload bruto do TikTok (search `musically_user`): muito campo de UI/AB (`global_doodle_config`, `feedback_survey`) que você pode ignorar. O que interessa é `user_list[].user_info`.
 - URLs de avatar (`url_list`) são assinadas e expiram (`x-expires`); não cacheie a URL crua por muito tempo.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Alimenta autocomplete/resultado de pesquisa de criadores ao digitar um handle ou nome.
 - Ponto de entrada para depois puxar detalhes/métricas via endpoints de detalhe do criador.
 

@@ -85,7 +85,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - `total_sale_gmv_amt` e `spu_avg_price` são **number**; os de canal (`*_live_*`, `*_video_*`) são integer. Todos os valores de venda/GMV são **estimados**.
 - IDs (`category_id`, `product_id`, `user_id`) vêm como **string**.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Liga **criador → produtos** (que produtos um concorrente/criador empurra e com que canal vende mais).
 - Apoia a métrica nº 1 do dashboard (produtos mais vendidos) cruzando com os criadores que os promovem.
 

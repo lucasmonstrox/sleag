@@ -75,7 +75,7 @@ A página declara o schema apenas como `object`; pelo **Example**, `data` traz:
 - Identificação por `user_id`. Avatares trazem `x-expires`/`x-signature` e **expiram**.
 - **Risk control:** `code=500` esperado; retry com backoff, sem QPS alto.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Mostra **quem um criador segue** na ficha de criador — útil para mapear rede/relacionamentos entre criadores.
 - Recurso secundário/avançado; não compõe o dashboard principal.
 

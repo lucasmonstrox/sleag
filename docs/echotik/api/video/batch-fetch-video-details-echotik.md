@@ -110,7 +110,7 @@ Envelope real: `{ code, message, data, requestId }` — `code = 0` significa suc
 - Vendas/GMV são **estimativas**; thumbnails (`reflow_cover`) **expiram**.
 - Janelas `_1d/_7d/_30d` são incrementos do período; `total_*_cnt` é acumulado.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Hidratação eficiente de listas de vídeos já identificadas (ex.: enriquecer favoritos/coleções do usuário ou resultados de outra origem com métricas completas) em lotes de 10.
 - Mesma estrutura de métricas de `video/list`, então serve a página de detalhe e os cards de "Criativos em alta".
 

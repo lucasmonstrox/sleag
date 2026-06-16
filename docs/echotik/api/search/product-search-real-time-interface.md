@@ -72,7 +72,7 @@ A resposta replica a estrutura de feed do app TikTok. Principais campos (ordem d
 - `region` aceita apenas a lista fixa de mercados; outros valores podem falhar.
 - Para extrair produtos: caminho é `data.body.sections[0].items[]` → parse de `data.raw_data` → `view_object.cardLog`/`baseLog`.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Alimenta a busca de produtos do usuário (achar produto por termo) e descoberta de mais vendidos via `sort_type=3` (BEST_SELLERS) — diretamente ligado à métrica nº 1 do dashboard (produtos mais vendidos).
 - O `product_id` extraído é a chave para enriquecer com detalhes/métricas em outro endpoint; planejar o parse de `raw_data` no `services/` da feature.
 

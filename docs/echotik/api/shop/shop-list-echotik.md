@@ -24,7 +24,7 @@ Lista lojas (sellers) do TikTok Shop a partir da biblioteca offline da EchoTik (
 | `sales_trend_flag` | integer | Não | `0` = estável · `1` = subindo · `2` = caindo | Filtra pela tendência de vendas nos últimos 7 dias. |
 | `seller_sort_field` | integer | Não | `1` = total_sale_cnt · `2` = total_sale_gmv_amt · `3` = spu_avg_price | Campo de ordenação da lista. |
 | `sort_type` | integer | Não | `0` = ascendente · `1` = descendente | Direção da ordenação. |
-| `region` | string | **Sim** | código de região, ex.: `BR`, `US` | Região do mercado. Para o TIKSPY validado em `BR`. |
+| `region` | string | **Sim** | código de região, ex.: `BR`, `US` | Região do mercado. Para o SLEAG validado em `BR`. |
 | `page_num` | integer | **Sim** | 1 … 100000 | Número da página (começa em 1). |
 | `page_size` | integer | **Sim** | máx **10** | Itens por página. Limite rígido de 10. |
 
@@ -82,7 +82,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` + HTTP 200
 - `page_size` máximo **10**; para varrer mais lojas, paginar via `page_num`.
 - Dado **offline T+1**: reflete o estado de ontem, não tempo real.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Alimenta o **ranking/descoberta de lojas** da área de Lojas/Concorrência: listar concorrentes por GMV/vendas, filtrar por categoria e tendência.
 - Os campos de tendência (`sales_trend_flag`) e incrementos (`*_7d`) servem para destacar lojas em ascensão.
 - `seller_id` é a chave para drill-down nos endpoints `seller/detail`, `seller/trend`, `seller/product/list`, `seller/influencer/list`, `seller/video/list`, `seller/live/list`.

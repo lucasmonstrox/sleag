@@ -92,7 +92,7 @@ Envelope: `{ code, message, data, requestId }` — `code = 0` (HTTP 200) = suces
 - Idioma dos termos depende do público do vídeo (no exemplo, indonésio) — pode exigir normalização antes de virar word cloud.
 - URLs de avatar (`comment_author.cover.url_list`) são assinadas e expiram (`x-expires`).
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - **Enriquecimento de criativo:** responde "por que esse vídeo bombou?" — termos recorrentes revelam gancho, objeções e demanda real.
 - Insumo para painel de análise de criativo/comentários na página de detalhe de um vídeo. Recurso de segunda onda, depois do mercado/ranking de produtos.
 

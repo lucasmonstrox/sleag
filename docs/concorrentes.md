@@ -1,6 +1,6 @@
 # Concorrentes — Inteligência de Mercado para TikTok Shop
 
-**Documentação interna TIKSPY** · Data: 2026-06-09
+**Documentação interna SLEAG** · Data: 2026-06-09
 
 > **Lema:** "Descubra onde o dinheiro está antes dos outros."
 
@@ -21,7 +21,7 @@ Avisos importantes para quem ler:
 
 ## 1. Panorama do mercado de inteligência para TikTok Shop
 
-O ecossistema de ferramentas que disputam (direta ou indiretamente) o espaço do TIKSPY pode ser dividido em **seis categorias funcionais**:
+O ecossistema de ferramentas que disputam (direta ou indiretamente) o espaço do SLEAG pode ser dividido em **seis categorias funcionais**:
 
 ### A) Analytics oficial nativo (gratuito, first-party)
 Painéis do próprio TikTok. Dados reais, porém limitados à conta do usuário ou à lente de anúncios.
@@ -47,16 +47,16 @@ Resolvem peças do quebra-cabeça, não competem nas 4 capacidades centrais.
 - **Dashboardly** e **HiveHQ** (profit/operações via API oficial), **kiero** (atribuição de afiliados), **Pentos** e **Exolyt** (content intelligence sem venda), **SociaVault** (API de scraping — potencial fornecedor), **ZIK Analytics**, **Shophunter/PPSPY/SpySales/Koala** (Shopify intelligence), **tokfy** (geração de criativos por IA — possível parceiro), **Hunter Hub** (Mercado Livre).
 
 ### F) Concorrentes brasileiros (PT-BR) — diretos e de posicionamento
-- **Diretos de dados:** **VYRAL** (o mais próximo do TIKSPY em PT-BR), **Gloda via ABLELIVE**, **Hunterfy** (pouca informação pública).
+- **Diretos de dados:** **VYRAL** (o mais próximo do SLEAG em PT-BR), **Gloda via ABLELIVE**, **Hunterfy** (pouca informação pública).
 - **De posicionamento (infoprodutos):** cursos, mentorias e comunidades (MVM, DOTTS, TikTok Shop Sem Segredo, Mapa do TikTok Shop, Udemy) — disputam atenção/orçamento, não funcionalidade.
 
-> **Conclusão do panorama:** os líderes globais (Kalodata, FastMoss) dominam volume de dados; a maior parte ignora score de viabilidade consolidado e alertas proativos. **No Brasil**, a vantagem de "estar em PT-BR" **já não é exclusiva** — Kalodata, FastMoss e Pipiads têm português, e VYRAL/Gloda/Hunterfy são nativos BR. O espaço defensável do TIKSPY está em **score proprietário (cap. 3) + alertas cruzando conteúdo x venda (cap. 4) + profundidade no catálogo BR**, não em "ser o único em PT-BR".
+> **Conclusão do panorama:** os líderes globais (Kalodata, FastMoss) dominam volume de dados; a maior parte ignora score de viabilidade consolidado e alertas proativos. **No Brasil**, a vantagem de "estar em PT-BR" **já não é exclusiva** — Kalodata, FastMoss e Pipiads têm português, e VYRAL/Gloda/Hunterfy são nativos BR. O espaço defensável do SLEAG está em **score proprietário (cap. 3) + alertas cruzando conteúdo x venda (cap. 4) + profundidade no catálogo BR**, não em "ser o único em PT-BR".
 
 ---
 
 ## 2. Tabela comparativa
 
-| Ferramenta | Foco | Preço inicial | Free/Trial | Brasil/PT-BR | Sobreposição c/ TIKSPY |
+| Ferramenta | Foco | Preço inicial | Free/Trial | Brasil/PT-BR | Sobreposição c/ SLEAG |
 |---|---|---|---|---|---|
 | **Kalodata** | Product research / all-in-one TikTok Shop | US$45,90/mês* | Trial 7d (sem cartão) | Dados BR sim; PT no app mobile | **Alta** (benchmark) |
 | **FastMoss** | Product research TikTok Shop | ~US$47-59/mês | Trial 7d | Dados BR sim; UI PT-BR sim | **Alta** (benchmark) |
@@ -98,9 +98,9 @@ Resolvem peças do quebra-cabeça, não competem nas 4 capacidades centrais.
 ### 3.1 Concorrentes diretos globais (benchmark)
 
 #### Kalodata — https://www.kalodata.com/
-**O que é:** Plataforma SaaS de analytics e inteligência do ecossistema TikTok Shop, líder de mercado junto à FastMoss. Rastreia 100M+ produtos, 200M+ criadores e 300M+ vídeos (até ~500 dias de histórico), atualizados diariamente. É o concorrente mais próximo do TIKSPY em proposta de valor.
+**O que é:** Plataforma SaaS de analytics e inteligência do ecossistema TikTok Shop, líder de mercado junto à FastMoss. Rastreia 100M+ produtos, 200M+ criadores e 300M+ vídeos (até ~500 dias de histórico), atualizados diariamente. É o concorrente mais próximo do SLEAG em proposta de valor.
 
-**Público:** Afiliados, vendedores/lojistas, marcas e criadores — exatamente o público do TIKSPY.
+**Público:** Afiliados, vendedores/lojistas, marcas e criadores — exatamente o público do SLEAG.
 
 **Features-chave:** pesquisa de produtos com filtros (categoria, receita, unidades, crescimento, nº de lojas concorrentes, janela diária/semanal/mensal); recomendação de **"potential products"** (emergentes antes do pico); banco de 200M+ criadores filtrável mostrando quem promove cada produto + vendas estimadas; **shop analysis** (assortimento, performance, histórico de concorrentes); analytics de vídeos e lives vinculados a produtos; **Open API** (só no Enterprise) com 6 módulos e 20+ endpoints; exportação de contatos de criadores e créditos de IA no Professional; app mobile Android/iOS (com video download, image search, login TikTok e **notificações**).
 
@@ -111,11 +111,11 @@ Limites: Starter = 50 buscas/dia, 10 lojas/criadores por resultado, histórico 9
 
 **Como obtém dados:** Scraping de canais públicos + modelos de IA para estimar GMV/vendas/ad spend. A própria empresa avisa que valores são **direcionais** e não devem ser usados em alta precisão (ex.: acerto de comissões). Alega 73% de acurácia para prever virais em 72h (**claim de marketing, não verificado**).
 
-**Forças:** marca líder e credibilidade; base de dados enorme e diária; cobre as 4 frentes do TIKSPY num só produto; já cobre o BR; trial sem cartão + plano de entrada acessível; Open API.
+**Forças:** marca líder e credibilidade; base de dados enorme e diária; cobre as 4 frentes do SLEAG num só produto; já cobre o BR; trial sem cartão + plano de entrada acessível; Open API.
 
 **Fraquezas:** dados são estimativas (discrepâncias relatadas); plano Starter limitado; recursos avançados atrás de paywall caro; **sem score proprietário consolidado** de viabilidade (oferece métricas brutas e "potential products", não um índice único); relatos de surpresas de cobrança. *(Nota: a fraqueza "não tem alertas" enfraqueceu — o app tem notificações.)*
 
-**Relevância ao TIKSPY:** **Concorrente DIRETO e benchmark.** Difícil bater em volume de dados. O caminho do TIKSPY é diferenciação por **score acionável (cap. 3)**, **alertas/monitoramento contínuo (cap. 4)** e profundidade/atendimento BR — não por mais dados brutos.
+**Relevância ao SLEAG:** **Concorrente DIRETO e benchmark.** Difícil bater em volume de dados. O caminho do SLEAG é diferenciação por **score acionável (cap. 3)**, **alertas/monitoramento contínuo (cap. 4)** e profundidade/atendimento BR — não por mais dados brutos.
 
 ---
 
@@ -136,14 +136,14 @@ Limites: Starter = 50 buscas/dia, 10 lojas/criadores por resultado, histórico 9
 
 **Fraquezas:** dados estimados; pouca transparência de metodologia; **sem score proprietário**; alertas real-time não são o foco central; API só no Enterprise; tier topo caro.
 
-**Relevância ao TIKSPY:** **Altíssima sobreposição.** Já tem PT-BR e BR, então o TIKSPY não vence por idioma — precisa vencer por **score proprietário**, **alertas/cruzamento conteúdo x venda** e foco em afiliados/criadores BR.
+**Relevância ao SLEAG:** **Altíssima sobreposição.** Já tem PT-BR e BR, então o SLEAG não vence por idioma — precisa vencer por **score proprietário**, **alertas/cruzamento conteúdo x venda** e foco em afiliados/criadores BR.
 
 ---
 
 #### EchoTik — https://echotik.live
 **O que é:** Plataforma de analytics de TikTok Shop de **baixo custo** (operada pela EchoSell/EchoTik AI, Singapura; lançada em 2022; 800k+ usuários). Combina dashboards, leaderboards e extensão de navegador. Tem produto de API separado (**KeyAPI**, até ~1.000 dias de histórico).
 
-**Público:** Sellers, afiliados, influenciadores, marcas, dropshippers — quase idêntico ao TIKSPY.
+**Público:** Sellers, afiliados, influenciadores, marcas, dropshippers — quase idêntico ao SLEAG.
 
 **Features-chave:** 60+ indicadores de seleção de produto; leaderboards "Top Sold", "Hot Promoted", "New Products"; **"Dark Horse Creators"** (oportunidades emergentes); rankings de lojas (local e cross-border); **Product Monitor (20-1.000x/mês), Live Monitor (5-300x/mês) e Videos Monitor** — recurso de monitoramento/alerta; extensão Chrome/Edge; calculadora de taxas; **AI Toolbox com ~11 ferramentas de IA**; analytics de influencer (90 dias).
 
@@ -153,11 +153,11 @@ Limites: Starter = 50 buscas/dia, 10 lojas/criadores por resultado, histórico 9
 
 **Como obtém dados:** Scraping; vendas estimadas; escala atual da home oficial: ~1,8B dados de produto, ~1B dados de influenciador.
 
-**Forças:** preço de entrada **muito baixo** (âncora agressiva contra a qual o TIKSPY terá de se posicionar); free tier real; **tem monitoramento de produto/live/vídeo** (mais perto da capacidade 4); extensão prática; AI Toolbox.
+**Forças:** preço de entrada **muito baixo** (âncora agressiva contra a qual o SLEAG terá de se posicionar); free tier real; **tem monitoramento de produto/live/vídeo** (mais perto da capacidade 4); extensão prática; AI Toolbox.
 
 **Fraquezas:** insights mais rasos que Kalodata/FastMoss; análise de competição bloqueada no básico; PT-BR de interface não confirmado; **sem score consolidado**; curva de aprendizado elevada; origem de dados não transparente.
 
-**Relevância ao TIKSPY:** Concorrente direto e o **concorrente de PREÇO**. Pressiona o tier de entrada. Diferenciação: profundidade, score proprietário, foco/atendimento BR e cruzamento conteúdo x venda mais sofisticado.
+**Relevância ao SLEAG:** Concorrente direto e o **concorrente de PREÇO**. Pressiona o tier de entrada. Diferenciação: profundidade, score proprietário, foco/atendimento BR e cruzamento conteúdo x venda mais sofisticado.
 
 ---
 
@@ -176,16 +176,16 @@ Limites: Starter = 50 buscas/dia, 10 lojas/criadores por resultado, histórico 9
 
 **Forças:** dedicado ao TikTok; atualização horária; preço de entrada acessível; free trial.
 
-**Fraquezas:** **sem Brasil/PT-BR** (lacuna direta que o TIKSPY explora); UI "bare-bones" com bugs reportados; **sem score proprietário**; sem alertas real-time robustos.
+**Fraquezas:** **sem Brasil/PT-BR** (lacuna direta que o SLEAG explora); UI "bare-bones" com bugs reportados; **sem score proprietário**; sem alertas real-time robustos.
 
-**Relevância ao TIKSPY:** Concorrente direto nas capacidades 1 e 2, mas a **ausência de BR/PT-BR é um ponto fraco-chave** que reforça a vantagem do TIKSPY no mercado brasileiro.
+**Relevância ao SLEAG:** Concorrente direto nas capacidades 1 e 2, mas a **ausência de BR/PT-BR é um ponto fraco-chave** que reforça a vantagem do SLEAG no mercado brasileiro.
 
 ---
 
 ### 3.2 Concorrentes brasileiros diretos (PT-BR)
 
 #### VYRAL — https://vyral.com.br/
-**O que é:** Plataforma SaaS **brasileira** de inteligência por IA que mostra em tempo real quais vídeos e produtos mais vendem no TikTok Shop, com ganho estimado **em R$ por vídeo** e transcrição por IA dos ganchos/dores/soluções/CTAs vencedores. **É o concorrente local mais direto e mais "parecido" com o TIKSPY** no eixo descoberta + criativos.
+**O que é:** Plataforma SaaS **brasileira** de inteligência por IA que mostra em tempo real quais vídeos e produtos mais vendem no TikTok Shop, com ganho estimado **em R$ por vídeo** e transcrição por IA dos ganchos/dores/soluções/CTAs vencedores. **É o concorrente local mais direto e mais "parecido" com o SLEAG** no eixo descoberta + criativos.
 
 **Público:** Afiliados, criadores, dropshippers, donos de loja e iniciantes BR.
 
@@ -197,11 +197,11 @@ Limites: Starter = 50 buscas/dia, 10 lojas/criadores por resultado, histórico 9
 
 **Como obtém dados:** Não declarado ("fica 24h analisando"); provável scraping + IA. **Baixa transparência.**
 
-**Forças:** PT-BR nativo + preço baixíssimo (R$49-67/mês); camada de IA que decompõe o porquê do sucesso (algo que o TIKSPY também promete); tração local forte.
+**Forças:** PT-BR nativo + preço baixíssimo (R$49-67/mês); camada de IA que decompõe o porquê do sucesso (algo que o SLEAG também promete); tração local forte.
 
 **Fraquezas:** foco quase exclusivo em vídeos/criativos; **sem score proprietário de viabilidade**; sem alertas/monitoramento contínuo evidente; estética flertando com infoproduto (escascez + checkout B4You); **reclamação no Reclame Aqui** sobre reembolso e "falta de vídeos para todos os produtos" → sinal de cobertura de catálogo incompleta.
 
-**Relevância ao TIKSPY:** **Sobreposição ALTA e direta no mercado-alvo.** É o **benchmark de preço** (R$49-67/mês). Lacunas exatamente onde o TIKSPY diferencia: **cap. 3 (score)** e **cap. 4 (alertas/monitoramento multi-plataforma)**.
+**Relevância ao SLEAG:** **Sobreposição ALTA e direta no mercado-alvo.** É o **benchmark de preço** (R$49-67/mês). Lacunas exatamente onde o SLEAG diferencia: **cap. 3 (score)** e **cap. 4 (alertas/monitoramento multi-plataforma)**.
 
 ---
 
@@ -222,18 +222,18 @@ Limites: Starter = 50 buscas/dia, 10 lojas/criadores por resultado, histórico 9
 
 **Fraquezas:** preços pouco transparentes; sem score proprietário de **viabilidade de produto** (só de criador); sem alertas push evidentes; cobertura BR recente e dependente da parceria; UI global em inglês.
 
-**Relevância ao TIKSPY:** **Alta e estratégica** — é o concorrente "enterprise-grade" que **já chegou ao Brasil em PT-BR**. Diferenciação: score proprietário de viabilidade de produto, alertas real-time configuráveis e UX 100% BR para afiliado individual.
+**Relevância ao SLEAG:** **Alta e estratégica** — é o concorrente "enterprise-grade" que **já chegou ao Brasil em PT-BR**. Diferenciação: score proprietário de viabilidade de produto, alertas real-time configuráveis e UX 100% BR para afiliado individual.
 
 ---
 
 #### Hunterfy — https://hunterfy.com.br/
-**O que é:** Ferramenta brasileira autodescrita como **"Sua Ferramenta de Inteligência para o TikTok Shop"** — o posicionamento de marca que **mais se aproxima literalmente do TIKSPY**.
+**O que é:** Ferramenta brasileira autodescrita como **"Sua Ferramenta de Inteligência para o TikTok Shop"** — o posicionamento de marca que **mais se aproxima literalmente do SLEAG**.
 
 **Status da informação:** ⚠️ **Muito limitada.** O site bloqueia coleta automatizada (falha SSL/TLS; HTTP 403) e não há reviews de terceiros nem snapshots no Wayback. Domínio ativo (Hostinger), conteúdo 100% PT-BR confirmado.
 
 **Features/Preços:** **Desconhecidos.** Provável descoberta de produtos + análise de concorrência (inferido pelo posicionamento). ⚠️ **Não confundir com "Hunter Hub"** (hunterhub.com.br, ferramenta de Mercado Livre) — buscas conflam features e o preço R$29,90 dos dois. O R$29,90 é do Hunter Hub, **não** da Hunterfy.
 
-**Relevância ao TIKSPY:** **Potencialmente o concorrente posicional mais direto** (mesmo nicho, mesma linguagem, mesma promessa). Sobreposição provável nas caps. 1 e 2; caps. 3 e 4 não confirmadas. **Requer investigação direta no site** (idealmente logado).
+**Relevância ao SLEAG:** **Potencialmente o concorrente posicional mais direto** (mesmo nicho, mesma linguagem, mesma promessa). Sobreposição provável nas caps. 1 e 2; caps. 3 e 4 não confirmadas. **Requer investigação direta no site** (idealmente logado).
 
 ---
 
@@ -256,7 +256,7 @@ Limites: Starter = 50 buscas/dia, 10 lojas/criadores por resultado, histórico 9
 
 **Fraquezas:** dados derivados de **anúncios**, não venda orgânica total; **sem score proprietário** de viabilidade demanda x concorrência; análise de saturação manual; modelo de créditos pode ficar caro; cobertura BR não especializada.
 
-**Relevância ao TIKSPY:** Concorrente direto de alta sobreposição. **Cap. 2 forte; cap. 1 parcial; cap. 3 = lacuna clara; cap. 4 parcial** (alertas limitados a entidades rastreadas, não descoberta proativa). O TIKSPY se diferencia ao **cruzar criativo com venda real + score + foco em afiliados/orgânico BR**.
+**Relevância ao SLEAG:** Concorrente direto de alta sobreposição. **Cap. 2 forte; cap. 1 parcial; cap. 3 = lacuna clara; cap. 4 parcial** (alertas limitados a entidades rastreadas, não descoberta proativa). O SLEAG se diferencia ao **cruzar criativo com venda real + score + foco em afiliados/orgânico BR**.
 
 ---
 
@@ -277,7 +277,7 @@ Limites: Starter = 50 buscas/dia, 10 lojas/criadores por resultado, histórico 9
 
 **Fraquezas:** foco em ads pagos, não no ecossistema orgânico/afiliado do TikTok Shop; sem score de viabilidade; sem alertas cruzados robustos; recursos de TikTok Shop atrás de Kalodata/FastMoss.
 
-**Relevância ao TIKSPY:** Sobreposição parcial. Concorrente no adspy, não no núcleo de inteligência de venda real do TikTok Shop.
+**Relevância ao SLEAG:** Sobreposição parcial. Concorrente no adspy, não no núcleo de inteligência de venda real do TikTok Shop.
 
 ---
 
@@ -292,7 +292,7 @@ Limites: Starter = 50 buscas/dia, 10 lojas/criadores por resultado, histórico 9
 
 **Fraquezas:** generalista de **anúncios**, sem dados de venda/GMV do TikTok Shop; profundidade em TikTok Shop inferior a nativos; sem score; sem alertas conteúdo x venda.
 
-**Relevância ao TIKSPY:** Sobreposição média (cap. 2). O diferencial real do TIKSPY aqui é **dado de venda real + foco no ecossistema TikTok Shop**, não o idioma (BigSpy tem PT-BR).
+**Relevância ao SLEAG:** Sobreposição média (cap. 2). O diferencial real do SLEAG aqui é **dado de venda real + foco no ecossistema TikTok Shop**, não o idioma (BigSpy tem PT-BR).
 
 ---
 
@@ -303,7 +303,7 @@ Limites: Starter = 50 buscas/dia, 10 lojas/criadores por resultado, histórico 9
 
 **Geografia:** Global; site só em inglês, sem PT-BR nem recorte BR.
 
-**Relevância ao TIKSPY:** **Baixa.** Público enterprise/agências e preço muito distantes de afiliados/PMEs BR. Toca a cap. 2 em escala de ads, não venda/seller do TikTok Shop.
+**Relevância ao SLEAG:** **Baixa.** Público enterprise/agências e preço muito distantes de afiliados/PMEs BR. Toca a cap. 2 em escala de ads, não venda/seller do TikTok Shop.
 
 ---
 
@@ -311,14 +311,14 @@ Limites: Starter = 50 buscas/dia, 10 lojas/criadores por resultado, histórico 9
 - **AdSpy** (https://adspy.com): 204M+ anúncios Meta, busca dentro de comentários (diferencial raro). Plano único **US$149/mês**, sem free tier. **Sem TikTok** — eliminatório para o nicho.
 - **Dropispy** (https://www.dropispy.com): adspy Meta francês de baixo custo (modelo por créditos). Free €0; Premium **€29,90/mês** (ou ~€14,90 no anual); Business €249,90/mês. **Sem TikTok.**
 
-**Relevância ao TIKSPY:** Baixa. Servem apenas como **benchmark de preço de entrada de mercado** e exemplos de players legados que ficaram fora da transição para TikTok.
+**Relevância ao SLEAG:** Baixa. Servem apenas como **benchmark de preço de entrada de mercado** e exemplos de players legados que ficaram fora da transição para TikTok.
 
 ---
 
 ### 3.4 All-in-one (adspy + sales tracker de TikTok Shop)
 
 #### WinningHunter — https://winninghunter.com
-**O que é:** Spy tool all-in-one com **módulo dedicado de TikTok Shop**. Junta biblioteca de anúncios (TikTok + Facebook + Pinterest), Magic AI Search e um **Sales Tracker** que rastreia receita de qualquer loja do TikTok Shop. Talvez o mais próximo do **escopo amplo** do TIKSPY. Cobre 50M+ produtos, 5M+ lojas, 200M+ ads, "19+ países".
+**O que é:** Spy tool all-in-one com **módulo dedicado de TikTok Shop**. Junta biblioteca de anúncios (TikTok + Facebook + Pinterest), Magic AI Search e um **Sales Tracker** que rastreia receita de qualquer loja do TikTok Shop. Talvez o mais próximo do **escopo amplo** do SLEAG. Cobre 50M+ produtos, 5M+ lojas, 200M+ ads, "19+ países".
 
 **Público:** Dropshippers e sellers que rodam anúncios e querem inteligência de TikTok Shop; gestores de tráfego.
 
@@ -334,12 +334,12 @@ Limites: Starter = 50 buscas/dia, 10 lojas/criadores por resultado, histórico 9
 
 **Fraquezas:** acurácia do tracker questionada; preço em EUR e tier premium caro (€249); **sem PT-BR**; **sem score proprietário consolidado**; alertas não são foco central; trial curto.
 
-**Relevância ao TIKSPY:** Sobreposição alta. O TIKSPY se diferencia por **transparência/acurácia honesta do dado**, **score proprietário**, **alertas que cruzam conteúdo x venda** e foco BR/PT-BR. Concorrente importante a posicionar contra (sobretudo no quesito **confiabilidade dos dados**).
+**Relevância ao SLEAG:** Sobreposição alta. O SLEAG se diferencia por **transparência/acurácia honesta do dado**, **score proprietário**, **alertas que cruzam conteúdo x venda** e foco BR/PT-BR. Concorrente importante a posicionar contra (sobretudo no quesito **confiabilidade dos dados**).
 
 ---
 
 #### FindNiche — https://findniche.com/tiktok
-**O que é:** Product research all-in-one para dropshipping + TikTok Shop. Acha nichos de **alta demanda e baixa concorrência** (conceito próximo da análise de viabilidade do TIKSPY). Cruza AliExpress/Shopify/Amazon. AdSpy de **80M+ anúncios em 4 plataformas** (TikTok, Facebook, Instagram, YouTube).
+**O que é:** Product research all-in-one para dropshipping + TikTok Shop. Acha nichos de **alta demanda e baixa concorrência** (conceito próximo da análise de viabilidade do SLEAG). Cruza AliExpress/Shopify/Amazon. AdSpy de **80M+ anúncios em 4 plataformas** (TikTok, Facebook, Instagram, YouTube).
 
 **Preços (USD):** **Free** (real) / Basic ~**US$12/mês** / Elite ~US$49/mês / Premium ~US$99/mês / VIP-Enterprise ~US$199-499/mês (custom). Anual mais barato. **Trial US$1/3 dias.**
 
@@ -349,7 +349,7 @@ Limites: Starter = 50 buscas/dia, 10 lojas/criadores por resultado, histórico 9
 
 **Fraquezas:** mais focado em dropshipping/AliExpress que em afiliados nativos; sem PT-BR; **sem score único proprietário** nem alertas cruzados.
 
-**Relevância ao TIKSPY:** Sobreposição na cap. 1 e conceitualmente na cap. 3 (mas sem score único). Público dropshipping é adjacente, não idêntico.
+**Relevância ao SLEAG:** Sobreposição na cap. 1 e conceitualmente na cap. 3 (mas sem score único). Público dropshipping é adjacente, não idêntico.
 
 ---
 
@@ -360,7 +360,7 @@ Limites: Starter = 50 buscas/dia, 10 lojas/criadores por resultado, histórico 9
 
 **Geografia:** **Sem BR/PT-BR.**
 
-**Relevância ao TIKSPY:** Baixa-média. Foco dropshipping/importação; inteligência de TikTok Shop é secundária e voltada a descoberta para dropshipping, não venda real/lives/afiliação orgânica.
+**Relevância ao SLEAG:** Baixa-média. Foco dropshipping/importação; inteligência de TikTok Shop é secundária e voltada a descoberta para dropshipping, não venda real/lives/afiliação orgânica.
 
 ---
 
@@ -371,7 +371,7 @@ Limites: Starter = 50 buscas/dia, 10 lojas/criadores por resultado, histórico 9
 
 **Geografia:** Sem PT-BR (provavelmente ausente).
 
-**Relevância ao TIKSPY:** Subiu para média — agora **tem score de viabilidade**, sobrepondo conceitualmente a cap. 3. Porém **sem GMV nativo do TikTok Shop**, sem ecossistema de afiliados e sem BR/PT-BR.
+**Relevância ao SLEAG:** Subiu para média — agora **tem score de viabilidade**, sobrepondo conceitualmente a cap. 3. Porém **sem GMV nativo do TikTok Shop**, sem ecossistema de afiliados e sem BR/PT-BR.
 
 ---
 
@@ -384,7 +384,7 @@ Limites: Starter = 50 buscas/dia, 10 lojas/criadores por resultado, histórico 9
 
 **Geografia:** Brasil/PT-BR não confirmados (interface provavelmente só inglês). ⚠️ Risco de disponibilidade (site instável na verificação).
 
-**Relevância ao TIKSPY:** Baixa-média. Pressiona o tier de entrada **pago** (~US$49/mês), comparável/acima de Kalodata/FastMoss — não por preço-zero.
+**Relevância ao SLEAG:** Baixa-média. Pressiona o tier de entrada **pago** (~US$49/mês), comparável/acima de Kalodata/FastMoss — não por preço-zero.
 
 ---
 
@@ -395,7 +395,7 @@ Limites: Starter = 50 buscas/dia, 10 lojas/criadores por resultado, histórico 9
 
 **Geografia:** **NÃO cobre Brasil e SEM PT-BR.** Idiomas: EN, ZH, ID, MS, Filipino, TH, VI, JA. Foco US + Sudeste Asiático.
 
-**Relevância ao TIKSPY:** Moderada funcionalmente (caps. 1 e 2), mas **baixa/nenhuma no mercado-alvo BR**. Atualização só a cada 24h reduz overlap nas caps. 3 e 4.
+**Relevância ao SLEAG:** Moderada funcionalmente (caps. 1 e 2), mas **baixa/nenhuma no mercado-alvo BR**. Atualização só a cada 24h reduz overlap nas caps. 3 e 4.
 
 ---
 
@@ -408,7 +408,7 @@ Limites: Starter = 50 buscas/dia, 10 lojas/criadores por resultado, histórico 9
 
 **Geografia:** **US-only** (US monthly rankings). Sem Brasil/PT-BR.
 
-**Relevância ao TIKSPY:** **Média — principal ameaça ao tier de ENTRADA pago.** Oferece descoberta (cap. 1) e noções de viabilidade/margem (cap. 3) **de graça** — inclusive um score básico. ⚠️ Isso **enfraquece** "score proprietário" e "dados em tempo real" como diferenciais exclusivos. O TIKSPY mantém vantagem em: **foco/cobertura BR e PT-BR**, inteligência competitiva mais profunda que top 500, API, analytics de livestream e base de creators (todos ausentes na SimpTok).
+**Relevância ao SLEAG:** **Média — principal ameaça ao tier de ENTRADA pago.** Oferece descoberta (cap. 1) e noções de viabilidade/margem (cap. 3) **de graça** — inclusive um score básico. ⚠️ Isso **enfraquece** "score proprietário" e "dados em tempo real" como diferenciais exclusivos. O SLEAG mantém vantagem em: **foco/cobertura BR e PT-BR**, inteligência competitiva mais profunda que top 500, API, analytics de livestream e base de creators (todos ausentes na SimpTok).
 
 ---
 
@@ -423,7 +423,7 @@ Analytics de **lucro e reconciliação** de payouts no nível de pedido/SKU, **p
 #### HiveHQ — https://www.hivehq.ai/
 Suite de **profit/operações + bot de recrutamento de afiliados** (banco de 1,5M+ criadores, outreach automatizado ~100k ações/mês, Creator Tracker). Não faz descoberta de produtos nem score de mercado.
 **Preços (USD):** Profit Dashboard Free (até 250 pedidos) → Enterprise US$399/mês; Affiliate Bot US$350-400/mês. **US e UK apenas, sem BR.**
-**Relevância:** Baixa/complementar. Atua no **pós-decisão** (operar, recrutar, lucrar); o TIKSPY atua no **pré-decisão** (descobrir, validar, monitorar).
+**Relevância:** Baixa/complementar. Atua no **pós-decisão** (operar, recrutar, lucrar); o SLEAG atua no **pré-decisão** (descobrir, validar, monitorar).
 
 #### kiero — https://kierolabs.com/landing
 Inteligência de **atribuição/valor de afiliados** ("Creator Score" por qualidade do cliente, Cross-Channel Attribution, Isabel AI). **UK-first**, preços em **GBP** (Free / £150/mês / Enterprise).
@@ -432,7 +432,7 @@ Inteligência de **atribuição/valor de afiliados** ("Creator Score" por qualid
 #### Pentos — https://pentos.co
 **Content intelligence** de TikTok (músicas/áudios virais, hashtags, contas, benchmarking de criadores). **NÃO cobre TikTok Shop, GMV nem preço de produto.**
 **Preços (USD):** Trends Pro US$99/mês; Icon US$299/mês; Mega US$999/mês. Histórico só prospectivo (após colocar tracker, sem backfill).
-**Relevância:** Parcial — cobre só **a metade de conteúdo** do cruzamento conteúdo x venda do TIKSPY.
+**Relevância:** Parcial — cobre só **a metade de conteúdo** do cruzamento conteúdo x venda do SLEAG.
 
 #### Exolyt — https://exolyt.com/
 Social intelligence de TikTok (influenciadores, marcas, sentimento, tendências de setor). **Sem TikTok Shop/e-commerce.**
@@ -457,7 +457,7 @@ Inteligência de **lojas Shopify** (receita estimada, apps/temas, fornecedores, 
 #### tokfy — https://tokfy.io/
 Ferramenta **brasileira de geração de criativos por IA** (fotos de produto → vídeos virais, avatares, imagens). **NÃO é inteligência de dados.**
 **Preços:** Desconhecido (provável SaaS BRL, assinatura agregando IAs).
-**Relevância:** Sobreposição quase nula. **Possível PARCEIRO/integração** (descobrir produto no TIKSPY → gerar criativo no tokfy) e útil para delimitar escopo.
+**Relevância:** Sobreposição quase nula. **Possível PARCEIRO/integração** (descobrir produto no SLEAG → gerar criativo no tokfy) e útil para delimitar escopo.
 
 #### Hunter Hub — https://hunterhub.com.br/
 Plataforma **brasileira** de gestão/inteligência de **Mercado Livre** (e Shopee via extensão Hunter Spy). ⚠️ **NÃO cobre TikTok Shop com dados nativos** (TikTok Shop só aparece no blog). Tem **Score 0-100** (IA com 15 variáveis), lucro real, conciliação de taxas, curva ABC.
@@ -472,7 +472,7 @@ Plataforma **brasileira** de gestão/inteligência de **Mercado Livre** (e Shope
 Painel oficial gratuito do lojista. Consolidou "Homepage" + "Growth Insights" em **Shop Analytics**: GMV, pedidos por SKU, vendas separadas por **live/vídeo/product card**, ranking de loja por categoria, analytics pós-compra. Alertas de estoque (em Products > Manage Stock). LIVE analytics via TikTok Studio.
 **Preços:** Gratuito (a operação tem taxas transacionais por venda à parte). **PT-BR no painel brasileiro** (seller-br.tiktok.com).
 **Limitação central:** vê **só a própria loja**. ⚠️ Inteligência competitiva real na TikTok agora existe via **Market Scope** (Ecommerce Insights: market share, concorrentes, Buyer Analysis), mas é **gated** (select customers, via rep de vendas, voltado a marcas/anunciantes).
-**Relevância:** Baseline contra o qual o TIKSPY justifica valor: *"o Seller Center mostra a SUA loja; o TIKSPY mostra o mercado todo."*
+**Relevância:** Baseline contra o qual o SLEAG justifica valor: *"o Seller Center mostra a SUA loja; o SLEAG mostra o mercado todo."*
 
 #### TikTok Shop Product Opportunities
 Ferramenta oficial gratuita (Products > Product Opportunities): Featured Products (sub-ofertados), Trending Searches, Trending Video Hashtags, Popular Subcategories, Exclusive Opportunities, auto-register/auto-match, incentivos (NewStar). Baseado em **sinais reais de demanda** (buscas/compras/conteúdo). Atualização periódica (semanal p/ tendências). **Provável no painel BR em PT-BR** (rótulo exato não confirmado).
@@ -480,7 +480,7 @@ Ferramenta oficial gratuita (Products > Product Opportunities): Featured Product
 
 #### TikTok Creative Center (Top Products / Top Ads / Trends)
 Recurso público gratuito, **em PT-BR desde set/2023**, com filtro de região (incl. Brasil). ⚠️ Top Products é 100% baseado em **anúncios** ("Popularity" = nº de criativos que apresentam o produto; **GMV estimado**, não vendas reais). As ferramentas de IA (Symphony, Product-to-Video, etc.) são grátis mas exigem login Business.
-**Relevância:** Sobreposição **parcial**; alternativa gratuita relevante. Não mostra vendas reais, não tem inteligência por afiliado/vendedor, não tem score nem alertas — exatamente os gaps que o TIKSPY preenche.
+**Relevância:** Sobreposição **parcial**; alternativa gratuita relevante. Não mostra vendas reais, não tem inteligência por afiliado/vendedor, não tem score nem alertas — exatamente os gaps que o SLEAG preenche.
 
 ---
 
@@ -508,7 +508,7 @@ Recurso público gratuito, **em PT-BR desde set/2023**, com filtro de região (i
 
 ### 4.2 A lacuna de ferramentas em PT-BR — reavaliada
 
-⚠️ **Correção importante de tese:** o argumento "só o TIKSPY estará em PT-BR" está **desatualizado**. O cenário real:
+⚠️ **Correção importante de tese:** o argumento "só o SLEAG estará em PT-BR" está **desatualizado**. O cenário real:
 
 - **Globais que JÁ atendem BR/PT-BR:** **Kalodata** (dados BR + PT no app; PT-BR web a confirmar), **FastMoss** (UI PT-BR + region=BR), **Pipiads** (interface PT, dados BR), **BigSpy** (UI PT-BR), **Exolyt** (UI PT).
 - **Nativos brasileiros de dados:** **VYRAL** (PT-BR, R$49/mês, o mais direto), **Gloda via ABLELIVE** (PT-BR, reais, forte em lives), **Hunterfy** (PT-BR, info escassa).
@@ -518,7 +518,7 @@ A vantagem defensável **não é o idioma**, e sim: **score proprietário consol
 
 ### 4.3 Os "falsos concorrentes" (infoprodutos/cursos/comunidades)
 
-Disputam **atenção e orçamento** do mesmo público, mas **não entregam dados em tempo real**. São o anti-posicionamento explícito do TIKSPY.
+Disputam **atenção e orçamento** do mesmo público, mas **não entregam dados em tempo real**. São o anti-posicionamento explícito do SLEAG.
 
 | Produto | Tipo | Preço oficial (BRL) | Observações |
 |---|---|---|---|
@@ -537,29 +537,29 @@ Disputam **atenção e orçamento** do mesmo público, mas **não entregam dados
 
 ## 5. Análise de lacunas e oportunidades de diferenciação
 
-Avaliação dos concorrentes contra as **4 capacidades centrais** do TIKSPY:
+Avaliação dos concorrentes contra as **4 capacidades centrais** do SLEAG:
 
 ### Capacidade 1 — Descoberta de produtos (já explodindo E emergentes)
 - **Bem coberta** por quase todos os players de dados (Kalodata "potential products", EchoTik "Dark Horse", Shoplus, FastMoss, VYRAL, Gloda) e até pela TikTok oficial (Product Opportunities).
 - **Lacuna do mercado:** poucos focam em **emergentes pré-hype com sinal confiável** + **profundidade no catálogo BR**.
-- **Onde o TIKSPY ganha:** descoberta de emergentes especificamente calibrada para o mercado brasileiro recém-aberto.
+- **Onde o SLEAG ganha:** descoberta de emergentes especificamente calibrada para o mercado brasileiro recém-aberto.
 
 ### Capacidade 2 — Inteligência competitiva (afiliados/criativos/estratégia)
 - **Bem coberta** por Kalodata, FastMoss, Pipiads (criativos), EchoTik, Gloda, VYRAL (transcrição de criativos), WinningHunter.
 - **Lacuna:** cruzar **criativos (conteúdo) com dados de venda real** de forma integrada — Pipiads/Minea têm criativos mas pouco GMV orgânico; VYRAL tem criativos+receita estimada mas raso em loja/seller.
-- **Onde o TIKSPY ganha:** cruzamento criativo × venda real + rastreio por afiliado/vendedor + frequência/estratégia.
+- **Onde o SLEAG ganha:** cruzamento criativo × venda real + rastreio por afiliado/vendedor + frequência/estratégia.
 
 ### Capacidade 3 — Análise de viabilidade com SCORE PROPRIETÁRIO ⭐ (maior oportunidade)
 - **Quase ninguém entrega um índice único consolidado** de oportunidade vs saturação cruzando demanda × concorrência × retorno:
   - Kalodata, FastMoss, EchoTik, Shoplus, Pipiads, Gloda, WinningHunter, VYRAL → **entregam métricas brutas/rankings**, não score.
   - **Exceções a observar:** **SimpTok** (tem score básico grátis — US-only), **Hunter Hub/Hunterfy** (score 0-100 em PT-BR, mas Hunter Hub é de Mercado Livre), **Dropship Spy** (veredito + confidence score por IA, sem GMV nativo TikTok Shop), **Gloda** (sales score só por criador).
-- **Onde o TIKSPY ganha:** **um SCORE proprietário transparente e acionável de viabilidade de PRODUTO** (não só de criador), calibrado para o BR. Esta é a **diferenciação mais defensável**, desde que o score seja confiável e explicável.
+- **Onde o SLEAG ganha:** **um SCORE proprietário transparente e acionável de viabilidade de PRODUTO** (não só de criador), calibrado para o BR. Esta é a **diferenciação mais defensável**, desde que o score seja confiável e explicável.
 
 ### Capacidade 4 — Monitoramento contínuo + alertas (cruzando conteúdo × venda) ⭐ (segunda maior oportunidade)
 - **Foco fraco no mercado:** a maioria é **consulta sob demanda** (dashboards), não **push proativo**.
   - Têm algum monitoramento/alerta: **EchoTik** (Product/Live/Video Monitor), **Pipiads** (Ad Tracker com notificações), **WinningHunter** (Competitor Analysis automático), **Kalodata** (notificações no app), **HiveHQ** (Smart Notification — mas operacional).
   - **Ninguém** faz, de forma central, **cruzamento proativo conteúdo × venda multi-plataforma** com alertas configuráveis.
-- **Onde o TIKSPY ganha:** monitoramento contínuo + alertas real-time que **cruzam tendência de conteúdo com tendência de venda** — pilar central, não acessório.
+- **Onde o SLEAG ganha:** monitoramento contínuo + alertas real-time que **cruzam tendência de conteúdo com tendência de venda** — pilar central, não acessório.
 
 > **Síntese:** o terreno disputado e maduro é caps. 1 e 2. O **espaço aberto e defensável** é **cap. 3 (score proprietário consolidado)** e **cap. 4 (alertas que cruzam conteúdo × venda)**, ambos **ancorados na profundidade BR**.
 
@@ -573,13 +573,13 @@ Avaliação dos concorrentes contra as **4 capacidades centrais** do TIKSPY:
 
 3. **Não vender "PT-BR" como diferencial único.** Kalodata, FastMoss, Pipiads, VYRAL e Gloda já estão em português. Reposicionar para **profundidade no catálogo/logística BR + atendimento + UX para o afiliado/criador brasileiro** + score + alertas.
 
-4. **Posicionar contra os infoprodutos com honestidade radical.** "Não é curso/mentoria/promessa; é ferramenta de dados reais." Capturar o aluno que **já fez curso** e precisa de dados para executar. Considerar **parcerias de afiliação** com mentores/comunidades (TIKSPY como "a ferramenta oficial" citada).
+4. **Posicionar contra os infoprodutos com honestidade radical.** "Não é curso/mentoria/promessa; é ferramenta de dados reais." Capturar o aluno que **já fez curso** e precisa de dados para executar. Considerar **parcerias de afiliação** com mentores/comunidades (SLEAG como "a ferramenta oficial" citada).
 
-5. **Ter resposta clara ao baseline gratuito** (Seller Center, Creative Center, Product Opportunities, SimpTok): *"O oficial mostra a SUA loja e tendências de anúncios; o TIKSPY mostra o mercado todo, com vendas reais, score e alertas."*
+5. **Ter resposta clara ao baseline gratuito** (Seller Center, Creative Center, Product Opportunities, SimpTok): *"O oficial mostra a SUA loja e tendências de anúncios; o SLEAG mostra o mercado todo, com vendas reais, score e alertas."*
 
 6. **Disciplina de preço.** O piso de mercado é agressivo: EchoTik US$9,90, VYRAL R$49, FastMoss/Pipiads/Minea US$49, Shoplus US$39, Kalodata US$45,90. Posicionar o **tier de entrada competitivo** (na faixa R$49-R$97 para fazer sentido com o ticket BR e bater VYRAL/Hunter Hub) e reservar **API + alertas real-time + monitoramento avançado** para os tiers superiores.
 
-7. **Confiabilidade do dado como argumento.** WinningHunter (90-95%, erro 20-40%) e Kalodata ("direcional") admitem imprecisão. O TIKSPY pode ganhar confiança ao ser **transparente sobre metodologia e margem de erro** — algo que VYRAL e a maioria não fazem.
+7. **Confiabilidade do dado como argumento.** WinningHunter (90-95%, erro 20-40%) e Kalodata ("direcional") admitem imprecisão. O SLEAG pode ganhar confiança ao ser **transparente sobre metodologia e margem de erro** — algo que VYRAL e a maioria não fazem.
 
 8. **Monitorar de perto:** **VYRAL** (rival direto BR por preço/posicionamento), **Gloda/ABLELIVE** (enterprise BR via parceria, forte em lives), **Hunterfy** (posicionamento idêntico — investigar a fundo), **Kalodata** (líder com BR + API + escala) e **Hunter Hub** (pode lançar módulo TikTok Shop).
 

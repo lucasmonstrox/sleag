@@ -45,7 +45,7 @@ Envelope padrão: `{ code, message, data, requestId }` — `code = 0` (e HTTP 20
 - Nem toda L2 tem L3 — algumas árvores param no segundo nível.
 - Dado de referência quase estático — cacheie.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Nível mais granular do seletor de categoria em cascata (L1 → L2 → L3) dos filtros de produto/ranking/descoberta.
 - Habilita análise de mercado em nichos muito específicos.
 

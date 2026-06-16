@@ -50,7 +50,7 @@ Aqui `data` **não é objeto nem array**: é uma **string simples** com o códig
 - Endpoint **single-purpose**: só retorna a região; não traz métricas do criador.
 - **Risk control:** `code=500` esperado; retry com backoff, sem QPS alto.
 
-## Relevância para o TIKSPY
+## Relevância para o SLEAG
 - Utilidade de apoio: **enriquecer/corrigir a região** de um criador (importante porque vários endpoints offline exigem `region`, ex.: ranking e lista).
 - Secundário; usado em pipelines de normalização de dados, não na UI direta.
 
