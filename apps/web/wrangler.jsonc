@@ -8,5 +8,8 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  // Custom domain: a Cloudflare cria o DNS + cert SSL automaticamente
+  // (a zona sleag.com.br precisa estar nesta conta).
+  "routes": [{ "pattern": "app.sleag.com.br", "custom_domain": true }],
   "dev": { "port": 8788 }
 }

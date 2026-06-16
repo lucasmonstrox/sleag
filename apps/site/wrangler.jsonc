@@ -5,5 +5,8 @@
   "compatibility_date": "2026-06-01",
   "assets": {
     "directory": "./out"
-  }
+  },
+  // Custom domain: a Cloudflare cria o DNS + cert SSL automaticamente
+  // (a zona sleag.com.br precisa estar nesta conta).
+  "routes": [{ "pattern": "sleag.com.br", "custom_domain": true }]
 }
