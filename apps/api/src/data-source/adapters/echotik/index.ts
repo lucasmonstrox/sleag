@@ -27,6 +27,7 @@ import {
   PRODUCT_CREATOR_PAGE_SIZE,
   PRODUCT_DETAIL_CREATORS,
   PRODUCT_DETAIL_VIDEOS,
+  PRODUCT_VIDEO_PAGE_SIZE,
   PRODUCT_LIVE_PAGE_SIZE,
   PRODUCT_REVIEW_PAGE_SIZE,
   PRODUCT_TREND_DEFAULT_DAYS,
@@ -63,12 +64,14 @@ import type {
   MarketProductCreatorPage,
   MarketProductDetail,
   MarketProductListItem,
+  MarketProductVideoPage,
   MarketProductLivePage,
   MarketProductReviewPage,
   MarketProductTrendPoint,
   ProductCreatorListOptions,
   ProductListOptions,
   ProductLiveListOptions,
+  ProductVideoListOptions,
   ProductSort,
   ProductTrendOptions,
   ReviewListOptions,
@@ -1004,6 +1007,36 @@ export const echotikSource: MarketDataSource = {
       page,
       // O endpoint não devolve total → página cheia = provável continuação.
       hasMore: items.length === PRODUCT_CREATOR_PAGE_SIZE,
+    }
+  },
+
+  async getProductVideos(
+    id: string,
+    options?: ProductVideoListOptions,
+  ): Promise<MarketProductVideoPage> {
+    const page = Math.max(1, Math.trunc(options?.page ?? 1))
+    const data = await echotikFetch("/echotik/product/video/list", {
+      product_id: id,
+      page_num: page,
+      page_size: PRODUCT_VIDEO_PAGE_SIZE,
+      product_video_sort_field: 1, // total_views_cnt
+      sort_type: 1, // desc — mais vistos primeiro
+    })
+    const items = productVideoItemSchema.array().parse(data ?? [])
+    // Capas echosell → 403; user_id → @handle resolvido à parte (best-effort).
+    const [covers, handleByUserId] = await Promise.all([
+      signCoverUrls(
+        items
+          .map((item) => item.reflow_cover ?? null)
+          .filter((url): url is string => Boolean(url)),
+      ),
+      fetchHandlesByUserId(items.map((item) => item.user_id)),
+    ])
+    return {
+      videos: toProductVideos(items, covers, handleByUserId),
+      page,
+      // O endpoint não devolve total → página cheia = provável continuação.
+      hasMore: items.length === PRODUCT_VIDEO_PAGE_SIZE,
     }
   },
 

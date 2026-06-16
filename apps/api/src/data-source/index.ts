@@ -36,6 +36,7 @@ export type {
   MarketProductReviewPage,
   MarketProductTrendPoint,
   MarketProductVideo,
+  MarketProductVideoPage,
   MarketSummary,
   MarketTrendPoint,
   ProductCreatorListOptions,

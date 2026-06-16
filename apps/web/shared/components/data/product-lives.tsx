@@ -99,8 +99,10 @@ function useProductLives(productId: string) {
 
 type ProductLivesProps = {
   productId: string
-  /** Altura do scroller do Virtuoso (px). Default 440. */
+  /** Altura do scroller interno (px). Ignorado quando `useWindowScroll`. Default 440. */
   height?: number
+  /** Usa o scroll da página (ancora no Radix ScrollArea) em vez de altura fixa. */
+  useWindowScroll?: boolean
   className?: string
 }
 
@@ -113,62 +115,80 @@ export function ProductLives(props: ProductLivesProps) {
   return <LivesList key={props.productId} {...props} />
 }
 
-function LivesList({ productId, height = 440, className }: ProductLivesProps) {
+function LivesList({
+  productId,
+  height = 440,
+  useWindowScroll = false,
+  className,
+}: ProductLivesProps) {
   const { state, loadMore } = useProductLives(productId)
   const { lives, status, hasMore, loadingMore } = state
 
-  if (status === "loading") {
-    return <LiveSkeleton />
-  }
+  // Âncora estável pra achar o viewport do Radix ScrollArea (o app não rola na
+  // janela); o Virtuoso ancora nele em vez de criar um scroller próprio.
+  const anchorRef = useRef<HTMLDivElement>(null)
+  const [scrollParent, setScrollParent] = useState<HTMLElement | null>(null)
 
-  if (status === "error") {
-    return (
-      <p className="py-6 text-center text-sm text-muted-foreground">
-        Não foi possível carregar as lives agora.
-      </p>
+  useEffect(() => {
+    if (!useWindowScroll) return
+    const parent = anchorRef.current?.closest<HTMLElement>(
+      "[data-radix-scroll-area-viewport]",
     )
-  }
+    setScrollParent(parent ?? null)
+  }, [useWindowScroll])
 
-  if (lives.length === 0) {
-    return (
-      <p className="py-6 text-center text-sm text-muted-foreground">
-        Nenhuma live indexada pra este produto ainda.
-      </p>
-    )
-  }
+  const scrollProps = useWindowScroll
+    ? scrollParent
+      ? { customScrollParent: scrollParent }
+      : { useWindowScroll: true as const }
+    : { style: { height } }
 
   return (
-    <div className={cn("flex flex-col gap-3", className)}>
-      <p className="text-xs text-muted-foreground">
-        {/* Contagem REAL do que foi carregado (o endpoint não dá total → "N+"
-            enquanto houver mais páginas). O total_live_cnt do detalhe é furado
-            (volta 0 mesmo com lives), então a fonte de verdade é a própria lista. */}
-        {lives.length}
-        {hasMore ? "+" : ""} {lives.length === 1 ? "live" : "lives"} — ordenadas
-        por GMV estimado.
-      </p>
-      <Virtuoso
-        style={{ height }}
-        data={lives}
-        // endReached pagina ao chegar no fim; o guard interno evita corrida.
-        endReached={() => {
-          if (hasMore) void loadMore()
-        }}
-        increaseViewportBy={200}
-        itemContent={(_, live) => <LiveRow live={live} />}
-        components={{
-          Footer: () =>
-            loadingMore ? (
-              <div className="flex items-center justify-center py-4 text-muted-foreground">
-                <Loader2Icon className="size-4 animate-spin" />
-              </div>
-            ) : !hasMore ? (
-              <p className="py-4 text-center text-xs text-muted-foreground/70">
-                Fim das lives.
-              </p>
-            ) : null,
-        }}
-      />
+    <div ref={anchorRef} className={cn("flex flex-col gap-3", className)}>
+      {status === "loading" ? (
+        <LiveSkeleton />
+      ) : status === "error" ? (
+        <p className="py-6 text-center text-sm text-muted-foreground">
+          Não foi possível carregar as lives agora.
+        </p>
+      ) : lives.length === 0 ? (
+        <p className="py-6 text-center text-sm text-muted-foreground">
+          Nenhuma live indexada pra este produto ainda.
+        </p>
+      ) : (
+        <>
+          <p className="text-xs text-muted-foreground">
+            {/* Contagem REAL do que foi carregado (o endpoint não dá total → "N+"
+                enquanto houver mais páginas). O total_live_cnt do detalhe é furado
+                (volta 0 mesmo com lives), então a fonte de verdade é a lista. */}
+            {lives.length}
+            {hasMore ? "+" : ""} {lives.length === 1 ? "live" : "lives"} —
+            ordenadas por GMV estimado.
+          </p>
+          <Virtuoso
+            {...scrollProps}
+            data={lives}
+            // endReached pagina ao chegar no fim; o guard interno evita corrida.
+            endReached={() => {
+              if (hasMore) void loadMore()
+            }}
+            increaseViewportBy={200}
+            itemContent={(_, live) => <LiveRow live={live} />}
+            components={{
+              Footer: () =>
+                loadingMore ? (
+                  <div className="flex items-center justify-center py-4 text-muted-foreground">
+                    <Loader2Icon className="size-4 animate-spin" />
+                  </div>
+                ) : !hasMore ? (
+                  <p className="py-4 text-center text-xs text-muted-foreground/70">
+                    Fim das lives.
+                  </p>
+                ) : null,
+            }}
+          />
+        </>
+      )}
     </div>
   )
 }

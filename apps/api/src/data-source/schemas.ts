@@ -109,6 +109,17 @@ export const marketProductVideoSchema = z.object({
 })
 
 /**
+ * Página de vídeos que promovem um produto (product/video/list). O endpoint não
+ * devolve total → `hasMore` é heurístico (página cheia = provável continuação),
+ * igual a criadores/lives/avaliações.
+ */
+export const marketProductVideoPageSchema = z.object({
+  videos: z.array(marketProductVideoSchema),
+  page: z.number().int().positive(),
+  hasMore: z.boolean(),
+})
+
+/**
  * Ficha completa de um produto pro sheet de detalhe do dashboard. Combina o
  * product/detail (preço/comissão/avaliação REAIS em BRL, janelas de venda) com
  * as listas de criadores e vídeos que o promovem. Sem GMV em R$: a EchoTik só

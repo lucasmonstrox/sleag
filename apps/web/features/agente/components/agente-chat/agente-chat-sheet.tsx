@@ -21,7 +21,10 @@ export function AgenteChatSheet({ open, onOpenChange }: AgenteChatSheetProps) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full gap-0 sm:max-w-md">
+      <SheetContent
+        side="right"
+        className="w-full gap-0 data-[side=right]:sm:max-w-xl"
+      >
         <SheetHeader className="border-b">
           <SheetTitle>Agente sleag</SheetTitle>
           <SheetDescription>

@@ -22,6 +22,7 @@ import type {
   marketProductReviewSchema,
   marketProductSchema,
   marketProductTrendPointSchema,
+  marketProductVideoPageSchema,
   marketProductVideoSchema,
   marketSummarySchema,
   marketTrendPointSchema,
@@ -35,6 +36,9 @@ export type MarketProductCreatorPage = z.infer<
   typeof marketProductCreatorPageSchema
 >
 export type MarketProductVideo = z.infer<typeof marketProductVideoSchema>
+export type MarketProductVideoPage = z.infer<
+  typeof marketProductVideoPageSchema
+>
 export type MarketProductReview = z.infer<typeof marketProductReviewSchema>
 export type MarketProductReviewPage = z.infer<
   typeof marketProductReviewPageSchema
@@ -102,6 +106,12 @@ export type ProductLiveListOptions = {
  * pede a próxima ao rolar até o fim. Ordenação é fixa (vendas do produto, desc).
  */
 export type ProductCreatorListOptions = {
+  /** Página (1-based); default 1. */
+  page?: number
+}
+
+/** Paginação dos vídeos que promovem um produto (product/video/list, page_size 10). */
+export type ProductVideoListOptions = {
   /** Página (1-based); default 1. */
   page?: number
 }
@@ -230,6 +240,11 @@ export type MarketDataSource = {
     id: string,
     options?: ProductCreatorListOptions,
   ): Promise<MarketProductCreatorPage>
+  /** Vídeos paginados que promovem um produto (product/video/list, por views) — aba Vídeos. */
+  getProductVideos(
+    id: string,
+    options?: ProductVideoListOptions,
+  ): Promise<MarketProductVideoPage>
   /** Avaliações paginadas de um produto (product/comment) — aba Avaliações. */
   getProductReviews(
     id: string,

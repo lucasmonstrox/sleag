@@ -3,8 +3,6 @@ import type { ReactNode } from "react"
 import { notFound } from "next/navigation"
 import { StarIcon } from "lucide-react"
 
-import type { MarketProductVideo } from "api"
-
 import { Badge } from "@workspace/ui/components/badge"
 import {
   Tabs,
@@ -21,9 +19,8 @@ import {
   ProductCreators,
   ProductLives,
   ProductReviews,
-  VideoGrid,
+  ProductVideos,
 } from "@/shared"
-import type { VideoItem } from "@/shared"
 
 import { getProductDetail, getProductTrend } from "../../services/produtos"
 import { ProdutoDetalheHeader } from "./produto-detalhe-header"
@@ -41,26 +38,16 @@ export async function ProdutoDetalhePage({ id }: ProdutoDetalhePageProps) {
   ])
   if (!detail) notFound()
 
-  const videoItems: VideoItem[] = detail.videos.map(toVideoItem)
-
   return (
     <PageShell>
       <ProdutoDetalheHeader detail={detail} />
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Kpi label="Preço" value={priceLabel(detail.priceMin, detail.priceMax)} />
         <Kpi
           label="Vendas 30d"
           value={formatCompact(detail.sales30d)}
           hint={`${formatCompact(detail.salesTotal)} no total`}
-        />
-        <Kpi
-          label="Comissão"
-          value={
-            detail.commissionRate != null
-              ? `${Math.round(detail.commissionRate * 100)}%`
-              : "—"
-          }
         />
         <Kpi
           label="Avaliação"
@@ -95,7 +82,7 @@ export async function ProdutoDetalhePage({ id }: ProdutoDetalhePageProps) {
           <TabsTrigger value="videos">
             Vídeos
             <Badge variant="secondary" className="ml-1.5">
-              {detail.videos.length}
+              {formatCompact(detail.videoCount)}
             </Badge>
           </TabsTrigger>
           <TabsTrigger value="lives">Lives</TabsTrigger>
@@ -115,24 +102,25 @@ export async function ProdutoDetalhePage({ id }: ProdutoDetalhePageProps) {
           <ProductCreators productId={detail.id} useWindowScroll />
         </TabsContent>
         <TabsContent value="videos">
-          {videoItems.length > 0 ? (
-            <VideoGrid items={videoItems} />
-          ) : (
-            <Empty>Nenhum vídeo registrado pra este produto.</Empty>
-          )}
+          {/* Client island: pagina os vídeos por conta própria (server action,
+              ordenados por views), independente do detalhe do server. Usa o
+              scroll da página — sem scroller aninhado dentro do tab. */}
+          <ProductVideos productId={detail.id} useWindowScroll />
         </TabsContent>
         <TabsContent value="lives">
           {/* Client island: pagina as lives associadas por conta própria (server
-              action, ordenadas por GMV), independente do detalhe do server. */}
-          <ProductLives productId={detail.id} height={520} />
+              action, ordenadas por GMV), independente do detalhe do server. Usa
+              o scroll da página — sem scroller aninhado dentro do tab. */}
+          <ProductLives productId={detail.id} useWindowScroll />
         </TabsContent>
         <TabsContent value="reviews">
           {/* Client island: pagina as avaliações por conta própria (server
-              action), independente do detalhe já carregado no server. */}
+              action), independente do detalhe já carregado no server. Usa o
+              scroll da página — sem scroller aninhado dentro do tab. */}
           <ProductReviews
             productId={detail.id}
             reviewCount={detail.reviewCount}
-            height={520}
+            useWindowScroll
           />
         </TabsContent>
       </Tabs>
@@ -162,40 +150,9 @@ function Kpi({
   )
 }
 
-function Empty({ children }: { children: ReactNode }) {
-  return (
-    <p className="py-6 text-sm text-muted-foreground">{children}</p>
-  )
-}
-
 /** Faixa de preço; "—" sem preço. NB: a fonte dá USD — ver pendência de conversão. */
 function priceLabel(min: number | null, max: number | null): string {
   if (min == null) return "—"
   if (max == null || min === max) return formatBrl(min)
   return `${formatBrl(min)}–${formatBrl(max)}`
-}
-
-/** Vídeo do produto → item do VideoGrid (player via videoId; vendas no slot verde). */
-function toVideoItem(video: MarketProductVideo): VideoItem {
-  const handle = video.creatorHandle
-  return {
-    title:
-      video.description ||
-      video.hashtags.map((tag) => `#${tag}`).join(" ") ||
-      "Vídeo do produto",
-    creator: handle ? `@${handle}` : "",
-    creatorUrl: handle ? `https://www.tiktok.com/@${handle}` : null,
-    href: handle ? `https://www.tiktok.com/@${handle}/video/${video.id}` : null,
-    views: formatCompact(video.views),
-    gmv:
-      video.productSales > 0
-        ? `${formatCompact(video.productSales)} vendas`
-        : null,
-    cover: video.cover,
-    videoId: video.id,
-    likes: formatCompact(video.likes),
-    comments: formatCompact(video.comments),
-    shares: formatCompact(video.shares),
-    favorites: formatCompact(video.favorites),
-  }
 }

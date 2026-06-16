@@ -6,7 +6,7 @@ import Link from "next/link"
 
 import { ChevronRightIcon, StarIcon } from "lucide-react"
 
-import type { MarketProduct, MarketProductVideo } from "api"
+import type { MarketProduct } from "api"
 
 import { Badge } from "@workspace/ui/components/badge"
 import {
@@ -29,10 +29,9 @@ import {
   ProductCreators,
   ProductLives,
   ProductReviews,
+  ProductVideos,
   ScorePill,
-  VideoGrid,
 } from "@/shared"
-import type { VideoItem } from "@/shared"
 
 import { useProductDetail } from "../../hooks/data/queries/use-product-detail"
 import {
@@ -77,10 +76,6 @@ function SheetBody({ product }: { product: MarketProduct }) {
   const detail = state.status === "success" ? state.detail : null
   const failed =
     state.status === "error" || (state.status === "success" && detail === null)
-
-  const videoItems: VideoItem[] = (detail?.videos ?? []).map((video) =>
-    toVideoItem(video),
-  )
 
   return (
     <>
@@ -189,7 +184,7 @@ function SheetBody({ product }: { product: MarketProduct }) {
                 Vídeos
                 {detail ? (
                   <Badge variant="secondary" className="ml-1.5">
-                    {detail.videos.length}
+                    {formatCompact(detail.videoCount)}
                   </Badge>
                 ) : null}
               </TabsTrigger>
@@ -209,16 +204,9 @@ function SheetBody({ product }: { product: MarketProduct }) {
               <ProductCreators productId={product.id} height={380} />
             </TabsContent>
             <TabsContent value="videos">
-              {loading ? (
-                <LoadingRows />
-              ) : videoItems.length > 0 ? (
-                <VideoGrid
-                  items={videoItems}
-                  className="grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2"
-                />
-              ) : (
-                <EmptyHint>Nenhum vídeo registrado pra este produto.</EmptyHint>
-              )}
+              {/* Vídeos carregam sob demanda (server action paginada, por views),
+                  então não dependem do `detail` — montam com o id do produto. */}
+              <ProductVideos productId={product.id} height={380} />
             </TabsContent>
             <TabsContent value="lives">
               {/* Lives carregam sob demanda (server action paginada, por GMV),
@@ -304,51 +292,9 @@ function Stat({
   )
 }
 
-function LoadingRows() {
-  return (
-    <div className="flex flex-col gap-3">
-      {Array.from({ length: 4 }, (_, index) => (
-        <div
-          key={index}
-          className="h-12 w-full animate-pulse rounded-lg bg-muted/50"
-        />
-      ))}
-    </div>
-  )
-}
-
-function EmptyHint({ children }: { children: ReactNode }) {
-  return <p className="py-6 text-center text-sm text-muted-foreground">{children}</p>
-}
-
 /** Faixa de preço em BRL: "R$ 44,30" ou "R$ 44,30–R$ 56,26". */
 function priceLabel(min: number | null, max: number | null): string {
   if (min == null) return "—"
   if (max == null || min === max) return formatBrl(min)
   return `${formatBrl(min)}–${formatBrl(max)}`
-}
-
-/** Vídeo do produto → item do VideoGrid (player via videoId; vendas no slot verde). */
-function toVideoItem(video: MarketProductVideo): VideoItem {
-  const handle = video.creatorHandle
-  return {
-    title:
-      video.description ||
-      video.hashtags.map((tag) => `#${tag}`).join(" ") ||
-      "Vídeo do produto",
-    creator: handle ? `@${handle}` : "",
-    creatorUrl: handle ? `https://www.tiktok.com/@${handle}` : null,
-    href: handle ? `https://www.tiktok.com/@${handle}/video/${video.id}` : null,
-    views: formatCompact(video.views),
-    gmv:
-      video.productSales > 0
-        ? `${formatCompact(video.productSales)} vendas`
-        : null,
-    cover: video.cover,
-    videoId: video.id,
-    likes: formatCompact(video.likes),
-    comments: formatCompact(video.comments),
-    shares: formatCompact(video.shares),
-    favorites: formatCompact(video.favorites),
-  }
 }

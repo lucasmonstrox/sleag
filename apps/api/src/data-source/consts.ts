@@ -24,6 +24,13 @@ export const PRODUCT_DETAIL_VIDEOS = 8
 export const PRODUCT_CREATOR_PAGE_SIZE = 10
 
 /**
+ * Vídeos associados ao produto (product/video/list): page_size travado em 10. A
+ * paginação vem de page_num; a UI (react-virtuoso/grid) pede a próxima ao rolar.
+ * Ordenado server-side por views (product_video_sort_field=1, desc).
+ */
+export const PRODUCT_VIDEO_PAGE_SIZE = 10
+
+/**
  * Avaliações do produto (product/comment): page_size travado em 10 igual aos
  * demais endpoints offline. A paginação vem de page_num; a UI (react-virtuoso)
  * pede a próxima página ao chegar no fim da lista.

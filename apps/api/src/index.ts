@@ -207,6 +207,25 @@ const market = new Elysia({ prefix: "/v1/market" })
     },
     { params: t.Object({ id: t.String() }), query: livesQuery },
   )
+  // Vídeos associados ao produto (product/video/list, por views) — aba Vídeos.
+  // Sub-rota estática de :id como /reviews, sem colisão com o :id dinâmico.
+  .get(
+    "/products/:id/videos",
+    async ({ params, query, set }) => {
+      try {
+        return await respond(set.headers, (source) =>
+          source.getProductVideos(params.id, { page: query.page }),
+        )
+      } catch (error) {
+        // Produto sem vídeos indexados → página vazia (não é erro pra UI).
+        if (error instanceof EchotikApiError && error.status === 404) {
+          return { videos: [], page: query.page ?? 1, hasMore: false }
+        }
+        throw error
+      }
+    },
+    { params: t.Object({ id: t.String() }), query: livesQuery },
+  )
   // Série diária da tendência do produto (product/trend) — gráfico da página.
   // Sub-rota estática de :id como /reviews, sem colisão com o :id dinâmico.
   .get(
@@ -433,6 +452,7 @@ export type {
   MarketProductReviewPage,
   MarketProductTrendPoint,
   MarketProductVideo,
+  MarketProductVideoPage,
   MarketSummary,
   MarketTrendPoint,
   ProductListOptions,

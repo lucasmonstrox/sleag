@@ -18,12 +18,14 @@ import type {
   MarketCreatorTrendPoint,
   MarketCreatorVideoPage,
   MarketProductCreatorPage,
+  MarketProductVideoPage,
   MarketTrendPoint,
   CreatorProductListOptions,
   CreatorTrendOptions,
   CreatorVideoListOptions,
   ProductCreatorListOptions,
   ProductLiveListOptions,
+  ProductVideoListOptions,
   ReviewListOptions,
 } from "../../types"
 
@@ -347,6 +349,7 @@ const MOCK_PRODUCT_LIVE_HOSTS = [
 ]
 const MOCK_PRODUCT_LIVE_TOTAL = 23
 const MOCK_PRODUCT_CREATOR_TOTAL = 27
+const MOCK_PRODUCT_VIDEO_TOTAL = 34
 
 /** Live sintética determinística pelo índice global (estável entre páginas). */
 function buildMockProductLive(index: number) {
@@ -619,6 +622,37 @@ export const mockSource: MarketDataSource = {
       page,
       hasMore: start + pageSize < MOCK_PRODUCT_CREATOR_TOTAL,
     }
+  },
+
+  async getProductVideos(
+    id,
+    options?: ProductVideoListOptions,
+  ): Promise<MarketProductVideoPage> {
+    const page = Math.max(1, Math.trunc(options?.page ?? 1))
+    const pageSize = 10
+    const start = (page - 1) * pageSize
+    const videos: MarketProductVideo[] = Array.from(
+      { length: Math.max(0, Math.min(pageSize, MOCK_PRODUCT_VIDEO_TOTAL - start)) },
+      (_, offset) => {
+        const index = start + offset
+        const creative = MOCK_CREATIVES[index % MOCK_CREATIVES.length]!
+        return {
+          id: `${id}-vid-${index}`,
+          creatorHandle: creative.creatorHandle.replace(/^@/, ""),
+          cover: null,
+          description: creative.title,
+          hashtags: ["tiktokmademebuyit", "achadinhos"],
+          durationSec: 24 + (index % 5) * 6,
+          views: creative.views,
+          likes: creative.likes ?? 0,
+          comments: creative.comments ?? 0,
+          shares: creative.shares ?? 0,
+          favorites: creative.favorites ?? 0,
+          productSales: Math.max(0, 1_500 - index * 45),
+        }
+      },
+    )
+    return { videos, page, hasMore: start + pageSize < MOCK_PRODUCT_VIDEO_TOTAL }
   },
 
   async getProductTrend(id, options) {

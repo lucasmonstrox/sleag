@@ -13,7 +13,6 @@ import { cn } from "@workspace/ui/lib/utils"
 import { Virtuoso } from "react-virtuoso"
 
 import { fetchProductReviews } from "../../actions/product-reviews"
-import { formatInteger } from "../../utils/format"
 
 type ReviewsState = {
   reviews: MarketProductReview[]
@@ -93,8 +92,10 @@ type ProductReviewsProps = {
   productId: string
   /** Total de avaliações do produto (do detalhe) — exibido no cabeçalho. */
   reviewCount?: number | null
-  /** Altura do scroller do Virtuoso (px). Default 440. */
+  /** Altura do scroller interno (px). Ignorado quando `useWindowScroll`. Default 440. */
   height?: number
+  /** Usa o scroll da página (ancora no Radix ScrollArea) em vez de altura fixa. */
+  useWindowScroll?: boolean
   className?: string
 }
 
@@ -109,63 +110,68 @@ export function ProductReviews(props: ProductReviewsProps) {
 
 function ReviewsList({
   productId,
-  reviewCount,
   height = 440,
+  useWindowScroll = false,
   className,
 }: ProductReviewsProps) {
   const { state, loadMore } = useProductReviews(productId)
   const { reviews, status, hasMore, loadingMore } = state
 
-  if (status === "loading") {
-    return <ReviewSkeleton />
-  }
+  // Âncora estável pra achar o viewport do Radix ScrollArea (o app não rola na
+  // janela); o Virtuoso ancora nele em vez de criar um scroller próprio.
+  const anchorRef = useRef<HTMLDivElement>(null)
+  const [scrollParent, setScrollParent] = useState<HTMLElement | null>(null)
 
-  if (status === "error") {
-    return (
-      <p className="py-6 text-center text-sm text-muted-foreground">
-        Não foi possível carregar as avaliações agora.
-      </p>
+  useEffect(() => {
+    if (!useWindowScroll) return
+    const parent = anchorRef.current?.closest<HTMLElement>(
+      "[data-radix-scroll-area-viewport]",
     )
-  }
+    setScrollParent(parent ?? null)
+  }, [useWindowScroll])
 
-  if (reviews.length === 0) {
-    return (
-      <p className="py-6 text-center text-sm text-muted-foreground">
-        Nenhuma avaliação indexada pra este produto ainda.
-      </p>
-    )
-  }
+  const scrollProps = useWindowScroll
+    ? scrollParent
+      ? { customScrollParent: scrollParent }
+      : { useWindowScroll: true as const }
+    : { style: { height } }
 
   return (
-    <div className={cn("flex flex-col gap-3", className)}>
-      {reviewCount ? (
-        <p className="text-xs text-muted-foreground">
-          {formatInteger(reviewCount)} avaliações no total — mostrando as
-          coletadas pela EchoTik.
+    <div ref={anchorRef} className={cn("flex flex-col gap-3", className)}>
+      {status === "loading" ? (
+        <ReviewSkeleton />
+      ) : status === "error" ? (
+        <p className="py-6 text-center text-sm text-muted-foreground">
+          Não foi possível carregar as avaliações agora.
         </p>
-      ) : null}
-      <Virtuoso
-        style={{ height }}
-        data={reviews}
-        // endReached pagina ao chegar no fim; o guard interno evita corrida.
-        endReached={() => {
-          if (hasMore) void loadMore()
-        }}
-        increaseViewportBy={200}
-        itemContent={(_, review) => <ReviewRow review={review} />}
-        components={{
-          Footer: () =>
-            loadingMore ? (
-              <div className="flex items-center justify-center py-4 text-muted-foreground">
-                <Loader2Icon className="size-4 animate-spin" />
-              </div>
-            ) : !hasMore ? (
-              <p className="py-4 text-center text-xs text-muted-foreground/70">
-                Fim das avaliações.
-              </p>
-            ) : null,
-        }}
-      />
+      ) : reviews.length === 0 ? (
+        <p className="py-6 text-center text-sm text-muted-foreground">
+          Nenhuma avaliação indexada pra este produto ainda.
+        </p>
+      ) : (
+        <Virtuoso
+          {...scrollProps}
+          data={reviews}
+          // endReached pagina ao chegar no fim; o guard interno evita corrida.
+          endReached={() => {
+            if (hasMore) void loadMore()
+          }}
+          increaseViewportBy={200}
+          itemContent={(_, review) => <ReviewRow review={review} />}
+          components={{
+            Footer: () =>
+              loadingMore ? (
+                <div className="flex items-center justify-center py-4 text-muted-foreground">
+                  <Loader2Icon className="size-4 animate-spin" />
+                </div>
+              ) : !hasMore ? (
+                <p className="py-4 text-center text-xs text-muted-foreground/70">
+                  Fim das avaliações.
+                </p>
+              ) : null,
+          }}
+        />
+      )}
     </div>
   )
 }
