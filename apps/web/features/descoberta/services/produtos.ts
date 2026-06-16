@@ -53,3 +53,16 @@ export const getProductDetail = cache(async (id: string) => {
   }
   return data
 })
+
+/**
+ * Série diária de tendência de um produto (product/trend) — alimenta o gráfico
+ * da página. Auxiliar: falha ou ausência de histórico NÃO derruba a página
+ * (devolve []), o gráfico mostra o próprio estado vazio. `days` recua a janela.
+ */
+export const getProductTrend = cache(async (id: string, days = 30) => {
+  const { data, error } = await api.v1.market
+    .products({ id })
+    .trend.get({ query: { days } })
+  if (error) return []
+  return data
+})

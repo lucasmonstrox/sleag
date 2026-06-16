@@ -2,6 +2,7 @@ import { cors } from "@elysiajs/cors"
 import { Elysia, t } from "elysia"
 import { CloudflareAdapter } from "elysia/adapter/cloudflare-worker"
 
+import { agent } from "./agent"
 import { EchotikApiError, fromMarketSource } from "./data-source"
 import type { MarketDataSource } from "./data-source"
 import { notifications } from "./notifications"
@@ -75,6 +76,16 @@ const trendQuery = t.Object({
   days: t.Optional(t.Numeric({ minimum: 7, maximum: 90 })),
 })
 
+const reviewsQuery = t.Object({
+  page: t.Optional(t.Numeric({ minimum: 1, maximum: 100000 })),
+  minRating: t.Optional(t.Numeric({ minimum: 0, maximum: 5 })),
+  maxRating: t.Optional(t.Numeric({ minimum: 0, maximum: 5 })),
+})
+
+const livesQuery = t.Object({
+  page: t.Optional(t.Numeric({ minimum: 1, maximum: 100000 })),
+})
+
 type SetHeaders = Record<string, string | number>
 
 async function respond<T>(
@@ -135,6 +146,105 @@ const market = new Elysia({ prefix: "/v1/market" })
     },
     { params: t.Object({ id: t.String() }) },
   )
+  // Avaliações paginadas (product/comment) — aba Avaliações do produto. Fica
+  // depois do :id mas é sub-rota estática (:id/reviews), sem colisão.
+  .get(
+    "/products/:id/reviews",
+    async ({ params, query, set }) => {
+      try {
+        return await respond(set.headers, (source) =>
+          source.getProductReviews(params.id, {
+            page: query.page,
+            minRating: query.minRating,
+            maxRating: query.maxRating,
+          }),
+        )
+      } catch (error) {
+        // Produto sem avaliações indexadas → página vazia (não é erro pra UI).
+        if (error instanceof EchotikApiError && error.status === 404) {
+          return { reviews: [], page: query.page ?? 1, hasMore: false }
+        }
+        throw error
+      }
+    },
+    { params: t.Object({ id: t.String() }), query: reviewsQuery },
+  )
+  // Lives associadas ao produto (product/live/list, por GMV) — aba Lives.
+  // Sub-rota estática de :id como /reviews, sem colisão com o :id dinâmico.
+  .get(
+    "/products/:id/lives",
+    async ({ params, query, set }) => {
+      try {
+        return await respond(set.headers, (source) =>
+          source.getProductLives(params.id, { page: query.page }),
+        )
+      } catch (error) {
+        // Produto sem lives indexadas → página vazia (não é erro pra UI).
+        if (error instanceof EchotikApiError && error.status === 404) {
+          return { lives: [], page: query.page ?? 1, hasMore: false }
+        }
+        throw error
+      }
+    },
+    { params: t.Object({ id: t.String() }), query: livesQuery },
+  )
+  // Criadores associados ao produto (product/influencer/list, por vendas) — aba
+  // Criadores. Sub-rota estática de :id como /reviews, sem colisão com o :id.
+  .get(
+    "/products/:id/creators",
+    async ({ params, query, set }) => {
+      try {
+        return await respond(set.headers, (source) =>
+          source.getProductCreators(params.id, { page: query.page }),
+        )
+      } catch (error) {
+        // Produto sem criadores indexados → página vazia (não é erro pra UI).
+        if (error instanceof EchotikApiError && error.status === 404) {
+          return { creators: [], page: query.page ?? 1, hasMore: false }
+        }
+        throw error
+      }
+    },
+    { params: t.Object({ id: t.String() }), query: livesQuery },
+  )
+  // Vídeos associados ao produto (product/video/list, por views) — aba Vídeos.
+  // Sub-rota estática de :id como /reviews, sem colisão com o :id dinâmico.
+  .get(
+    "/products/:id/videos",
+    async ({ params, query, set }) => {
+      try {
+        return await respond(set.headers, (source) =>
+          source.getProductVideos(params.id, { page: query.page }),
+        )
+      } catch (error) {
+        // Produto sem vídeos indexados → página vazia (não é erro pra UI).
+        if (error instanceof EchotikApiError && error.status === 404) {
+          return { videos: [], page: query.page ?? 1, hasMore: false }
+        }
+        throw error
+      }
+    },
+    { params: t.Object({ id: t.String() }), query: livesQuery },
+  )
+  // Série diária da tendência do produto (product/trend) — gráfico da página.
+  // Sub-rota estática de :id como /reviews, sem colisão com o :id dinâmico.
+  .get(
+    "/products/:id/trend",
+    async ({ params, query, set }) => {
+      try {
+        return await respond(set.headers, (source) =>
+          source.getProductTrend(params.id, { days: query.days }),
+        )
+      } catch (error) {
+        // Produto sem histórico indexado → série vazia (não é erro pra UI).
+        if (error instanceof EchotikApiError && error.status === 404) {
+          return []
+        }
+        throw error
+      }
+    },
+    { params: t.Object({ id: t.String() }), query: trendQuery },
+  )
   .get(
     "/creatives/trending",
     ({ query, set }) =>
@@ -165,6 +275,73 @@ const market = new Elysia({ prefix: "/v1/market" })
         }),
       ),
     { query: creatorsQuery },
+  )
+  // Ficha de um criador (influencer/detail) — header da página /criadores/[id].
+  // Sub-rotas estáticas (:id/videos etc.) vêm antes pra não cair no :id dinâmico.
+  .get(
+    "/creators/:id/videos",
+    async ({ params, query, set }) => {
+      try {
+        return await respond(set.headers, (source) =>
+          source.getCreatorVideos(params.id, { page: query.page }),
+        )
+      } catch (error) {
+        if (error instanceof EchotikApiError && error.status === 404) {
+          return { videos: [], page: query.page ?? 1, hasMore: false }
+        }
+        throw error
+      }
+    },
+    { params: t.Object({ id: t.String() }), query: livesQuery },
+  )
+  .get(
+    "/creators/:id/products",
+    async ({ params, query, set }) => {
+      try {
+        return await respond(set.headers, (source) =>
+          source.getCreatorProducts(params.id, { page: query.page }),
+        )
+      } catch (error) {
+        if (error instanceof EchotikApiError && error.status === 404) {
+          return { products: [], page: query.page ?? 1, hasMore: false }
+        }
+        throw error
+      }
+    },
+    { params: t.Object({ id: t.String() }), query: livesQuery },
+  )
+  .get(
+    "/creators/:id/trend",
+    async ({ params, query, set }) => {
+      try {
+        return await respond(set.headers, (source) =>
+          source.getCreatorTrend(params.id, { days: query.days }),
+        )
+      } catch (error) {
+        if (error instanceof EchotikApiError && error.status === 404) {
+          return []
+        }
+        throw error
+      }
+    },
+    { params: t.Object({ id: t.String() }), query: trendQuery },
+  )
+  .get(
+    "/creators/:id",
+    async ({ params, set, status }) => {
+      try {
+        return await respond(set.headers, (source) =>
+          source.getCreatorDetail(params.id),
+        )
+      } catch (error) {
+        // user_id sem ficha no EchoTik → 404 tipado (não polui o tipo do 200).
+        if (error instanceof EchotikApiError && error.status === 404) {
+          return status(404, { error: "creator_not_found" })
+        }
+        throw error
+      }
+    },
+    { params: t.Object({ id: t.String() }) },
   )
   .get(
     "/videos",
@@ -240,6 +417,7 @@ export const app = new Elysia(
   .use(market)
   .use(webhooks)
   .use(notifications)
+  .use(agent)
 
 // Só sobe o servidor Bun quando executado direto (`bun run src/index.ts`); ao ser
 // importado pelo worker.ts (workerd) ou pelo Eden (tipos), não escuta porta.
@@ -257,12 +435,24 @@ export type {
   MarketCategoryStats,
   MarketCreative,
   MarketCreator,
+  MarketCreatorDetail,
+  MarketCreatorProduct,
+  MarketCreatorProductPage,
+  MarketCreatorTrendPoint,
+  MarketCreatorVideoPage,
   MarketLive,
   MarketProduct,
   MarketProductCreator,
+  MarketProductCreatorPage,
   MarketProductDetail,
   MarketProductListItem,
+  MarketProductLive,
+  MarketProductLivePage,
+  MarketProductReview,
+  MarketProductReviewPage,
+  MarketProductTrendPoint,
   MarketProductVideo,
+  MarketProductVideoPage,
   MarketSummary,
   MarketTrendPoint,
   ProductListOptions,

@@ -27,6 +27,15 @@ export function FinalCtaSection() {
         <div className="mt-10">
           <WaitlistForm />
         </div>
+        <p className="mt-6 text-sm text-zinc-500">
+          Já tem acesso?{" "}
+          <a
+            href="https://app.sleag.com.br"
+            className="font-medium text-[#25f4ee] underline-offset-4 transition-colors hover:text-white hover:underline"
+          >
+            Entrar no app →
+          </a>
+        </p>
         <p className="mt-6 font-mono text-[10px] text-zinc-600">
           // vagas em lotes por capacidade de infra — limite técnico, não falsa escassez
         </p>

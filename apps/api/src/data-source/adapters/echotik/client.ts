@@ -42,36 +42,27 @@ const CONTROL_CHARS_REGEX = new RegExp(
 
 const cache = new Map<string, { expires: number; value: unknown }>()
 
-// ── Throttle (plano RapidAPI básico tem rate-limit apertado) ──────────────────
+// ── Concorrência (sem fila serial) ────────────────────────────────────────────
 // O dashboard dispara summary+top+creatives juntos, cada um com várias páginas.
-// 1) dedup de requisições EM VOO: mesma URL concorrente compartilha 1 request;
-// 2) serializa as chamadas distintas com um gap mínimo entre elas;
-// 3) retry com backoff no 429, como rede de segurança.
-const MIN_REQUEST_GAP_MS = Number(
-  process.env.ECHOTIK_MIN_REQUEST_GAP_MS ?? 300,
-)
+// NÃO serializamos: chamadas distintas vão direto, em paralelo. Quem protege a
+// cota é o CACHE + o dedup em voo (mesma URL concorrente = 1 request) — afrouxar
+// a concorrência não muda o nº de chamadas, só o pico de QPS. Camadas:
+// 1) cache por URL (TTL): rebate barato dentro da janela;
+// 2) dedup EM VOO: chamadas concorrentes pra mesma URL compartilham 1 request;
+// 3) retry com backoff no 429, como rede de segurança contra o rate-limit.
 const RATE_LIMIT_RETRIES = 3
+// Base do backoff no 429 (cresce por tentativa): a 1ª espera 2×, depois 3×…
+const RATE_LIMIT_BACKOFF_MS = Number(
+  process.env.ECHOTIK_RATE_LIMIT_BACKOFF_MS ?? 300,
+)
 
 const inflight = new Map<string, Promise<unknown>>()
-let queue: Promise<unknown> = Promise.resolve()
-let lastRequestAt = 0
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-
-type FetchOptions = {
-  /**
-   * Pula a fila serializada (gap de 300ms entre chamadas). Usado SÓ no realtime
-   * de lives, que precisa disparar várias buscas/detalhes juntos — senão a
-   * página espera ~13s em série. Mantém cache + dedup em voo + retry do 429. O
-   * offline (ranklist etc.) continua serializado pra proteger a cota do trial.
-   */
-  parallel?: boolean
-}
 
 export async function echotikFetch(
   path: string,
   params: Record<string, string | number>,
-  options?: FetchOptions,
 ): Promise<unknown> {
   // Concatena base+path (não `new URL(path, base)`): um path absoluto "/echotik/..."
   // descartaria o prefixo /api/v3 da base. Aqui a base sempre fica intacta.
@@ -84,29 +75,14 @@ export async function echotikFetch(
   if (cached && cached.expires > Date.now()) return cached.value
 
   // Dedup em voo: chamadas concorrentes pra mesma URL (ex.: summary e top ambos
-  // pedindo o rank de hoje) reusam o mesmo request.
+  // pedindo o rank de hoje) reusam o mesmo request — sem isso, dispararíamos a
+  // mesma chamada N vezes em paralelo.
   const pending = inflight.get(url.href)
   if (pending) return pending
 
-  // Modo paralelo: dispara já, sem esperar a fila/gap. Mantém cache + dedup.
-  if (options?.parallel) {
-    const run = performFetch(url, path)
-    inflight.set(url.href, run)
-    void run.finally(() => inflight.delete(url.href))
-    return run
-  }
-
-  // Enfileira: distintas rodam em série, com gap mínimo entre elas.
-  const run = queue.then(async () => {
-    const wait = lastRequestAt + MIN_REQUEST_GAP_MS - Date.now()
-    if (wait > 0) await sleep(wait)
-    lastRequestAt = Date.now()
-    return performFetch(url, path)
-  })
-  queue = run.then(
-    () => undefined,
-    () => undefined,
-  )
+  // Dispara direto, em paralelo. O 429 (rate-limit) é absorvido pelo retry com
+  // backoff dentro de performFetch.
+  const run = performFetch(url, path)
   inflight.set(url.href, run)
   void run.finally(() => inflight.delete(url.href))
   return run
@@ -128,7 +104,7 @@ async function performFetch(url: URL, path: string): Promise<unknown> {
 
     // 429: rate-limit. Espera (backoff) e re-tenta antes de propagar.
     if (response.status === 429 && attempt < RATE_LIMIT_RETRIES) {
-      await sleep(MIN_REQUEST_GAP_MS * (attempt + 2))
+      await sleep(RATE_LIMIT_BACKOFF_MS * (attempt + 2))
       continue
     }
     if (!response.ok) {

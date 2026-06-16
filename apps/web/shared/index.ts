@@ -9,6 +9,7 @@ export {
   formatCompact,
   formatDeltaPct,
   formatInteger,
+  formatRegion,
   formatSignedInteger,
 } from "./utils/format"
 export { THUMB_TONES } from "./consts"
@@ -29,6 +30,12 @@ export {
   type QuadrantDot,
 } from "./components/data/quadrant-scatter"
 export { VideoGrid, type VideoItem } from "./components/data/video-grid"
+export { ProductReviews } from "./components/data/product-reviews"
+export { ProductLives } from "./components/data/product-lives"
+export { ProductCreators } from "./components/data/product-creators"
+export { ProductVideos } from "./components/data/product-videos"
+export { CreatorVideos } from "./components/data/creator-videos"
+export { CreatorProducts } from "./components/data/creator-products"
 export { EventList, type EventItem } from "./components/data/event-list"
 export { FilterBar } from "./components/data/filter-bar"
 

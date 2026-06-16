@@ -158,6 +158,66 @@ export const productVideoItemSchema = z.object({
 export type ProductVideoItem = z.infer<typeof productVideoItemSchema>
 
 /**
+ * Item do GET /api/v3/echotik/product/comment — uma avaliação/comentário do
+ * produto já indexada pela EchoTik (offline T+1). `rating` é inteiro 0–5;
+ * `review_timestamp` vem em MILISSEGUNDOS (epoch ms) — dividir por 1000 antes de
+ * virar Date. Cobertura parcial (não é o total de reviews do TikTok ao vivo).
+ */
+export const productReviewItemSchema = z.object({
+  review_id: z.coerce.string(),
+  product_id: z.coerce.string().nullish(),
+  display_text: z.string().nullish(),
+  rating: z.coerce.number().default(0),
+  review_timestamp: z.coerce.number().nullish(),
+  sku_id: z.coerce.string().nullish(),
+  sku_specification: z.string().nullish(),
+})
+
+export type ProductReviewItem = z.infer<typeof productReviewItemSchema>
+
+/**
+ * Item do GET /api/v3/echotik/product/live/list — uma sessão de live (offline
+ * T+1) em que o produto foi vendido/exibido. `room_id` identifica a transmissão;
+ * `user_id` é o host (sem @handle — resolvido à parte via influencer/detail).
+ * `create_time` vem em epoch SEGUNDOS. `max_views_cnt` é o pico simultâneo;
+ * `total_views_cnt`, o acumulado. Vendas/GMV são ESTIMADOS (unidade do GMV não
+ * documentada). `cover_url` é CDN do TikTok (acessível direto, não é echosell).
+ */
+export const productLiveItemSchema = z.object({
+  room_id: z.coerce.string(),
+  user_id: z.coerce.string().nullish(),
+  category_id: z.string().nullish(),
+  cover_url: z.string().nullish(),
+  create_time: z.coerce.number().nullish(),
+  max_views_cnt: z.coerce.number().default(0),
+  total_views_cnt: z.coerce.number().default(0),
+  total_product_cnt: z.coerce.number().default(0),
+  total_sale_cnt: z.coerce.number().default(0),
+  total_sale_gmv_amt: z.coerce.number().default(0),
+  spu_avg_price: z.coerce.number().nullish(),
+})
+
+export type ProductLiveItem = z.infer<typeof productLiveItemSchema>
+
+/**
+ * Item do GET /api/v3/echotik/product/trend — snapshot diário do produto
+ * (offline T+1, ESPARSO: só há linha nos dias captados). `total_sale_1d_cnt` =
+ * vendas do dia; `total_sale_cnt` = acumulado até o dia; `spu_avg_price` em BRL.
+ * GMV (USD) e lives ficam de fora (ancoramos em unidades + preço BRL).
+ */
+export const productTrendItemSchema = z.object({
+  // Dia do snapshot — a fonte manda "yyyy-MM-dd"; validado no mapper.
+  dt: z.string(),
+  spu_avg_price: z.coerce.number().nullish(),
+  total_sale_1d_cnt: z.coerce.number().default(0),
+  total_sale_cnt: z.coerce.number().default(0),
+  total_video_cnt: z.coerce.number().default(0),
+  total_ifl_cnt: z.coerce.number().default(0),
+})
+
+export type ProductTrendItem = z.infer<typeof productTrendItemSchema>
+
+/**
  * Recorte do GET /api/v3/echotik/influencer/detail (batch por `user_ids`, máx.
  * 10) só pra resolver o @handle: nem o product/video/list nem o product/
  * influencer/list trazem `unique_id`, só `user_id`. Daqui sai user_id → handle.
@@ -279,3 +339,120 @@ export const influencerListItemSchema = z.object({
 })
 
 export type InfluencerListItem = z.infer<typeof influencerListItemSchema>
+
+/**
+ * Item do GET /api/v3/echotik/influencer/detail (batch por `user_ids`, máx. 10)
+ * — ficha completa do criador (base do header/KPIs da página /criadores/[id]).
+ * Mais rico que o influencerHandleItemSchema (que só pega o @handle). IDs vêm
+ * como string; contadores podem vir string → coerce. `first_crawl_dt` é yyyyMMdd.
+ */
+export const influencerDetailItemSchema = z.object({
+  user_id: z.coerce.string(),
+  unique_id: z.string().nullish(),
+  nick_name: z.string().nullish(),
+  avatar: z.string().nullish(),
+  category: z.string().nullish(),
+  region: z.string().nullish(),
+  signature: z.string().nullish(),
+  contact_email: z.string().nullish(),
+  ec_score: z.coerce.number().default(0),
+  interaction_rate: z.coerce.number().default(0),
+  first_crawl_dt: z.coerce.number().nullish(),
+  total_followers_cnt: z.coerce.number().default(0),
+  total_followers_30d_cnt: z.coerce.number().default(0),
+  total_following_cnt: z.coerce.number().default(0),
+  total_digg_cnt: z.coerce.number().default(0),
+  total_post_video_cnt: z.coerce.number().default(0),
+  total_product_cnt: z.coerce.number().default(0),
+  total_sale_cnt: z.coerce.number().default(0),
+  total_sale_gmv_amt: z.coerce.number().default(0),
+  total_sale_gmv_30d_amt: z.coerce.number().default(0),
+})
+
+export type InfluencerDetailItem = z.infer<typeof influencerDetailItemSchema>
+
+/**
+ * Recorte do GET /api/v3/realtime/influencer/detail (objeto cru do TikTok) pra
+ * enriquecer o perfil com o que o influencer/detail offline NÃO traz: selo de
+ * verificação e redes sociais (YouTube/Twitter). `data` vem como `{ user: {...} }`.
+ * Tempo-real → pode dar risk control (code 500); uso é best-effort.
+ */
+export const influencerRealtimeDetailSchema = z.object({
+  user: z
+    .object({
+      verification_type: z.coerce.number().nullish(),
+      custom_verify: z.string().nullish(),
+      enterprise_verify_reason: z.string().nullish(),
+      youtube_channel_id: z.string().nullish(),
+      youtube_channel_title: z.string().nullish(),
+      twitter_id: z.string().nullish(),
+      twitter_name: z.string().nullish(),
+    })
+    .nullish(),
+})
+
+export type InfluencerRealtimeDetail = z.infer<
+  typeof influencerRealtimeDetailSchema
+>
+
+/**
+ * Item do GET /api/v3/echotik/influencer/video/list — vídeo de um criador (aba
+ * Vídeos da página /criadores/[id]). Mesma família do product/video/list, mas
+ * já traz `unique_id` (não precisa resolver handle à parte). `reflow_cover`
+ * expira (assina-se à parte). Contadores podem vir string → coerce.
+ */
+export const influencerVideoItemSchema = z.object({
+  video_id: z.coerce.string(),
+  user_id: z.coerce.string().nullish(),
+  unique_id: z.string().nullish(),
+  video_desc: z.string().nullish(),
+  reflow_cover: z.string().nullish(),
+  duration: z.coerce.number().nullish(),
+  total_views_cnt: z.coerce.number().default(0),
+  total_digg_cnt: z.coerce.number().default(0),
+  total_comments_cnt: z.coerce.number().default(0),
+  total_shares_cnt: z.coerce.number().default(0),
+  total_favorites_cnt: z.coerce.number().default(0),
+  total_video_sale_cnt: z.coerce.number().default(0),
+})
+
+export type InfluencerVideoItem = z.infer<typeof influencerVideoItemSchema>
+
+/**
+ * Item do GET /api/v3/echotik/influencer/product/list — produto promovido por um
+ * criador (aba Produtos da página /criadores/[id]). `cover_url` é JSON-array em
+ * string (`[{url,index}]`) → usar firstCoverUrl. Split de vendas/GMV por canal
+ * (live vs vídeo). IDs como string; GMV estimado.
+ */
+export const influencerProductItemSchema = z.object({
+  product_id: z.coerce.string(),
+  product_name: z.string().nullish(),
+  cover_url: z.string().nullish(),
+  category_id: z.string().nullish(),
+  spu_avg_price: z.coerce.number().default(0),
+  total_sale_cnt: z.coerce.number().default(0),
+  total_sale_gmv_amt: z.coerce.number().default(0),
+  total_video_cnt: z.coerce.number().default(0),
+  total_live_cnt: z.coerce.number().default(0),
+  total_video_sale_cnt: z.coerce.number().default(0),
+  total_live_sale_cnt: z.coerce.number().default(0),
+})
+
+export type InfluencerProductItem = z.infer<typeof influencerProductItemSchema>
+
+/**
+ * Item do GET /api/v3/echotik/influencer/trend — snapshot diário de um criador
+ * (gráfico de seguidores da página /criadores/[id]). `dt` é yyyy-MM-dd;
+ * `total_followers_1d_cnt` pode ser NEGATIVO (perda de seguidores no dia).
+ */
+export const influencerTrendItemSchema = z.object({
+  dt: z.string().nullish(),
+  total_followers_cnt: z.coerce.number().default(0),
+  total_followers_1d_cnt: z.coerce.number().default(0),
+  /** Vendas estimadas naquele dia (unidades). */
+  total_sale_1d_cnt: z.coerce.number().default(0),
+  /** GMV estimado daquele dia (USD). */
+  total_sale_gmv_1d_amt: z.coerce.number().default(0),
+})
+
+export type InfluencerTrendItem = z.infer<typeof influencerTrendItemSchema>

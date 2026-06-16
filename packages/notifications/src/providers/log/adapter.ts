@@ -1,20 +1,24 @@
-import type { ChannelHealth, DeliveryResult, NotificationChannel } from "../../channel"
+import type { Channel, ChannelHealth, DeliveryResult, NotificationChannel } from "../../channel"
 
 /**
- * Provider DRY-RUN (default seguro). Só loga — não envia nada. Mesma filosofia do
- * MARKET_DATA_SOURCE=mock: ninguém dispara WhatsApp real (e arrisca o ban do número)
- * por acidente em dev/CI. Para enviar de verdade, set WHATSAPP_PROVIDER=evolution.
+ * Adapter DRY-RUN (default seguro de QUALQUER canal). Só loga — não envia nada.
+ * É o canal `console` (sink de validação) e também o stub default de
+ * email/telegram/push até cada um ganhar um provider real. Mesma filosofia do
+ * MARKET_DATA_SOURCE=mock: envio real é opt-in explícito por env, porque disparo
+ * acidental a usuário real custa caro (spam + risco de ban do número).
  */
-export const logChannel: NotificationChannel = {
-  id: "whatsapp",
-  provider: "log",
+export function logAdapter(channelId: Channel): NotificationChannel {
+  return {
+    id: channelId,
+    provider: "log",
 
-  async sendText(number, text): Promise<DeliveryResult> {
-    console.info(`[notifications] DRY-RUN WhatsApp → ${number}: ${text}`)
-    return { ok: true, providerMessageId: null }
-  },
+    async sendText(address, text): Promise<DeliveryResult> {
+      console.info(`[notifications] DRY-RUN ${channelId} → ${address || "—"}: ${text}`)
+      return { ok: true, providerMessageId: null }
+    },
 
-  async health(): Promise<ChannelHealth> {
-    return { state: "open", detail: "dry-run" }
-  },
+    async health(): Promise<ChannelHealth> {
+      return { state: "open", detail: "dry-run" }
+    },
+  }
 }

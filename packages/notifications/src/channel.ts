@@ -1,10 +1,17 @@
 /**
- * Contrato provider-agnóstico de um canal de notificação (hoje só WhatsApp).
- * O motor de alertas fala SÓ com esta interface — qual provider está por trás
- * (Evolution não-oficial agora, WhatsApp Cloud API oficial depois) é decisão de
- * env, não de código. Trocar de provider = trocar WHATSAPP_PROVIDER, sem reescrever
- * a entrega. Ver docs/infra.md §9.2 (mandato de manter o caminho oficial a um flip).
+ * Contrato provider-agnóstico de um canal de notificação. O motor de alertas fala
+ * SÓ com esta interface — qual canal (whatsapp/email/…) e qual provider por trás
+ * (Evolution agora, Cloud API depois) é decisão de env, não de código. Trocar de
+ * canal = `getChannel(channel)`; trocar de provider = trocar `<CANAL>_PROVIDER`, sem
+ * reescrever a entrega. Ver docs/infra.md §9.2 (manter o caminho oficial a um flip).
  */
+
+/**
+ * Canais de entrega. `console` é o sink de dev/validação (sempre imprime, sem
+ * consentimento/plano); os demais ganham um provider real num flip de env, até lá
+ * caem no stub `log`.
+ */
+export type Channel = "console" | "email" | "telegram" | "whatsapp" | "push"
 
 export type WhatsappProvider = "log" | "evolution" | "cloud-api"
 
@@ -19,10 +26,11 @@ export type ChannelHealthState = "open" | "close" | "connecting" | "unknown"
 export type ChannelHealth = { state: ChannelHealthState; detail?: string }
 
 export interface NotificationChannel {
-  readonly id: "whatsapp"
-  readonly provider: WhatsappProvider
-  /** `number` = E.164/dígitos; `text` = corpo já renderizado do alerta. Devolve wamid quando há. */
-  sendText(number: string, text: string): Promise<DeliveryResult>
-  /** Saúde do remetente — o motor pula WhatsApp (e cai pra outro canal) quando não está `open`. */
+  readonly id: Channel
+  /** Provider concreto por trás do canal (ex.: "log", "evolution", "cloud-api"). */
+  readonly provider: string
+  /** `address` = destino do canal (phone/email/chat_id/endpoint); `text` = corpo já renderizado. Devolve o id do provider (ex.: wamid) quando há. */
+  sendText(address: string, text: string): Promise<DeliveryResult>
+  /** Saúde do remetente — o motor pula o canal (e cai pra outro) quando não está `open`. */
   health(): Promise<ChannelHealth>
 }

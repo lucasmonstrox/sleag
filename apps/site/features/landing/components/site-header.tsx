@@ -23,12 +23,20 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <a
-          href="#acesso"
-          className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-zinc-200"
-        >
-          Acesso antecipado
-        </a>
+        <div className="flex items-center gap-3">
+          <a
+            href="https://app.sleag.com.br"
+            className="text-sm font-medium text-zinc-400 transition-colors hover:text-white"
+          >
+            Entrar
+          </a>
+          <a
+            href="#acesso"
+            className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-zinc-200"
+          >
+            Acesso antecipado
+          </a>
+        </div>
       </div>
     </header>
   )

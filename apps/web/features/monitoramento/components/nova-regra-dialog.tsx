@@ -144,11 +144,12 @@ export function NovaRegraDialog() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="realtime">Tempo real</SelectItem>
-                  <SelectItem value="15min">A cada 15 min</SelectItem>
-                  <SelectItem value="1h">A cada 1 h</SelectItem>
-                  <SelectItem value="6h">A cada 6 h</SelectItem>
+                  {/* O motor avalia 1x/dia (cron diário). Intraday entra quando houver sweep por bucket. */}
                   <SelectItem value="1d">1x por dia</SelectItem>
+                  <SelectItem value="6h" disabled>A cada 6 h — em breve</SelectItem>
+                  <SelectItem value="1h" disabled>A cada 1 h — em breve</SelectItem>
+                  <SelectItem value="15min" disabled>A cada 15 min — em breve</SelectItem>
+                  <SelectItem value="realtime" disabled>Tempo real — em breve</SelectItem>
                 </SelectContent>
               </Select>
             </div>

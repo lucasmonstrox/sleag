@@ -1,4 +1,6 @@
-import { BellPlusIcon, BookmarkIcon, StarIcon } from "lucide-react"
+import { BellPlusIcon, BookmarkIcon, CalendarIcon, StarIcon } from "lucide-react"
+import { format, parseISO } from "date-fns"
+import { ptBR } from "date-fns/locale"
 
 import type { MarketProductDetail } from "api"
 
@@ -13,8 +15,8 @@ type ProdutoDetalheHeaderProps = {
 
 export function ProdutoDetalheHeader({ detail }: ProdutoDetalheHeaderProps) {
   return (
-    <div className="flex flex-wrap items-start justify-between gap-4">
-      <div className="flex items-center gap-4">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex min-w-0 items-center gap-4">
         {detail.image ? (
           // eslint-disable-next-line @next/next/no-img-element -- CDN externo (echosell), sem next/image config
           <img
@@ -52,10 +54,16 @@ export function ProdutoDetalheHeader({ detail }: ProdutoDetalheHeaderProps) {
                 Comissão {Math.round(detail.commissionRate * 100)}%
               </Badge>
             ) : null}
+            {detail.firstSeen ? (
+              <Badge variant="outline" className="gap-1 text-muted-foreground">
+                <CalendarIcon className="size-3" />
+                No mercado desde {formatShortDate(detail.firstSeen)}
+              </Badge>
+            ) : null}
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2">
         <Button variant="outline" className="gap-2">
           <BookmarkIcon className="size-4" />
           Adicionar à watchlist
@@ -67,4 +75,10 @@ export function ProdutoDetalheHeader({ detail }: ProdutoDetalheHeaderProps) {
       </div>
     </div>
   )
+}
+
+/** "d MMM" pt-BR a partir de "yyyy-MM-dd" (ou Date já revivido pelo Eden). */
+function formatShortDate(date: string | Date): string {
+  const value = typeof date === "string" ? parseISO(date) : date
+  return format(value, "d MMM", { locale: ptBR })
 }

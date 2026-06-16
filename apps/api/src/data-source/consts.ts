@@ -14,11 +14,64 @@ export const RANK_PAGES = 2
 /** Quantos criadores/vídeos trazer no sheet de detalhe do produto (1 página cada). */
 export const PRODUCT_DETAIL_CREATORS = 8
 export const PRODUCT_DETAIL_VIDEOS = 8
+
+/**
+ * Criadores associados ao produto (product/influencer/list): page_size travado
+ * em 10 igual aos demais endpoints offline. A paginação vem de page_num; a UI
+ * (react-virtuoso) pede a próxima ao rolar. Ordenado server-side por vendas do
+ * produto (product_influencer_sort_field=3, desc).
+ */
+export const PRODUCT_CREATOR_PAGE_SIZE = 10
+
+/**
+ * Vídeos associados ao produto (product/video/list): page_size travado em 10. A
+ * paginação vem de page_num; a UI (react-virtuoso/grid) pede a próxima ao rolar.
+ * Ordenado server-side por views (product_video_sort_field=1, desc).
+ */
+export const PRODUCT_VIDEO_PAGE_SIZE = 10
+
+/**
+ * Avaliações do produto (product/comment): page_size travado em 10 igual aos
+ * demais endpoints offline. A paginação vem de page_num; a UI (react-virtuoso)
+ * pede a próxima página ao chegar no fim da lista.
+ */
+export const PRODUCT_REVIEW_PAGE_SIZE = 10
+
+/**
+ * Lives associadas ao produto (product/live/list): page_size travado em 10 igual
+ * aos demais endpoints offline. A paginação vem de page_num; a UI (react-virtuoso)
+ * pede a próxima página ao chegar no fim. Ordenado server-side por GMV estimado
+ * (product_live_sort_field=4, desc).
+ */
+export const PRODUCT_LIVE_PAGE_SIZE = 10
+
+/**
+ * Tendência do produto (product/trend): page_size travado em 10 e a janela é
+ * limitada a 180 dias na fonte. Varremos por page_num até a página vir
+ * incompleta — a cobertura é esparsa (1 snapshot/dia, só nos dias captados),
+ * então quase sempre são poucas páginas. O teto cobre a janela máxima da UI
+ * (90d ≈ 9 páginas de snapshots diários) e protege a cota se a janela crescer.
+ */
+export const PRODUCT_TREND_PAGE_SIZE = 10
+export const PRODUCT_TREND_MAX_PAGES = 9
+export const PRODUCT_TREND_DEFAULT_DAYS = 30
+
 export const VIDEO_PAGE_SIZE = 10
 export const VIDEO_PAGES = 2
 /** Criadores (influencer/list, offline T+1): page_size travado em 10 igual aos demais. */
 export const INFLUENCER_PAGE_SIZE = 10
 export const INFLUENCER_PAGES = 2
+
+/**
+ * Detalhe do criador (/criadores/[id]): vídeos e produtos promovidos paginam por
+ * page_num com page_size travado em 10 (UI react-virtuoso pede a próxima ao
+ * rolar). A série de seguidores (influencer/trend) varre dias em blocos de 10.
+ */
+export const CREATOR_VIDEO_PAGE_SIZE = 10
+export const CREATOR_PRODUCT_PAGE_SIZE = 10
+export const CREATOR_TREND_PAGE_SIZE = 10
+export const CREATOR_TREND_MAX_PAGES = 9
+export const CREATOR_TREND_DEFAULT_DAYS = 30
 
 // /categorias agrega o ranking diário por category_id. A lista varre o ranking
 // GLOBAL fundo o bastante p/ cobrir várias categorias; o detalhe varre o ranking

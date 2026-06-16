@@ -2,10 +2,6 @@ import type { ReactNode } from "react"
 
 import { notFound } from "next/navigation"
 import { StarIcon } from "lucide-react"
-import { format, parseISO } from "date-fns"
-import { ptBR } from "date-fns/locale"
-
-import type { MarketProductCreator, MarketProductVideo } from "api"
 
 import { Badge } from "@workspace/ui/components/badge"
 import {
@@ -16,84 +12,38 @@ import {
 } from "@workspace/ui/components/tabs"
 
 import {
-  DataTable,
   formatBrl,
   formatCompact,
   formatInteger,
-  MediaCell,
   PageShell,
-  VideoGrid,
+  ProductCreators,
+  ProductLives,
+  ProductReviews,
+  ProductVideos,
 } from "@/shared"
-import type { DataColumn, VideoItem } from "@/shared"
 
-import { getProductDetail } from "../../services/produtos"
+import { getProductDetail, getProductTrend } from "../../services/produtos"
 import { ProdutoDetalheHeader } from "./produto-detalhe-header"
+import { ProductTrendsChart } from "./produto-trends-chart"
 
 type ProdutoDetalhePageProps = {
   id: string
 }
 
-const CRIADORES_COLUMNS: DataColumn<MarketProductCreator>[] = [
-  {
-    header: "Criador",
-    render: (row, index) => (
-      <MediaCell
-        title={row.name}
-        subtitle={row.niche}
-        seed={index}
-        shape="circle"
-      />
-    ),
-  },
-  {
-    header: "Seguidores",
-    align: "right",
-    render: (row) => (
-      <span className="text-sm text-muted-foreground">
-        {formatCompact(row.followers)}
-      </span>
-    ),
-  },
-  {
-    header: "Vídeos",
-    align: "right",
-    render: (row) => (
-      <span className="text-sm text-muted-foreground">
-        {formatInteger(row.videos)}
-      </span>
-    ),
-  },
-  {
-    header: "Vendas do produto",
-    align: "right",
-    render: (row) => (
-      <span className="text-sm font-medium">
-        {formatCompact(row.productSales)}
-      </span>
-    ),
-  },
-]
-
 export async function ProdutoDetalhePage({ id }: ProdutoDetalhePageProps) {
-  const detail = await getProductDetail(id)
+  // Ficha + tendência em paralelo; a série é auxiliar (devolve [] se falhar).
+  const [detail, trend] = await Promise.all([
+    getProductDetail(id),
+    getProductTrend(id),
+  ])
   if (!detail) notFound()
-
-  const videoItems: VideoItem[] = detail.videos.map(toVideoItem)
 
   return (
     <PageShell>
       <ProdutoDetalheHeader detail={detail} />
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Kpi label="Preço" value={priceLabel(detail.priceMin, detail.priceMax)} />
-        <Kpi
-          label="Comissão"
-          value={
-            detail.commissionRate != null
-              ? `${Math.round(detail.commissionRate * 100)}%`
-              : "—"
-          }
-        />
         <Kpi
           label="Vendas 30d"
           value={formatCompact(detail.sales30d)}
@@ -119,42 +69,59 @@ export async function ProdutoDetalhePage({ id }: ProdutoDetalhePageProps) {
         />
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-        <span>{formatCompact(detail.creatorCount)} criadores no total</span>
-        <span>{formatCompact(detail.videoCount)} vídeos</span>
-        {detail.firstSeen ? (
-          <span>No mercado desde {formatShortDate(detail.firstSeen)}</span>
-        ) : null}
-      </div>
+      <ProductTrendsChart data={trend} />
 
       <Tabs defaultValue="criadores" className="gap-6">
         <TabsList>
           <TabsTrigger value="criadores">
             Criadores
             <Badge variant="secondary" className="ml-1.5">
-              {detail.creators.length}
+              {formatCompact(detail.creatorCount)}
             </Badge>
           </TabsTrigger>
           <TabsTrigger value="videos">
             Vídeos
             <Badge variant="secondary" className="ml-1.5">
-              {detail.videos.length}
+              {formatCompact(detail.videoCount)}
             </Badge>
+          </TabsTrigger>
+          <TabsTrigger value="lives">Lives</TabsTrigger>
+          <TabsTrigger value="reviews">
+            Avaliações
+            {detail.reviewCount ? (
+              <Badge variant="secondary" className="ml-1.5">
+                {formatInteger(detail.reviewCount)}
+              </Badge>
+            ) : null}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="criadores">
-          {detail.creators.length > 0 ? (
-            <DataTable columns={CRIADORES_COLUMNS} rows={detail.creators} />
-          ) : (
-            <Empty>Nenhum criador registrado pra este produto ainda.</Empty>
-          )}
+          {/* Client island: pagina os criadores por conta própria (server action,
+              ordenados por vendas do produto), independente do detalhe do server.
+              Usa o scroll da página — sem scroller aninhado dentro do tab. */}
+          <ProductCreators productId={detail.id} useWindowScroll />
         </TabsContent>
         <TabsContent value="videos">
-          {videoItems.length > 0 ? (
-            <VideoGrid items={videoItems} />
-          ) : (
-            <Empty>Nenhum vídeo registrado pra este produto.</Empty>
-          )}
+          {/* Client island: pagina os vídeos por conta própria (server action,
+              ordenados por views), independente do detalhe do server. Usa o
+              scroll da página — sem scroller aninhado dentro do tab. */}
+          <ProductVideos productId={detail.id} useWindowScroll />
+        </TabsContent>
+        <TabsContent value="lives">
+          {/* Client island: pagina as lives associadas por conta própria (server
+              action, ordenadas por GMV), independente do detalhe do server. Usa
+              o scroll da página — sem scroller aninhado dentro do tab. */}
+          <ProductLives productId={detail.id} useWindowScroll />
+        </TabsContent>
+        <TabsContent value="reviews">
+          {/* Client island: pagina as avaliações por conta própria (server
+              action), independente do detalhe já carregado no server. Usa o
+              scroll da página — sem scroller aninhado dentro do tab. */}
+          <ProductReviews
+            productId={detail.id}
+            reviewCount={detail.reviewCount}
+            useWindowScroll
+          />
         </TabsContent>
       </Tabs>
     </PageShell>
@@ -183,46 +150,9 @@ function Kpi({
   )
 }
 
-function Empty({ children }: { children: ReactNode }) {
-  return (
-    <p className="py-6 text-sm text-muted-foreground">{children}</p>
-  )
-}
-
-/** "d MMM" pt-BR a partir de "yyyy-MM-dd" (ou Date já revivido). */
-function formatShortDate(date: string | Date): string {
-  const value = typeof date === "string" ? parseISO(date) : date
-  return format(value, "d MMM", { locale: ptBR })
-}
-
 /** Faixa de preço; "—" sem preço. NB: a fonte dá USD — ver pendência de conversão. */
 function priceLabel(min: number | null, max: number | null): string {
   if (min == null) return "—"
   if (max == null || min === max) return formatBrl(min)
   return `${formatBrl(min)}–${formatBrl(max)}`
-}
-
-/** Vídeo do produto → item do VideoGrid (player via videoId; vendas no slot verde). */
-function toVideoItem(video: MarketProductVideo): VideoItem {
-  const handle = video.creatorHandle
-  return {
-    title:
-      video.description ||
-      video.hashtags.map((tag) => `#${tag}`).join(" ") ||
-      "Vídeo do produto",
-    creator: handle ? `@${handle}` : "",
-    creatorUrl: handle ? `https://www.tiktok.com/@${handle}` : null,
-    href: handle ? `https://www.tiktok.com/@${handle}/video/${video.id}` : null,
-    views: formatCompact(video.views),
-    gmv:
-      video.productSales > 0
-        ? `${formatCompact(video.productSales)} vendas`
-        : null,
-    cover: video.cover,
-    videoId: video.id,
-    likes: formatCompact(video.likes),
-    comments: formatCompact(video.comments),
-    shares: formatCompact(video.shares),
-    favorites: formatCompact(video.favorites),
-  }
 }

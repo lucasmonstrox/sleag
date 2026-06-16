@@ -1,11 +1,16 @@
 import { WorkflowEntrypoint, type WorkflowStep } from "cloudflare:workers"
 import type { WorkflowEvent } from "cloudflare:workers"
 
+import { getChannel } from "@workspace/notifications"
+import type { SupabaseClient } from "@supabase/supabase-js"
+
 import {
   createDeliveriesForEvents,
   evaluateRuleAgainstMarket,
   type AlertRuleRow,
+  type CreatedDelivery,
 } from "../alerts/engine"
+import { renderAlertMessage } from "../alerts/events"
 import { quietHoursWaitMs } from "../alerts/quiet-hours"
 import { type Env, propagateEnv } from "../lib/env"
 import { supabaseAdmin } from "../lib/supabase"
@@ -14,6 +19,33 @@ type Params = { snapshotDt?: string }
 
 /** Teto de delay de mensagem da Queue (12h). Janelas de quiet-hours realistas cabem. */
 const MAX_QUEUE_DELAY_S = 43200
+
+/**
+ * Despacho síncrono dos canais sem fila (console/email/telegram/push — dry-run hoje).
+ * Só WhatsApp precisa da fila serializada (anti-ban); os demais imprimem/enviam na hora
+ * e marcam a entrega. Idempotente: roda dentro do step.do por regra (resume não
+ * re-despacha) e a unique (event_id, channel) já impediu linha duplicada.
+ */
+async function dispatchSyncDelivery(db: SupabaseClient, delivery: CreatedDelivery): Promise<void> {
+  const channel = getChannel(delivery.channel)
+  const result = await channel.sendText("", renderAlertMessage(delivery.title, delivery.description))
+  const now = new Date().toISOString()
+  await db
+    .from("notification_deliveries")
+    .update(
+      result.ok
+        ? {
+            status: "delivered",
+            provider: channel.provider,
+            provider_message_id: result.providerMessageId,
+            sent_at: now,
+            delivered_at: now,
+            attempts: 1,
+          }
+        : { status: "failed", provider: channel.provider, last_error: result.error, failed_at: now, attempts: 1 },
+    )
+    .eq("id", delivery.id)
+}
 
 /**
  * Avaliação diária de alertas (cron "30 9 * * *" no wrangler.jsonc).
@@ -59,7 +91,7 @@ export class EvaluateAlertsWorkflow extends WorkflowEntrypoint<Env, Params> {
       // não reavalia regra já processada no dia.
       queued += await step.do(`rule:${rule.id}:${snapshotDt}`, async () => {
         const summary = await evaluateRuleAgainstMarket(db, rule, snapshotDt)
-        const { queuedIds } = await createDeliveriesForEvents(db, rule, summary.inserted)
+        const { deliveries } = await createDeliveriesForEvents(db, rule, summary.inserted)
 
         // Quiet-hours → ADIA a entrega via delay da mensagem (não trava o consumer
         // concurrency:1). O consumer ainda re-checa na hora (cobre cap de 12h/skew).
@@ -67,13 +99,22 @@ export class EvaluateAlertsWorkflow extends WorkflowEntrypoint<Env, Params> {
           Math.ceil(quietHoursWaitMs(rule.quiet_hours) / 1000),
           MAX_QUEUE_DELAY_S,
         )
-        for (const deliveryId of queuedIds) {
-          await this.env.WHATSAPP_QUEUE.send(
-            { deliveryId },
-            delaySeconds > 0 ? { delaySeconds } : undefined,
-          )
+        let dispatched = 0
+        for (const delivery of deliveries) {
+          if (delivery.status !== "queued") continue
+          if (delivery.channel === "whatsapp") {
+            // WhatsApp → fila serializada (anti-ban), com quiet-hours adiando via delay.
+            await this.env.WHATSAPP_QUEUE.send(
+              { deliveryId: delivery.id },
+              delaySeconds > 0 ? { delaySeconds } : undefined,
+            )
+          } else {
+            // console/email/telegram/push (dry-run) → despacho síncrono, sem fila.
+            await dispatchSyncDelivery(db, delivery)
+          }
+          dispatched++
         }
-        return queuedIds.length
+        return dispatched
       })
     }
 

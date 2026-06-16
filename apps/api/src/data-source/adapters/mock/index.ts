@@ -8,9 +8,25 @@ import type {
   MarketProductCreator,
   MarketProductDetail,
   MarketProductListItem,
+  MarketProductLivePage,
+  MarketProductReviewPage,
+  MarketProductTrendPoint,
   MarketProductVideo,
   MarketSummary,
+  MarketCreatorDetail,
+  MarketCreatorProductPage,
+  MarketCreatorTrendPoint,
+  MarketCreatorVideoPage,
+  MarketProductCreatorPage,
+  MarketProductVideoPage,
   MarketTrendPoint,
+  CreatorProductListOptions,
+  CreatorTrendOptions,
+  CreatorVideoListOptions,
+  ProductCreatorListOptions,
+  ProductLiveListOptions,
+  ProductVideoListOptions,
+  ReviewListOptions,
 } from "../../types"
 
 const MOCK_SUMMARY: MarketSummary = {
@@ -278,6 +294,87 @@ const MOCK_CATEGORY_STATS: MarketCategoryStats[] = [
   { id: "700645", name: "Saúde", gmv: 350_000, sales: 7_800, productCount: 9, gmvDelta: -0.03, gmvTrend: [55, 52, 50, 48, 47, 45] },
 ]
 
+// Avaliações sintéticas pro mock — texto/nota/variante variados pra demonstrar a
+// aba de Avaliações (com paginação). Total grande o bastante pra exercitar o
+// react-virtuoso (várias páginas de 10).
+const MOCK_REVIEW_TEXTS = [
+  "Produto excelente, chegou super rápido e bem embalado!",
+  "Cumpre o que promete, recomendo demais.",
+  "Qualidade boa pelo preço, voltaria a comprar.",
+  "Achei mediano, esperava um pouco mais pela propaganda.",
+  "Maravilhoso! Já é o segundo que compro.",
+  "Veio com um pequeno defeito, mas o suporte resolveu rápido.",
+  "Melhor compra que fiz no mês, vale cada centavo.",
+  "Entrega demorou um pouco, mas o produto é ótimo.",
+  "Material parece frágil, mas funciona bem.",
+  "Superou minhas expectativas, recomendo!",
+  "Bom custo-benefício, atende o básico.",
+  "Amei a cor e o acabamento, perfeito.",
+]
+const MOCK_REVIEW_SKUS = [
+  "Item: tamanho único, Preto",
+  "Item: M, Rosa",
+  "Item: G, Azul",
+  "Item: P, Branco",
+  null,
+]
+const MOCK_REVIEW_TOTAL = 47
+
+/** Avaliação sintética determinística pelo índice global (estável entre páginas). */
+function buildMockReview(index: number) {
+  const rating = 5 - (index % 3) // 5,4,3,5,4,3…
+  const daysAgo = index * 3
+  const date = new Date(2026, 5, 16)
+  date.setDate(date.getDate() - daysAgo)
+  return {
+    id: `mock-review-${index}`,
+    text: MOCK_REVIEW_TEXTS[index % MOCK_REVIEW_TEXTS.length]!,
+    rating,
+    sku: MOCK_REVIEW_SKUS[index % MOCK_REVIEW_SKUS.length] ?? null,
+    date: date.toISOString(),
+  }
+}
+
+// Lives associadas ao produto pro mock — hosts/títulos variados pra demonstrar a
+// aba Lives (com paginação). Total > 1 página de 10 pra exercitar o virtuoso.
+const MOCK_PRODUCT_LIVE_HOSTS = [
+  "belezaglow",
+  "topeletricobr",
+  "modabella",
+  "techmaxbr",
+  "casaeciadecor",
+  "dudacosmeticos",
+  "achadinhosdaduda",
+  "ofertasdarê",
+]
+const MOCK_PRODUCT_LIVE_TOTAL = 23
+const MOCK_PRODUCT_CREATOR_TOTAL = 27
+const MOCK_PRODUCT_VIDEO_TOTAL = 34
+
+/** Live sintética determinística pelo índice global (estável entre páginas). */
+function buildMockProductLive(index: number) {
+  const host = MOCK_PRODUCT_LIVE_HOSTS[index % MOCK_PRODUCT_LIVE_HOSTS.length]!
+  // GMV decrescente pelo índice (o adapter real ordena por GMV desc).
+  const gmv = Math.max(0, 48_000 - index * 1_900)
+  const sales = Math.max(0, 1_200 - index * 47)
+  const daysAgo = index * 2
+  const date = new Date(2026, 5, 16)
+  date.setDate(date.getDate() - daysAgo)
+  return {
+    id: `mock-live-${index}`,
+    hostHandle: host,
+    cover: null,
+    date: date.toISOString(),
+    peakViewers: 4_200 - index * 130,
+    totalViewers: 58_000 - index * 1_800,
+    productCount: 18 + (index % 7) * 4,
+    sales,
+    gmv,
+    avgPrice: Math.round((39.9 + (index % 5) * 8) * 100) / 100,
+    tiktokUrl: `https://www.tiktok.com/@${host}`,
+  }
+}
+
 const GMV_SERIES = [
   12, 14, 13, 17, 19, 18, 22, 26, 24, 29, 33, 31, 38, 42, 40, 47, 52, 49, 55,
   61, 58, 66, 71, 69, 76, 83, 80, 88, 95, 92,
@@ -301,6 +398,64 @@ function buildMockTrend(days: number): MarketTrendPoint[] {
       date: date.toISOString().slice(0, 10),
       estimatedGmv: GMV_SERIES[seriesIndex]! * 10_000,
       videosPublished: VIDEOS_SERIES[seriesIndex]! * 100,
+    }
+  })
+}
+
+/**
+ * Tendência sintética de um produto: onda diária determinística (pico no meio da
+ * janela) acumulando vendas, com preço/vídeos/criadores crescendo devagar. Em
+ * unidades + preço BRL, igual ao adapter real. Estável entre renders (sem random).
+ */
+function buildMockProductTrend(
+  id: string,
+  days: number,
+): MarketProductTrendPoint[] {
+  const product =
+    MOCK_PRODUCTS.find((item) => item.id === id) ?? MOCK_PRODUCTS[0]!
+  const span = Math.max(days, 1)
+  let cumulative = Math.round(product.sales24h * 32) // base antes da janela
+  const today = new Date()
+  return Array.from({ length: days }, (_, index) => {
+    const date = new Date(today)
+    date.setDate(date.getDate() - (days - 1 - index))
+    // Onda 0,6→1,0→0,6 ao longo da janela (pico no meio) + leve crescimento.
+    const wave = 0.6 + 0.4 * Math.sin((index / Math.max(span - 1, 1)) * Math.PI)
+    const daily = Math.max(0, Math.round((product.sales24h / 24) * wave))
+    cumulative += daily
+    return {
+      date: date.toISOString().slice(0, 10),
+      sales: daily,
+      salesTotal: cumulative,
+      avgPrice: Math.round((49.9 + index * 0.08) * 100) / 100,
+      videoCount: 38 + index * 2,
+      creatorCount: 16 + Math.floor(index / 2),
+    }
+  })
+}
+
+const MOCK_CREATOR_VIDEO_TOTAL = 24
+const MOCK_CREATOR_PRODUCT_TOTAL = 18
+
+/** Série de seguidores fake (crescente com leve ruído) pra /criadores/[id]. */
+function buildMockCreatorTrend(days: number): MarketCreatorTrendPoint[] {
+  const span = Math.max(days, 1)
+  let followers = 1_050_000
+  const today = new Date()
+  return Array.from({ length: days }, (_, index) => {
+    const date = new Date(today)
+    date.setDate(date.getDate() - (days - 1 - index))
+    // Ganho diário ondulando 1k→7k (pico no meio da janela).
+    const wave = 0.5 + 0.5 * Math.sin((index / Math.max(span - 1, 1)) * Math.PI)
+    const delta = Math.round(1_000 + 6_000 * wave)
+    followers += delta
+    const sales = Math.round(120 + 900 * wave)
+    return {
+      date: date.toISOString().slice(0, 10),
+      followers,
+      delta,
+      sales,
+      gmv: sales * 58,
     }
   })
 }
@@ -403,6 +558,107 @@ export const mockSource: MarketDataSource = {
     }
   },
 
+  async getProductReviews(
+    _id,
+    options?: ReviewListOptions,
+  ): Promise<MarketProductReviewPage> {
+    const page = Math.max(1, Math.trunc(options?.page ?? 1))
+    const pageSize = 10
+    const start = (page - 1) * pageSize
+    const slice = Array.from(
+      { length: Math.max(0, Math.min(pageSize, MOCK_REVIEW_TOTAL - start)) },
+      (_, offset) => buildMockReview(start + offset),
+    )
+    // Honra o filtro de nota como o endpoint real faria (pós-fatia, mock).
+    const reviews = slice.filter(
+      (review) =>
+        (options?.minRating === undefined || review.rating >= options.minRating) &&
+        (options?.maxRating === undefined || review.rating <= options.maxRating),
+    )
+    return { reviews, page, hasMore: start + pageSize < MOCK_REVIEW_TOTAL }
+  },
+
+  async getProductLives(
+    _id,
+    options?: ProductLiveListOptions,
+  ): Promise<MarketProductLivePage> {
+    const page = Math.max(1, Math.trunc(options?.page ?? 1))
+    const pageSize = 10
+    const start = (page - 1) * pageSize
+    const lives = Array.from(
+      { length: Math.max(0, Math.min(pageSize, MOCK_PRODUCT_LIVE_TOTAL - start)) },
+      (_, offset) => buildMockProductLive(start + offset),
+    )
+    return { lives, page, hasMore: start + pageSize < MOCK_PRODUCT_LIVE_TOTAL }
+  },
+
+  async getProductCreators(
+    id,
+    options?: ProductCreatorListOptions,
+  ): Promise<MarketProductCreatorPage> {
+    const page = Math.max(1, Math.trunc(options?.page ?? 1))
+    const pageSize = 10
+    const start = (page - 1) * pageSize
+    const creators: MarketProductCreator[] = Array.from(
+      { length: Math.max(0, Math.min(pageSize, MOCK_PRODUCT_CREATOR_TOTAL - start)) },
+      (_, offset) => {
+        const index = start + offset
+        const creative = MOCK_CREATIVES[index % MOCK_CREATIVES.length]!
+        return {
+          id: `${id}-cr-${index}`,
+          name: creative.creatorHandle.replace(/^@/, ""),
+          avatar: null,
+          handle: creative.creatorHandle.replace(/^@/, ""),
+          niche: "Variados",
+          followers: 220_000 - index * 7_000,
+          videos: Math.max(1, 18 - index),
+          views: creative.views,
+          productSales: Math.max(1, 4_000 - index * 130),
+        }
+      },
+    )
+    return {
+      creators,
+      page,
+      hasMore: start + pageSize < MOCK_PRODUCT_CREATOR_TOTAL,
+    }
+  },
+
+  async getProductVideos(
+    id,
+    options?: ProductVideoListOptions,
+  ): Promise<MarketProductVideoPage> {
+    const page = Math.max(1, Math.trunc(options?.page ?? 1))
+    const pageSize = 10
+    const start = (page - 1) * pageSize
+    const videos: MarketProductVideo[] = Array.from(
+      { length: Math.max(0, Math.min(pageSize, MOCK_PRODUCT_VIDEO_TOTAL - start)) },
+      (_, offset) => {
+        const index = start + offset
+        const creative = MOCK_CREATIVES[index % MOCK_CREATIVES.length]!
+        return {
+          id: `${id}-vid-${index}`,
+          creatorHandle: creative.creatorHandle.replace(/^@/, ""),
+          cover: null,
+          description: creative.title,
+          hashtags: ["tiktokmademebuyit", "achadinhos"],
+          durationSec: 24 + (index % 5) * 6,
+          views: creative.views,
+          likes: creative.likes ?? 0,
+          comments: creative.comments ?? 0,
+          shares: creative.shares ?? 0,
+          favorites: creative.favorites ?? 0,
+          productSales: Math.max(0, 1_500 - index * 45),
+        }
+      },
+    )
+    return { videos, page, hasMore: start + pageSize < MOCK_PRODUCT_VIDEO_TOTAL }
+  },
+
+  async getProductTrend(id, options) {
+    return buildMockProductTrend(id, options?.days ?? 30)
+  },
+
   async getTrendingCreatives(options) {
     return MOCK_CREATIVES.slice(0, options?.limit ?? MOCK_CREATIVES.length)
   },
@@ -418,6 +674,106 @@ export const mockSource: MarketDataSource = {
     // EchoTik real (rode com MARKET_DATA_SOURCE=echotik). Aqui devolve vazio só
     // pra satisfazer o contrato uniforme.
     return []
+  },
+
+  async getCreatorDetail(id): Promise<MarketCreatorDetail> {
+    // Sem base de criador no mock — placeholder mínimo só pra a página renderizar
+    // (o dado real vem do EchoTik). Deriva do id pra ficar estável.
+    const creative = MOCK_CREATIVES[0]!
+    return {
+      id,
+      handle: creative.creatorHandle.replace(/^@/, ""),
+      name: creative.creatorHandle.replace(/^@/, ""),
+      avatar: null,
+      niche: "Variados",
+      region: "BR",
+      bio: null,
+      contactEmail: null,
+      followers: 1_250_000,
+      following: 312,
+      followersDelta30d: 48_000,
+      verified: true,
+      youtube: {
+        url: "https://www.youtube.com/@exemplo",
+        title: "Canal do criador",
+      },
+      twitter: null,
+      likes: 18_400_000,
+      videos: 1_840,
+      products: 92,
+      sales: 64_000,
+      estimatedGmv: 1_280_000,
+      estimatedGmv30d: 210_000,
+      ecScore: 78,
+      interactionRate: 6.4,
+      firstSeen: "2025-09-12",
+    }
+  },
+
+  async getCreatorVideos(
+    _id,
+    options?: CreatorVideoListOptions,
+  ): Promise<MarketCreatorVideoPage> {
+    const page = Math.max(1, Math.trunc(options?.page ?? 1))
+    const pageSize = 10
+    const start = (page - 1) * pageSize
+    const videos: MarketProductVideo[] = Array.from(
+      { length: Math.max(0, Math.min(pageSize, MOCK_CREATOR_VIDEO_TOTAL - start)) },
+      (_, offset) => {
+        const index = start + offset
+        const creative = MOCK_CREATIVES[index % MOCK_CREATIVES.length]!
+        return {
+          id: `cr-vid-${index}`,
+          creatorHandle: creative.creatorHandle.replace(/^@/, ""),
+          cover: null,
+          description: creative.title,
+          hashtags: ["tiktokmademebuyit"],
+          durationSec: 24 + (index % 5) * 6,
+          views: creative.views,
+          likes: creative.likes ?? 0,
+          comments: creative.comments ?? 0,
+          shares: creative.shares ?? 0,
+          favorites: creative.favorites ?? 0,
+          productSales: Math.max(0, 1_200 - index * 40),
+        }
+      },
+    )
+    return { videos, page, hasMore: start + pageSize < MOCK_CREATOR_VIDEO_TOTAL }
+  },
+
+  async getCreatorProducts(
+    _id,
+    options?: CreatorProductListOptions,
+  ): Promise<MarketCreatorProductPage> {
+    const page = Math.max(1, Math.trunc(options?.page ?? 1))
+    const pageSize = 10
+    const start = (page - 1) * pageSize
+    const products = Array.from(
+      { length: Math.max(0, Math.min(pageSize, MOCK_CREATOR_PRODUCT_TOTAL - start)) },
+      (_, offset) => {
+        const index = start + offset
+        const product = MOCK_PRODUCTS[index % MOCK_PRODUCTS.length]!
+        const sales = Math.max(0, 9_000 - index * 280)
+        return {
+          id: `${product.id}-promo-${index}`,
+          name: product.name,
+          image: null,
+          avgPrice: 59.9,
+          sales,
+          estimatedGmv: sales * 60,
+          videoSales: Math.round(sales * 0.7),
+          liveSales: Math.round(sales * 0.3),
+        }
+      },
+    )
+    return { products, page, hasMore: start + pageSize < MOCK_CREATOR_PRODUCT_TOTAL }
+  },
+
+  async getCreatorTrend(
+    _id,
+    options?: CreatorTrendOptions,
+  ): Promise<MarketCreatorTrendPoint[]> {
+    return buildMockCreatorTrend(options?.days ?? 30)
   },
 
   async getVideos(options) {
