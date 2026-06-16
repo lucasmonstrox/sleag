@@ -1,4 +1,4 @@
-import { getWhatsappChannel } from "@workspace/notifications"
+import { getChannel } from "@workspace/notifications"
 import type { MessageBatch } from "@cloudflare/workers-types"
 
 import { renderWhatsappMessage } from "../alerts/events"
@@ -82,7 +82,7 @@ async function deliverOne(deliveryId: string): Promise<DeliverResult> {
     return { retry: false }
   }
 
-  const channel = getWhatsappChannel()
+  const channel = getChannel("whatsapp")
 
   // Saúde do remetente: instância caída → falha (retry resolve queda transitória).
   if (channel.provider !== "log") {

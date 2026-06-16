@@ -12,7 +12,13 @@ export interface Env {
   ALERTS_WORKFLOW: Workflow
   /** Fila do remetente WhatsApp (serializada, anti-ban). */
   WHATSAPP_QUEUE: Queue<WhatsappJob>
-  /** Segredos (propagados p/ process.env): SUPABASE_*, EVOLUTION_*, WHATSAPP_PROVIDER. */
+  /**
+   * Config/segredos (propagados p/ process.env):
+   *  - SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY  (obrigatórios)
+   *  - WHATSAPP_PROVIDER (log|evolution|cloud-api; default log), EVOLUTION_*
+   *  - TRIGGER_SECRET       → Bearer do POST/GET /trigger (disparo on-demand)
+   *  - ALERTS_CONSOLE_SINK  → "false" desliga o canal console sempre-on (default ligado)
+   */
   [key: string]: unknown
 }
 

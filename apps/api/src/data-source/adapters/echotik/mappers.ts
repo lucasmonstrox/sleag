@@ -2,20 +2,34 @@ import { computeScores } from "../../score"
 import type {
   MarketCreative,
   MarketCreator,
+  MarketCreatorDetail,
+  MarketCreatorProduct,
+  MarketCreatorTrendPoint,
   MarketLive,
   MarketProduct,
   MarketProductCreator,
   MarketProductDetail,
   MarketProductListItem,
+  MarketProductLive,
+  MarketProductReview,
+  MarketProductTrendPoint,
   MarketProductVideo,
 } from "../../types"
 import type {
+  InfluencerDetailItem,
   InfluencerListItem,
+  InfluencerProductItem,
+  InfluencerRealtimeDetail,
+  InfluencerTrendItem,
+  InfluencerVideoItem,
   LiveSearchItem,
   ProductDetailFull,
   ProductDetailItem,
   ProductInfluencerItem,
   ProductListItem,
+  ProductLiveItem,
+  ProductReviewItem,
+  ProductTrendItem,
   ProductVideoItem,
   RankItem,
   VideoItem,
@@ -212,11 +226,19 @@ function parseHashtags(raw?: string | null): string[] {
 /** product/influencer/list → criadores que promovem o produto (ordem do servidor). */
 export function toProductCreators(
   items: ProductInfluencerItem[],
+  // user_id → @handle (unique_id), resolvido à parte; default vazio pro detalhe
+  // embutido (que não resolve handle).
+  handleByUserId: Map<string, string> = new Map(),
+  // Avatar original (CDN EchoTik) → URL assinada; default vazio cai na crua.
+  signedAvatarByOriginal: Map<string, string> = new Map(),
 ): MarketProductCreator[] {
   return items.map((item) => ({
     id: item.user_id,
     name: item.nick_name?.trim() || `Criador ${item.user_id.slice(-4)}`,
-    avatar: item.avatar || null,
+    avatar: item.avatar
+      ? (signedAvatarByOriginal.get(item.avatar) ?? item.avatar)
+      : null,
+    handle: (item.user_id && handleByUserId.get(item.user_id)) || null,
     niche: item.category?.trim() || "—",
     followers: item.total_followers_cnt,
     videos: item.total_post_video_cnt,
@@ -284,6 +306,122 @@ export function toProductDetail(
     creators,
     videos,
   }
+}
+
+/** `review_timestamp` (epoch ms) → ISO; null quando ausente/inválido. */
+function reviewTimestampToIso(value?: number | null): string | null {
+  if (!value || !Number.isFinite(value)) return null
+  // O exemplo da opendoc vem em ms (1721308360410). Toleramos segundos (10
+  // dígitos) escalando pra ms antes de virar Date.
+  const ms = value < 1e12 ? value * 1000 : value
+  const date = new Date(ms)
+  return Number.isNaN(date.getTime()) ? null : date.toISOString()
+}
+
+/**
+ * product/comment → avaliações do produto. `rating` é clampado em 0–5 (inteiro
+ * na fonte); descarta itens sem texto E sem nota (linha vazia). A ordem do
+ * servidor é preservada (a EchoTik não documenta o critério de ordenação).
+ */
+export function toProductReviews(
+  items: ProductReviewItem[],
+): MarketProductReview[] {
+  return items.map((item) => ({
+    id: item.review_id,
+    text: item.display_text?.trim() || "",
+    rating: Math.min(Math.max(Math.round(item.rating), 0), 5),
+    sku: item.sku_specification?.trim() || null,
+    date: reviewTimestampToIso(item.review_timestamp),
+  }))
+}
+
+/**
+ * `cover_url` do product/live/list é inconsistente: ora vem como URL crua
+ * (string única, como na opendoc), ora como string-JSON com um ARRAY de URLs
+ * (`["https://...","https://..."]`) — diferente do `[{url,index}]` dos produtos.
+ * Normaliza ambos pra 1ª URL http; null quando não dá pra extrair.
+ */
+function firstLiveCoverUrl(raw?: string | null): string | null {
+  if (!raw) return null
+  const value = raw.trim()
+  if (value.startsWith("[")) {
+    try {
+      const list = JSON.parse(value) as unknown[]
+      const first = Array.isArray(list)
+        ? list.find(
+            (entry): entry is string =>
+              typeof entry === "string" && entry.startsWith("http"),
+          )
+        : null
+      return first ?? null
+    } catch {
+      return null
+    }
+  }
+  return value.startsWith("http") ? value : null
+}
+
+/** `create_time` (epoch SEGUNDOS) → ISO; null quando ausente/inválido. */
+function liveCreateTimeToIso(value?: number | null): string | null {
+  if (!value || !Number.isFinite(value)) return null
+  // A doc cravou segundos (ex.: 1708707773). Toleramos ms (13 dígitos) sem escalar.
+  const ms = value < 1e12 ? value * 1000 : value
+  const date = new Date(ms)
+  return Number.isNaN(date.getTime()) ? null : date.toISOString()
+}
+
+/**
+ * product/live/list → lives associadas ao produto. A live já encerrou (offline),
+ * então só carregamos as métricas da sessão; o link aponta pro PERFIL do host (a
+ * sala não existe mais). O @handle vem resolvido à parte (o payload só tem
+ * user_id). A ordem do servidor (GMV desc) é preservada. A capa é CDN do TikTok
+ * (acessível direto — não é echosell, não precisa assinar).
+ */
+export function toProductLives(
+  items: ProductLiveItem[],
+  // user_id → @handle (unique_id), resolvido via influencer/detail (best-effort).
+  handleByUserId: Map<string, string>,
+): MarketProductLive[] {
+  return items.map((item) => {
+    const handle = (item.user_id && handleByUserId.get(item.user_id)) || null
+    return {
+      id: item.room_id,
+      hostHandle: handle,
+      cover: firstLiveCoverUrl(item.cover_url),
+      date: liveCreateTimeToIso(item.create_time),
+      peakViewers: item.max_views_cnt,
+      totalViewers: item.total_views_cnt,
+      productCount: item.total_product_cnt,
+      sales: item.total_sale_cnt,
+      gmv: item.total_sale_gmv_amt,
+      avgPrice:
+        item.spu_avg_price && item.spu_avg_price > 0 ? item.spu_avg_price : null,
+      tiktokUrl: handle ? `https://www.tiktok.com/@${handle}` : null,
+    }
+  })
+}
+
+/**
+ * product/trend → série diária da tendência do produto. A fonte não garante
+ * ordem nem preenche os dias sem captura (série esparsa), então ordenamos por
+ * data ascendente e descartamos linhas sem dia válido (yyyy-MM-dd). `avgPrice`
+ * vira null quando 0 (preço desconhecido naquele dia, não "de graça").
+ */
+export function toProductTrend(
+  items: ProductTrendItem[],
+): MarketProductTrendPoint[] {
+  return items
+    .filter((item) => /^\d{4}-\d{2}-\d{2}$/.test(item.dt))
+    .map((item) => ({
+      date: item.dt,
+      sales: item.total_sale_1d_cnt,
+      salesTotal: item.total_sale_cnt,
+      avgPrice:
+        item.spu_avg_price && item.spu_avg_price > 0 ? item.spu_avg_price : null,
+      videoCount: item.total_video_cnt,
+      creatorCount: item.total_ifl_cnt,
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date))
 }
 
 /**
@@ -408,4 +546,164 @@ export function toMarketLives(
       }
     })
     .filter((live): live is MarketLive => live !== null)
+}
+
+/**
+ * Enriquecimento do realtime (verificação + redes), resolvido à parte e
+ * best-effort. Tudo desligado quando o realtime falha/não traz.
+ */
+export type CreatorSocial = {
+  verified: boolean
+  youtube: { url: string; title: string } | null
+  twitter: { url: string; handle: string } | null
+}
+
+const EMPTY_SOCIAL: CreatorSocial = {
+  verified: false,
+  youtube: null,
+  twitter: null,
+}
+
+/**
+ * influencer/detail → ficha do criador (header/KPIs da /criadores/[id]). Avatar
+ * já vem assinado pelo adapter. GMV em USD (pendência de conversão). `likes` usa
+ * total_digg_cnt (curtidas acumuladas). `social` vem do realtime (best-effort).
+ */
+export function toCreatorDetail(
+  item: InfluencerDetailItem,
+  signedAvatar: string | null,
+  social: CreatorSocial = EMPTY_SOCIAL,
+): MarketCreatorDetail {
+  return {
+    id: item.user_id,
+    handle: item.unique_id || null,
+    name: item.nick_name?.trim() || `Criador ${item.user_id.slice(-4)}`,
+    avatar: signedAvatar ?? item.avatar ?? null,
+    niche: item.category?.trim() || "—",
+    region: item.region?.trim() || null,
+    bio: item.signature?.trim() || null,
+    contactEmail: item.contact_email?.trim() || null,
+    followers: item.total_followers_cnt,
+    following: item.total_following_cnt,
+    followersDelta30d: item.total_followers_30d_cnt || null,
+    verified: social.verified,
+    youtube: social.youtube,
+    twitter: social.twitter,
+    likes: item.total_digg_cnt,
+    videos: item.total_post_video_cnt,
+    products: item.total_product_cnt,
+    sales: item.total_sale_cnt,
+    estimatedGmv: item.total_sale_gmv_amt,
+    estimatedGmv30d: item.total_sale_gmv_30d_amt,
+    ecScore: item.ec_score,
+    interactionRate: item.interaction_rate,
+    firstSeen: crawlDateToIso(item.first_crawl_dt),
+  }
+}
+
+/**
+ * Objeto user do realtime/influencer/detail → CreatorSocial. Verificado se há
+ * verification_type != 0 ou qualquer string de verificação preenchida. URLs de
+ * YouTube/Twitter montadas a partir do id; null quando ausente.
+ */
+export function toCreatorSocial(
+  raw: InfluencerRealtimeDetail | null,
+): CreatorSocial {
+  const user = raw?.user
+  if (!user) return EMPTY_SOCIAL
+
+  const verified =
+    (user.verification_type ?? 0) !== 0 ||
+    Boolean(user.custom_verify?.trim()) ||
+    Boolean(user.enterprise_verify_reason?.trim())
+
+  const ytId = user.youtube_channel_id?.trim()
+  const youtube = ytId
+    ? {
+        url: `https://www.youtube.com/channel/${ytId}`,
+        title: user.youtube_channel_title?.trim() || "YouTube",
+      }
+    : null
+
+  const twId = user.twitter_id?.trim()
+  const twitter = twId
+    ? {
+        url: `https://twitter.com/${twId}`,
+        handle: user.twitter_name?.trim() || twId,
+      }
+    : null
+
+  return { verified, youtube, twitter }
+}
+
+/**
+ * influencer/video/list → vídeos do criador (shape de MarketProductVideo). O item
+ * já traz `unique_id` (handle do próprio criador), então não há resolução à
+ * parte. Capa assinada (echosell → 403). `productSales` = vendas do vídeo.
+ */
+export function toCreatorVideos(
+  items: InfluencerVideoItem[],
+  signedCoverByOriginal: Map<string, string>,
+): MarketProductVideo[] {
+  return items.map((item) => ({
+    id: item.video_id,
+    creatorHandle: item.unique_id || null,
+    cover: item.reflow_cover
+      ? (signedCoverByOriginal.get(item.reflow_cover) ?? null)
+      : null,
+    description: item.video_desc?.trim() || "",
+    hashtags: parseHashtags(item.video_desc),
+    durationSec: item.duration ?? null,
+    views: item.total_views_cnt,
+    likes: item.total_digg_cnt,
+    comments: item.total_comments_cnt,
+    shares: item.total_shares_cnt,
+    favorites: item.total_favorites_cnt,
+    productSales: item.total_video_sale_cnt,
+  }))
+}
+
+/**
+ * influencer/product/list → produtos promovidos pelo criador, com capa assinada.
+ * `cover_url` é JSON-array em string (`[{url,index}]`) → firstCoverUrl. Split de
+ * vendas por canal (vídeo vs live); GMV estimado em USD.
+ */
+export function toCreatorProducts(
+  items: InfluencerProductItem[],
+  signedCoverByOriginal: Map<string, string>,
+): MarketCreatorProduct[] {
+  return items.map((item) => {
+    const rawCover = firstCoverUrl(item.cover_url)
+    return {
+      id: item.product_id,
+      name: item.product_name?.trim() || "Produto",
+      image: rawCover ? (signedCoverByOriginal.get(rawCover) ?? null) : null,
+      avgPrice: item.spu_avg_price,
+      sales: item.total_sale_cnt,
+      estimatedGmv: item.total_sale_gmv_amt,
+      videoSales: item.total_video_sale_cnt,
+      liveSales: item.total_live_sale_cnt,
+    }
+  })
+}
+
+/**
+ * influencer/trend → série diária de seguidores (cronológica). A fonte pode vir
+ * fora de ordem → ordena por data. `delta` (variação do dia) pode ser negativo.
+ */
+export function toCreatorTrend(
+  items: InfluencerTrendItem[],
+): MarketCreatorTrendPoint[] {
+  return items
+    .filter((item): item is InfluencerTrendItem & { dt: string } =>
+      Boolean(item.dt),
+    )
+    .map((item) => ({
+      date: item.dt,
+      followers: item.total_followers_cnt,
+      delta: item.total_followers_1d_cnt,
+      sales: item.total_sale_1d_cnt,
+      gmv: item.total_sale_gmv_1d_amt,
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date))
 }

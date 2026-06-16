@@ -5,12 +5,23 @@ import type {
   marketCategorySchema,
   marketCategoryStatsSchema,
   marketCreativeSchema,
+  marketCreatorDetailSchema,
+  marketCreatorProductPageSchema,
+  marketCreatorProductSchema,
   marketCreatorSchema,
+  marketCreatorTrendPointSchema,
+  marketCreatorVideoPageSchema,
   marketLiveSchema,
+  marketProductCreatorPageSchema,
   marketProductCreatorSchema,
   marketProductDetailSchema,
   marketProductListItemSchema,
+  marketProductLivePageSchema,
+  marketProductLiveSchema,
+  marketProductReviewPageSchema,
+  marketProductReviewSchema,
   marketProductSchema,
+  marketProductTrendPointSchema,
   marketProductVideoSchema,
   marketSummarySchema,
   marketTrendPointSchema,
@@ -20,9 +31,34 @@ export type MarketProduct = z.infer<typeof marketProductSchema>
 export type MarketProductListItem = z.infer<typeof marketProductListItemSchema>
 export type MarketProductDetail = z.infer<typeof marketProductDetailSchema>
 export type MarketProductCreator = z.infer<typeof marketProductCreatorSchema>
+export type MarketProductCreatorPage = z.infer<
+  typeof marketProductCreatorPageSchema
+>
 export type MarketProductVideo = z.infer<typeof marketProductVideoSchema>
+export type MarketProductReview = z.infer<typeof marketProductReviewSchema>
+export type MarketProductReviewPage = z.infer<
+  typeof marketProductReviewPageSchema
+>
+export type MarketProductLive = z.infer<typeof marketProductLiveSchema>
+export type MarketProductLivePage = z.infer<
+  typeof marketProductLivePageSchema
+>
+export type MarketProductTrendPoint = z.infer<
+  typeof marketProductTrendPointSchema
+>
 export type MarketCreative = z.infer<typeof marketCreativeSchema>
 export type MarketCreator = z.infer<typeof marketCreatorSchema>
+export type MarketCreatorDetail = z.infer<typeof marketCreatorDetailSchema>
+export type MarketCreatorVideoPage = z.infer<
+  typeof marketCreatorVideoPageSchema
+>
+export type MarketCreatorProduct = z.infer<typeof marketCreatorProductSchema>
+export type MarketCreatorProductPage = z.infer<
+  typeof marketCreatorProductPageSchema
+>
+export type MarketCreatorTrendPoint = z.infer<
+  typeof marketCreatorTrendPointSchema
+>
 export type MarketCategory = z.infer<typeof marketCategorySchema>
 export type MarketCategoryStats = z.infer<typeof marketCategoryStatsSchema>
 export type MarketCategoryDetail = z.infer<typeof marketCategoryDetailSchema>
@@ -34,7 +70,51 @@ export type ListOptions = {
   limit?: number
 }
 
+/**
+ * Paginação das avaliações de um produto. O product/comment tem page_size
+ * travado em 10 → o consumidor controla só a página (1-based), e a UI pede a
+ * próxima ao rolar até o fim (react-virtuoso). `minRating`/`maxRating` mapeiam
+ * pro filtro de nota do endpoint (inteiros 0–5).
+ */
+export type ReviewListOptions = {
+  /** Página (1-based); default 1. */
+  page?: number
+  /** Nota mínima (0–5); omitido = sem piso. */
+  minRating?: number
+  /** Nota máxima (0–5); omitido = sem teto. */
+  maxRating?: number
+}
+
+/**
+ * Paginação das lives associadas a um produto. O product/live/list tem page_size
+ * travado em 10 → o consumidor controla só a página (1-based), e a UI pede a
+ * próxima ao rolar até o fim. Ordenação é fixa (GMV estimado, desc) — a regra de
+ * negócio é "lives que mais venderam primeiro".
+ */
+export type ProductLiveListOptions = {
+  /** Página (1-based); default 1. */
+  page?: number
+}
+
+/**
+ * Paginação dos criadores que promovem um produto. O product/influencer/list tem
+ * page_size travado em 10 → o consumidor controla só a página (1-based), e a UI
+ * pede a próxima ao rolar até o fim. Ordenação é fixa (vendas do produto, desc).
+ */
+export type ProductCreatorListOptions = {
+  /** Página (1-based); default 1. */
+  page?: number
+}
+
 export type TrendOptions = {
+  days?: number
+}
+
+/**
+ * Janela da tendência de um produto. `days` (7–90 na UI; a fonte aceita até 180)
+ * recua a partir de hoje; o adapter clampa e a rota valida.
+ */
+export type ProductTrendOptions = {
   days?: number
 }
 
@@ -60,6 +140,23 @@ export type VideoListOptions = {
  * na influencer/list → ordenado pós-fetch sobre a janela trazida.
  */
 export type CreatorSort = "followers" | "videos" | "efficiency" | "gmv"
+
+/** Paginação dos vídeos de um criador (influencer/video/list, page_size 10). */
+export type CreatorVideoListOptions = {
+  /** Página (1-based); default 1. */
+  page?: number
+}
+
+/** Paginação dos produtos promovidos por um criador (influencer/product/list). */
+export type CreatorProductListOptions = {
+  /** Página (1-based); default 1. */
+  page?: number
+}
+
+/** Janela da série de seguidores de um criador (influencer/trend, até 180 dias). */
+export type CreatorTrendOptions = {
+  days?: number
+}
 
 export type CreatorListOptions = {
   /** Nome do nicho/categoria (influencer_category_name). */
@@ -128,10 +225,47 @@ export type MarketDataSource = {
   getProducts(options?: ProductListOptions): Promise<MarketProductListItem[]>
   /** Ficha completa de um produto (detalhe + criadores + vídeos) — sheet do dashboard. */
   getProductDetail(id: string): Promise<MarketProductDetail>
+  /** Criadores paginados que promovem um produto (product/influencer/list) — aba Criadores. */
+  getProductCreators(
+    id: string,
+    options?: ProductCreatorListOptions,
+  ): Promise<MarketProductCreatorPage>
+  /** Avaliações paginadas de um produto (product/comment) — aba Avaliações. */
+  getProductReviews(
+    id: string,
+    options?: ReviewListOptions,
+  ): Promise<MarketProductReviewPage>
+  /** Lives associadas a um produto (product/live/list, por GMV) — aba Lives. */
+  getProductLives(
+    id: string,
+    options?: ProductLiveListOptions,
+  ): Promise<MarketProductLivePage>
+  /** Série diária de tendência de um produto (product/trend) — gráfico da página. */
+  getProductTrend(
+    id: string,
+    options?: ProductTrendOptions,
+  ): Promise<MarketProductTrendPoint[]>
   getTrendingCreatives(options?: ListOptions): Promise<MarketCreative[]>
   getTopSellingCreatives(options?: ListOptions): Promise<MarketCreative[]>
   /** Criadores (influencer/list) com filtros server-side — base do /criadores. */
   getCreators(options?: CreatorListOptions): Promise<MarketCreator[]>
+  /** Ficha completa de um criador (influencer/detail) — header da /criadores/[id]. */
+  getCreatorDetail(id: string): Promise<MarketCreatorDetail>
+  /** Vídeos paginados de um criador (influencer/video/list) — aba Vídeos. */
+  getCreatorVideos(
+    id: string,
+    options?: CreatorVideoListOptions,
+  ): Promise<MarketCreatorVideoPage>
+  /** Produtos promovidos paginados (influencer/product/list) — aba Produtos. */
+  getCreatorProducts(
+    id: string,
+    options?: CreatorProductListOptions,
+  ): Promise<MarketCreatorProductPage>
+  /** Série diária de seguidores de um criador (influencer/trend) — gráfico. */
+  getCreatorTrend(
+    id: string,
+    options?: CreatorTrendOptions,
+  ): Promise<MarketCreatorTrendPoint[]>
   /** Ranking de vídeos com filtros (sort/período/categoria/IA) — base do /videos. */
   getVideos(options?: VideoListOptions): Promise<MarketCreative[]>
   /** Categorias L1 pro filtro de vídeos (lista estática, cacheável). */

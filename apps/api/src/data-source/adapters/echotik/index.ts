@@ -13,14 +13,25 @@ import {
   CATEGORY_DETAIL_PRODUCTS,
   CATEGORY_LANGUAGE,
   CATEGORY_RANK_PAGES,
+  CREATOR_PRODUCT_PAGE_SIZE,
+  CREATOR_TREND_DEFAULT_DAYS,
+  CREATOR_TREND_MAX_PAGES,
+  CREATOR_TREND_PAGE_SIZE,
+  CREATOR_VIDEO_PAGE_SIZE,
   CONSOLIDADO_MIN_TOTAL_SALES,
   EMERGENTE_MAX_AGE_DAYS,
   INFLUENCER_PAGES,
   INFLUENCER_PAGE_SIZE,
   LIVE_ENRICH_LIMIT,
   LIVE_KEYWORDS,
+  PRODUCT_CREATOR_PAGE_SIZE,
   PRODUCT_DETAIL_CREATORS,
   PRODUCT_DETAIL_VIDEOS,
+  PRODUCT_LIVE_PAGE_SIZE,
+  PRODUCT_REVIEW_PAGE_SIZE,
+  PRODUCT_TREND_DEFAULT_DAYS,
+  PRODUCT_TREND_MAX_PAGES,
+  PRODUCT_TREND_PAGE_SIZE,
   PRODUCT_LIST_PAGES,
   PRODUCT_LIST_PAGE_SIZE,
   PRODUCT_SEARCH_SIZE,
@@ -33,6 +44,9 @@ import {
 } from "../../consts"
 import type {
   CreatorListOptions,
+  CreatorProductListOptions,
+  CreatorTrendOptions,
+  CreatorVideoListOptions,
   CreatorSort,
   ListOptions,
   MarketCategory,
@@ -40,12 +54,24 @@ import type {
   MarketCategoryStats,
   MarketCreative,
   MarketCreator,
+  MarketCreatorDetail,
+  MarketCreatorProductPage,
+  MarketCreatorTrendPoint,
+  MarketCreatorVideoPage,
   MarketDataSource,
   MarketLive,
+  MarketProductCreatorPage,
   MarketProductDetail,
   MarketProductListItem,
+  MarketProductLivePage,
+  MarketProductReviewPage,
+  MarketProductTrendPoint,
+  ProductCreatorListOptions,
   ProductListOptions,
+  ProductLiveListOptions,
   ProductSort,
+  ProductTrendOptions,
+  ReviewListOptions,
   VideoListOptions,
   VideoPeriod,
   VideoSort,
@@ -60,24 +86,40 @@ import {
   firstCoverUrl,
   type LiveAudience,
   toMarketCreatives,
+  toCreatorDetail,
+  toCreatorProducts,
+  toCreatorSocial,
+  toCreatorTrend,
+  toCreatorVideos,
   toMarketCreators,
   toMarketLives,
   toMarketProductListItems,
   toMarketProducts,
   toProductCreators,
   toProductDetail,
+  toProductLives,
+  toProductReviews,
+  toProductTrend,
   toProductVideos,
 } from "./mappers"
 import {
   categoryItemSchema,
   influencerHandleItemSchema,
+  influencerDetailItemSchema,
   influencerListItemSchema,
+  influencerProductItemSchema,
+  influencerRealtimeDetailSchema,
+  influencerTrendItemSchema,
+  influencerVideoItemSchema,
   liveDetailSchema,
   liveSearchEnvelopeSchema,
   productDetailFullSchema,
   productDetailItemSchema,
   productInfluencerItemSchema,
   productListItemSchema,
+  productLiveItemSchema,
+  productReviewItemSchema,
+  productTrendItemSchema,
   productVideoItemSchema,
   rankItemSchema,
   searchProductItemSchema,
@@ -85,11 +127,12 @@ import {
 } from "./schemas"
 import type {
   InfluencerListItem,
+  InfluencerTrendItem,
   LiveSearchItem,
   ProductDetailItem,
   ProductListItem,
+  ProductTrendItem,
   SearchProductItem,
-  ProductVideoItem,
   RankItem,
   VideoItem,
 } from "./schemas"
@@ -408,8 +451,6 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
  * Endpoints realtime topam risk control intermitente (a doc manda: code≠0 →
  * retry). echotikFetch já cobre o 429; aqui re-tentamos o erro de risk control
  * com backoff curto, pra a página não piscar vazia por um tropeço da gateway.
- * Roda em modo `parallel` (sem a fila/gap): lives disparam buscas e detalhes
- * juntos — em série seria ~13s.
  */
 async function realtimeFetch(
   path: string,
@@ -418,7 +459,7 @@ async function realtimeFetch(
 ): Promise<unknown> {
   for (let attempt = 0; ; attempt++) {
     try {
-      return await echotikFetch(path, params, { parallel: true })
+      return await echotikFetch(path, params)
     } catch (error) {
       if (attempt >= retries) throw error
       await sleep(400 * (attempt + 1))
@@ -496,8 +537,8 @@ async function getLives(options?: ListOptions): Promise<MarketLive[]> {
     .sort((a, b) => Number(hasShowcase(b)) - Number(hasShowcase(a)))
     .slice(0, limit)
 
-  // Enriquece o topo com a audiência atual, EM PARALELO (modo parallel do client):
-  // as live/detail disparam juntas, não em série. Best-effort — falha de uma live
+  // Enriquece o topo com a audiência atual, EM PARALELO: as live/detail disparam
+  // juntas, não em série. Best-effort — falha de uma live
   // (encerrou / risk control) só deixa aquela sem viewers, não derruba a página.
   const audienceByRoom = new Map<string, LiveAudience>()
   await Promise.all(
@@ -572,19 +613,16 @@ async function getCreators(
 }
 
 /**
- * Resolve user_id → @handle (unique_id) dos autores dos vídeos do produto via
- * influencer/detail (batch, máx. 10). O product/video/list só traz user_id.
- * Best-effort: erro ou autor fora da base → vídeo fica sem handle (sem quebrar).
+ * Resolve user_id → @handle (unique_id) via influencer/detail (batch, máx. 10).
+ * Nem o product/video/list nem o product/live/list trazem `unique_id`, só
+ * user_id. Best-effort: erro ou autor fora da base → item fica sem handle (sem
+ * quebrar). Dedup + corte em 10 (limite do batch).
  */
-async function fetchVideoHandles(
-  videos: ProductVideoItem[],
+async function fetchHandlesByUserId(
+  userIds: Array<string | null | undefined>,
 ): Promise<Map<string, string>> {
   const ids = [
-    ...new Set(
-      videos
-        .map((video) => video.user_id)
-        .filter((userId): userId is string => Boolean(userId)),
-    ),
+    ...new Set(userIds.filter((userId): userId is string => Boolean(userId))),
   ].slice(0, 10)
   if (ids.length === 0) return new Map()
   try {
@@ -600,6 +638,26 @@ async function fetchVideoHandles(
     )
   } catch {
     return new Map()
+  }
+}
+
+/**
+ * Enriquece o perfil do criador com verificação + redes (YouTube/Twitter) via
+ * realtime/influencer/detail (por @handle), que o offline NÃO traz. Best-effort:
+ * sem handle, ou erro/risk control (code 500) → tudo desligado, sem quebrar a
+ * ficha. Tempo-real, então pode falhar; não é crítico pro 200.
+ */
+async function fetchCreatorSocial(
+  uniqueId?: string | null,
+): Promise<ReturnType<typeof toCreatorSocial>> {
+  if (!uniqueId) return toCreatorSocial(null)
+  try {
+    const data = await echotikFetch("/realtime/influencer/detail", {
+      unique_id: uniqueId,
+    })
+    return toCreatorSocial(influencerRealtimeDetailSchema.parse(data ?? {}))
+  } catch {
+    return toCreatorSocial(null)
   }
 }
 
@@ -857,7 +915,9 @@ export const echotikSource: MarketDataSource = {
       (detail.category_id && nameById.get(detail.category_id)) || "—"
 
     // O video/list só traz user_id — resolve o @handle num batch best-effort.
-    const handleByUserId = await fetchVideoHandles(videoItems)
+    const handleByUserId = await fetchHandlesByUserId(
+      videoItems.map((video) => video.user_id),
+    )
 
     return toProductDetail(
       detail,
@@ -868,7 +928,226 @@ export const echotikSource: MarketDataSource = {
     )
   },
 
+  async getProductReviews(
+    id: string,
+    options?: ReviewListOptions,
+  ): Promise<MarketProductReviewPage> {
+    const page = Math.max(1, Math.trunc(options?.page ?? 1))
+    const query: Record<string, string | number> = {
+      product_id: id,
+      page_num: page,
+      page_size: PRODUCT_REVIEW_PAGE_SIZE,
+    }
+    if (options?.minRating !== undefined) query.min_rating = options.minRating
+    if (options?.maxRating !== undefined) query.max_rating = options.maxRating
+
+    const data = await echotikFetch("/echotik/product/comment", query)
+    const items = productReviewItemSchema.array().parse(data ?? [])
+    return {
+      reviews: toProductReviews(items),
+      page,
+      // O endpoint não devolve total → página cheia = provável continuação.
+      hasMore: items.length === PRODUCT_REVIEW_PAGE_SIZE,
+    }
+  },
+
+  async getProductLives(
+    id: string,
+    options?: ProductLiveListOptions,
+  ): Promise<MarketProductLivePage> {
+    const page = Math.max(1, Math.trunc(options?.page ?? 1))
+    const data = await echotikFetch("/echotik/product/live/list", {
+      product_id: id,
+      page_num: page,
+      page_size: PRODUCT_LIVE_PAGE_SIZE,
+      product_live_sort_field: 4, // total_sale_gmv_amt
+      sort_type: 1, // desc — lives que mais venderam primeiro
+    })
+    const items = productLiveItemSchema.array().parse(data ?? [])
+    // O payload só traz user_id → resolve o @handle num batch best-effort (≤10/pág).
+    const handleByUserId = await fetchHandlesByUserId(
+      items.map((item) => item.user_id),
+    )
+    return {
+      lives: toProductLives(items, handleByUserId),
+      page,
+      // O endpoint não devolve total → página cheia = provável continuação.
+      hasMore: items.length === PRODUCT_LIVE_PAGE_SIZE,
+    }
+  },
+
+  async getProductCreators(
+    id: string,
+    options?: ProductCreatorListOptions,
+  ): Promise<MarketProductCreatorPage> {
+    const page = Math.max(1, Math.trunc(options?.page ?? 1))
+    const data = await echotikFetch("/echotik/product/influencer/list", {
+      product_id: id,
+      page_num: page,
+      page_size: PRODUCT_CREATOR_PAGE_SIZE,
+      product_influencer_sort_field: 3, // per_product_ifl_sale_cnt (vendas do produto)
+      sort_type: 1, // desc — quem mais vendeu este produto primeiro
+    })
+    const items = productInfluencerItemSchema.array().parse(data ?? [])
+    // O payload só traz user_id → resolve @handle (link externo) num batch (≤10);
+    // avatares do CDN dão 403 direto → assina no mesmo passo (sem custo de cota).
+    const [handleByUserId, signedAvatars] = await Promise.all([
+      fetchHandlesByUserId(items.map((item) => item.user_id)),
+      signCoverUrls(
+        items
+          .map((item) => item.avatar ?? null)
+          .filter((url): url is string => Boolean(url)),
+      ),
+    ])
+    return {
+      creators: toProductCreators(items, handleByUserId, signedAvatars),
+      page,
+      // O endpoint não devolve total → página cheia = provável continuação.
+      hasMore: items.length === PRODUCT_CREATOR_PAGE_SIZE,
+    }
+  },
+
+  async getProductTrend(
+    id: string,
+    options?: ProductTrendOptions,
+  ): Promise<MarketProductTrendPoint[]> {
+    // Janela em dias recuada de hoje; a fonte exige range ≤ 180 dias.
+    const days = Math.min(
+      Math.max(Math.trunc(options?.days ?? PRODUCT_TREND_DEFAULT_DAYS), 1),
+      180,
+    )
+    const startDate = format(subDays(new Date(), days - 1), "yyyy-MM-dd")
+    const endDate = format(new Date(), "yyyy-MM-dd")
+
+    // Snapshots diários paginados (page_size travado em 10). Varre page_num até
+    // a página vir incompleta — a cobertura é esparsa, então quase sempre são
+    // poucas páginas; o teto protege a cota se a janela for grande.
+    const items: ProductTrendItem[] = []
+    for (let page = 1; page <= PRODUCT_TREND_MAX_PAGES; page++) {
+      const data = await echotikFetch("/echotik/product/trend", {
+        product_id: id,
+        start_date: startDate,
+        end_date: endDate,
+        page_num: page,
+        page_size: PRODUCT_TREND_PAGE_SIZE,
+      })
+      const batch = productTrendItemSchema.array().parse(data ?? [])
+      items.push(...batch)
+      if (batch.length < PRODUCT_TREND_PAGE_SIZE) break
+    }
+
+    return toProductTrend(items)
+  },
+
   getCreators,
+
+  async getCreatorDetail(id: string): Promise<MarketCreatorDetail> {
+    const data = await echotikFetch("/echotik/influencer/detail", {
+      user_ids: id,
+    })
+    const item = influencerDetailItemSchema.array().parse(data ?? [])[0]
+    if (!item) {
+      throw new EchotikApiError(
+        404,
+        "/echotik/influencer/detail",
+        `criador ${id} sem ficha`,
+      )
+    }
+    // Avatar do CDN dá 403 direto → assina; verificação/redes vêm do realtime
+    // (o offline não traz) — best-effort, em paralelo. Ambos sem derrubar a ficha.
+    const [signedAvatars, social] = await Promise.all([
+      item.avatar ? signCoverUrls([item.avatar]) : Promise.resolve(undefined),
+      fetchCreatorSocial(item.unique_id),
+    ])
+    const signed = item.avatar
+      ? (signedAvatars?.get(item.avatar) ?? null)
+      : null
+    return toCreatorDetail(item, signed, social)
+  },
+
+  async getCreatorVideos(
+    id: string,
+    options?: CreatorVideoListOptions,
+  ): Promise<MarketCreatorVideoPage> {
+    const page = Math.max(1, Math.trunc(options?.page ?? 1))
+    const data = await echotikFetch("/echotik/influencer/video/list", {
+      user_id: id,
+      page_num: page,
+      page_size: CREATOR_VIDEO_PAGE_SIZE,
+      influencer_video_sort_field: 1, // total_views_cnt
+      sort_type: 1, // desc — mais vistos primeiro
+    })
+    const items = influencerVideoItemSchema.array().parse(data ?? [])
+    // Capas echosell → 403; assina num lote só (sem custo de cota).
+    const covers = await signCoverUrls(
+      items
+        .map((item) => item.reflow_cover ?? null)
+        .filter((url): url is string => Boolean(url)),
+    )
+    return {
+      videos: toCreatorVideos(items, covers),
+      page,
+      // O endpoint não devolve total → página cheia = provável continuação.
+      hasMore: items.length === CREATOR_VIDEO_PAGE_SIZE,
+    }
+  },
+
+  async getCreatorProducts(
+    id: string,
+    options?: CreatorProductListOptions,
+  ): Promise<MarketCreatorProductPage> {
+    const page = Math.max(1, Math.trunc(options?.page ?? 1))
+    const data = await echotikFetch("/echotik/influencer/product/list", {
+      user_id: id,
+      page_num: page,
+      page_size: CREATOR_PRODUCT_PAGE_SIZE,
+      influencer_product_sort_field: 2, // total_sale_gmv_amt
+      sort_type: 1, // desc — maior GMV primeiro
+    })
+    const items = influencerProductItemSchema.array().parse(data ?? [])
+    // cover_url é JSON-array em string → firstCoverUrl; capas echosell → assina.
+    const covers = await signCoverUrls(
+      items
+        .map((item) => firstCoverUrl(item.cover_url))
+        .filter((url): url is string => Boolean(url)),
+    )
+    return {
+      products: toCreatorProducts(items, covers),
+      page,
+      hasMore: items.length === CREATOR_PRODUCT_PAGE_SIZE,
+    }
+  },
+
+  async getCreatorTrend(
+    id: string,
+    options?: CreatorTrendOptions,
+  ): Promise<MarketCreatorTrendPoint[]> {
+    // Janela em dias recuada de hoje; a fonte exige range ≤ 180 dias.
+    const days = Math.min(
+      Math.max(Math.trunc(options?.days ?? CREATOR_TREND_DEFAULT_DAYS), 1),
+      180,
+    )
+    const startDate = format(subDays(new Date(), days - 1), "yyyy-MM-dd")
+    const endDate = format(new Date(), "yyyy-MM-dd")
+
+    // Snapshots diários paginados (page_size travado em 10). Varre page_num até
+    // a página vir incompleta; o teto protege a cota se a janela for grande.
+    const items: InfluencerTrendItem[] = []
+    for (let page = 1; page <= CREATOR_TREND_MAX_PAGES; page++) {
+      const data = await echotikFetch("/echotik/influencer/trend", {
+        user_id: id,
+        start_date: startDate,
+        end_date: endDate,
+        page_num: page,
+        page_size: CREATOR_TREND_PAGE_SIZE,
+      })
+      const batch = influencerTrendItemSchema.array().parse(data ?? [])
+      items.push(...batch)
+      if (batch.length < CREATOR_TREND_PAGE_SIZE) break
+    }
+
+    return toCreatorTrend(items)
+  },
 
   getVideos,
 

@@ -1,7 +1,7 @@
-import type { NotificationChannel, WhatsappProvider } from "./channel"
+import type { Channel, NotificationChannel, WhatsappProvider } from "./channel"
 import { cloudApiChannel } from "./providers/cloud-api/adapter"
 import { evolutionChannel } from "./providers/evolution/adapter"
-import { logChannel } from "./providers/log/adapter"
+import { logAdapter } from "./providers/log/adapter"
 
 /**
  * Seleção do canal WhatsApp via WHATSAPP_PROVIDER. Default "log" (dry-run) — mesmo
@@ -21,8 +21,33 @@ export function getWhatsappChannel(): NotificationChannel {
     case "cloud-api":
       return cloudApiChannel
     case "log":
-      return logChannel
+      return logAdapter("whatsapp")
     default:
       throw new Error(`WHATSAPP_PROVIDER inválido: "${selected}" (use log | evolution | cloud-api)`)
+  }
+}
+
+/**
+ * Resolve o adapter de QUALQUER canal. O motor de alertas chama isto por entrega —
+ * não conhece o provider concreto. Provider real é opt-in por env (`<CANAL>_PROVIDER`);
+ * o default é o stub `log` (imprime, não envia). `console` é sempre dry-run (sink de
+ * validação). Adicionar um provider real = só trocar o `case` do canal, sem tocar no motor.
+ */
+export function getChannel(channel: Channel): NotificationChannel {
+  switch (channel) {
+    case "whatsapp":
+      return getWhatsappChannel()
+    case "console":
+      return logAdapter("console")
+    // email/telegram/push: só o stub `log` hoje. Quando um provider real chegar
+    // (Resend/Telegram Bot/Web Push), seleciona por env aqui — schema e motor não mudam.
+    case "email":
+    case "telegram":
+    case "push":
+      return logAdapter(channel)
+    default: {
+      const exhaustive: never = channel
+      throw new Error(`canal desconhecido: ${String(exhaustive)}`)
+    }
   }
 }

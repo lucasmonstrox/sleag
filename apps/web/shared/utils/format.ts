@@ -37,6 +37,24 @@ export function formatBrlCompact(value: number): string {
   return currency(value, BRL).format()
 }
 
+const regionNames = new Intl.DisplayNames(["pt-BR"], { type: "region" })
+
+/**
+ * Código de região ISO (ex.: "ID", "US", "BR") → nome do país em pt-BR
+ * ("Indonésia", "Estados Unidos", "Brasil"). Cai no próprio código se não for
+ * um código válido (a EchoTik às vezes manda algo inesperado).
+ */
+export function formatRegion(code?: string | null): string | null {
+  if (!code) return null
+  const normalized = code.trim().toUpperCase()
+  if (normalized.length !== 2) return code
+  try {
+    return regionNames.of(normalized) ?? code
+  } catch {
+    return code
+  }
+}
+
 export function formatDeltaPct(fraction: number): string {
   const pct = (fraction * 100).toLocaleString("pt-BR", {
     maximumFractionDigits: 1,

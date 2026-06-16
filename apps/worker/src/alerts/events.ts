@@ -85,3 +85,8 @@ export function presentEvent(
 export function renderWhatsappMessage(title: string, description: string): string {
   return `🚨 SLEAG — ${title}\n${description}\n\nResponda PARAR para deixar de receber alertas.`
 }
+
+/** Corpo genérico (console/email/telegram/push) — sem o rodapé PARAR específico do WhatsApp. */
+export function renderAlertMessage(title: string, description: string): string {
+  return `🚨 SLEAG — ${title}\n${description}`
+}

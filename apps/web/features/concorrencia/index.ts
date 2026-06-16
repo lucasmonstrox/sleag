@@ -1,4 +1,5 @@
 export { CriadoresPage } from "./components/criadores-page"
+export { CriadorDetalhePage } from "./components/criador-detalhe/criador-detalhe-page"
 export { LojasPage } from "./components/lojas-page"
 export { VideosPage } from "./components/videos-page"
 export { LivesPage } from "./components/lives-page"

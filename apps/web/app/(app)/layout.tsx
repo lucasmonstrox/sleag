@@ -9,6 +9,7 @@ import { TooltipProvider } from "@workspace/ui/components/tooltip"
 
 import { getSessionUser } from "@/lib/supabase/user"
 import { AppSidebar, AppTopbar } from "@/features/shell"
+import { AgenteLauncher } from "@/features/agente"
 
 export default async function AppLayout({
   children,
@@ -29,6 +30,7 @@ export default async function AppLayout({
           <AppTopbar />
           <ScrollArea className="min-h-0 flex-1">{children}</ScrollArea>
         </SidebarInset>
+        <AgenteLauncher />
       </SidebarProvider>
     </TooltipProvider>
   )

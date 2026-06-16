@@ -6,11 +6,7 @@ import Link from "next/link"
 
 import { ChevronRightIcon, StarIcon } from "lucide-react"
 
-import type {
-  MarketProduct,
-  MarketProductCreator,
-  MarketProductVideo,
-} from "api"
+import type { MarketProduct, MarketProductVideo } from "api"
 
 import { Badge } from "@workspace/ui/components/badge"
 import {
@@ -27,7 +23,15 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs"
 
-import { Delta, getInitials, MediaCell, ScorePill, VideoGrid } from "@/shared"
+import {
+  Delta,
+  getInitials,
+  ProductCreators,
+  ProductLives,
+  ProductReviews,
+  ScorePill,
+  VideoGrid,
+} from "@/shared"
 import type { VideoItem } from "@/shared"
 
 import { useProductDetail } from "../../hooks/data/queries/use-product-detail"
@@ -177,7 +181,7 @@ function SheetBody({ product }: { product: MarketProduct }) {
                 Criadores
                 {detail ? (
                   <Badge variant="secondary" className="ml-1.5">
-                    {detail.creators.length}
+                    {formatCompact(detail.creatorCount)}
                   </Badge>
                 ) : null}
               </TabsTrigger>
@@ -189,13 +193,20 @@ function SheetBody({ product }: { product: MarketProduct }) {
                   </Badge>
                 ) : null}
               </TabsTrigger>
+              <TabsTrigger value="lives">Lives</TabsTrigger>
+              <TabsTrigger value="reviews">
+                Avaliações
+                {detail?.reviewCount ? (
+                  <Badge variant="secondary" className="ml-1.5">
+                    {formatInteger(detail.reviewCount)}
+                  </Badge>
+                ) : null}
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="criadores">
-              {loading ? (
-                <LoadingRows />
-              ) : detail ? (
-                <CreatorsList creators={detail.creators} />
-              ) : null}
+              {/* Criadores carregam sob demanda (server action paginada, por
+                  vendas), então não dependem do `detail` — montam com o id. */}
+              <ProductCreators productId={product.id} height={380} />
             </TabsContent>
             <TabsContent value="videos">
               {loading ? (
@@ -208,6 +219,20 @@ function SheetBody({ product }: { product: MarketProduct }) {
               ) : (
                 <EmptyHint>Nenhum vídeo registrado pra este produto.</EmptyHint>
               )}
+            </TabsContent>
+            <TabsContent value="lives">
+              {/* Lives carregam sob demanda (server action paginada, por GMV),
+                  então não dependem do `detail` — montam com o id do produto. */}
+              <ProductLives productId={product.id} height={380} />
+            </TabsContent>
+            <TabsContent value="reviews">
+              {/* Reviews carregam sob demanda (server action paginada), então
+                  não dependem do `detail` — montam direto com o id do produto. */}
+              <ProductReviews
+                productId={product.id}
+                reviewCount={detail?.reviewCount}
+                height={380}
+              />
             </TabsContent>
           </Tabs>
         )}
@@ -223,38 +248,6 @@ function SheetBody({ product }: { product: MarketProduct }) {
         </Link>
       </div>
     </>
-  )
-}
-
-function CreatorsList({ creators }: { creators: MarketProductCreator[] }) {
-  if (creators.length === 0) {
-    return (
-      <EmptyHint>Nenhum criador registrado pra este produto ainda.</EmptyHint>
-    )
-  }
-  return (
-    <div className="flex flex-col">
-      {creators.map((creator, index) => (
-        <div
-          key={creator.id}
-          className="flex items-center justify-between gap-3 border-b border-foreground/5 py-2.5 last:border-0"
-        >
-          <MediaCell
-            title={creator.name}
-            subtitle={creator.niche}
-            seed={index}
-            shape="circle"
-          />
-          <div className="flex items-center gap-5 text-right">
-            <Metric value={formatCompact(creator.productSales)} label="vendas" />
-            <Metric
-              value={formatCompact(creator.followers)}
-              label="seguidores"
-            />
-          </div>
-        </div>
-      ))}
-    </div>
   )
 }
 
@@ -307,15 +300,6 @@ function Stat({
       {hint && !loading ? (
         <span className="text-[11px] text-muted-foreground/70">{hint}</span>
       ) : null}
-    </div>
-  )
-}
-
-function Metric({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="flex flex-col">
-      <span className="text-sm font-medium">{value}</span>
-      <span className="text-[11px] text-muted-foreground/70">{label}</span>
     </div>
   )
 }

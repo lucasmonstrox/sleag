@@ -21,9 +21,11 @@
     "wrangler": "^4.42.0"
   },
   "dependencies": {
+    "@ai-sdk/deepseek": "^2.0.38",
     "@elysiajs/cors": "^1.4.2",
     "@supabase/supabase-js": "^2.58.0",
     "@workspace/notifications": "workspace:*",
+    "ai": "^6.0.206",
     "date-fns": "^4.4.0",
     "elysia": "^1.4.28",
     "zod": "^4.4.3"

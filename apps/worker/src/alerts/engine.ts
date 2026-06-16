@@ -1,3 +1,4 @@
+import { getChannel } from "@workspace/notifications"
 import type { SupabaseClient } from "@supabase/supabase-js"
 
 import {
@@ -184,19 +185,62 @@ export async function evaluateRuleAgainstMarket(
   return { evaluated: refs.length, matched, inserted: (inserted ?? []) as InsertedEvent[] }
 }
 
-export type CreatedDeliveries = { queuedIds: string[]; skipped: number }
+/** Entrega criada (linha NOVA de notification_deliveries) + dados do evento p/ despacho síncrono sem re-query. */
+export type CreatedDelivery = {
+  id: string
+  channel: Channel
+  status: string
+  title: string
+  description: string
+}
+export type CreatedDeliveries = { deliveries: CreatedDelivery[]; skipped: number }
+
+type DeliveryDecision = { status: "queued" | "skipped"; skipReason: string | null }
 
 /**
- * Materializa as entregas de um lote de eventos novos: 1 linha por evento×canal.
- * Canal bloqueado (plano / sem provider / sem consentimento) vira `skipped` com
- * skip_reason — visível na UI, nunca drop silencioso.
+ * Política de entrega por canal — quando um alerta entra na fila/é despachado vs.
+ * é pulado. É AQUI que "validar o conceito" vira regra explícita (ajuste à vontade):
+ *  - console               → sempre entrega (sink de validação; sem plano, sem consentimento).
+ *  - fora do plano         → skipped/plan_gate (visível na UI, nunca drop silencioso).
+ *  - síncrono em dry-run    → email/telegram/push com provider=log imprimem; nada sai
+ *                            do sistema → entregam sem consentimento.
+ *  - provider real / whatsapp → exigem notification_channels confirmado + enabled, senão
+ *                            consent_missing. (WhatsApp sempre passa pela fila + consumer,
+ *                            que tem seu próprio gate de consentimento — gatear aqui também
+ *                            evita enfileirar entrega fadada a skip.)
+ */
+function decideDeliveryStatus(
+  channel: Channel,
+  planTier: string,
+  channelState: Map<string, { status: string; enabled: boolean }>,
+): DeliveryDecision {
+  if (channel === "console") return { status: "queued", skipReason: null }
+  if (!channelAllowedForPlan(planTier, channel)) return { status: "skipped", skipReason: "plan_gate" }
+
+  // Canais de despacho síncrono em dry-run (provider log) imprimem sem consentimento.
+  // WhatsApp fica de fora: vai pra fila e o consumer exige consentimento de verdade.
+  if (channel !== "whatsapp" && getChannel(channel).provider === "log") {
+    return { status: "queued", skipReason: null }
+  }
+
+  const state = channelState.get(channel)
+  if (!state || state.status !== "confirmed" || !state.enabled) {
+    return { status: "skipped", skipReason: "consent_missing" }
+  }
+  return { status: "queued", skipReason: null }
+}
+
+/**
+ * Materializa as entregas de um lote de eventos novos: 1 linha por evento×canal
+ * (canais da regra + `console` implícito quando ALERTS_CONSOLE_SINK ≠ "false").
+ * O despacho em si é do workflow (WhatsApp → fila serializada; demais → síncrono).
  */
 export async function createDeliveriesForEvents(
   db: SupabaseClient,
   rule: AlertRuleRow,
   events: InsertedEvent[],
 ): Promise<CreatedDeliveries> {
-  if (events.length === 0) return { queuedIds: [], skipped: 0 }
+  if (events.length === 0) return { deliveries: [], skipped: 0 }
 
   const [{ data: tenant, error: tErr }, { data: channelRows, error: cErr }] = await Promise.all([
     db.from("tenants").select("plan_tier").eq("id", rule.tenant_id).single(),
@@ -210,47 +254,37 @@ export async function createDeliveriesForEvents(
     (channelRows ?? []).map((r) => [r.channel as string, { status: r.status as string, enabled: r.enabled as boolean }]),
   )
 
+  // Canais da regra + console sink (default ligado). Set dedup evita linha duplicada.
+  const consoleSink = process.env.ALERTS_CONSOLE_SINK !== "false"
+  const channels = new Set<Channel>((rule.channels ?? []).map((c) => c.toLowerCase() as Channel))
+  if (consoleSink) channels.add("console")
+
+  const eventById = new Map(events.map((e) => [e.id, e]))
   const rows: Record<string, unknown>[] = []
   for (const event of events) {
-    for (const raw of rule.channels ?? []) {
-      const channel = raw.toLowerCase() as Channel
-      let status = "queued"
-      let skipReason: string | null = null
-
-      if (!channelAllowedForPlan(planTier, channel)) {
-        status = "skipped"
-        skipReason = "plan_gate"
-      } else if (channel !== "whatsapp") {
-        status = "skipped"
-        skipReason = "provider_not_implemented" // email/telegram/push entram nas próximas fases
-      } else {
-        const state = channelState.get("whatsapp")
-        if (!state || state.status !== "confirmed" || !state.enabled) {
-          status = "skipped"
-          skipReason = "consent_missing"
-        }
-      }
-
-      rows.push({
-        tenant_id: rule.tenant_id,
-        event_id: event.id,
-        channel,
-        status,
-        skip_reason: skipReason,
-      })
+    for (const channel of channels) {
+      const { status, skipReason } = decideDeliveryStatus(channel, planTier, channelState)
+      rows.push({ tenant_id: rule.tenant_id, event_id: event.id, channel, status, skip_reason: skipReason })
     }
   }
-  if (rows.length === 0) return { queuedIds: [], skipped: 0 }
+  if (rows.length === 0) return { deliveries: [], skipped: 0 }
 
+  // on conflict do nothing + select → só linhas NOVAS voltam (idempotência (event_id,channel)).
   const { data: inserted, error: iErr } = await db
     .from("notification_deliveries")
     .upsert(rows, { onConflict: "event_id,channel", ignoreDuplicates: true })
-    .select("id, status")
+    .select("id, channel, status, event_id")
   if (iErr) throw new Error(`deliveries upsert: ${iErr.message}`)
 
-  const created = inserted ?? []
-  return {
-    queuedIds: created.filter((d) => d.status === "queued").map((d) => d.id as string),
-    skipped: created.filter((d) => d.status === "skipped").length,
-  }
+  const deliveries: CreatedDelivery[] = (inserted ?? []).map((d) => {
+    const ev = eventById.get(d.event_id as string)
+    return {
+      id: d.id as string,
+      channel: d.channel as Channel,
+      status: d.status as string,
+      title: ev?.title ?? "",
+      description: ev?.description ?? "",
+    }
+  })
+  return { deliveries, skipped: deliveries.filter((d) => d.status === "skipped").length }
 }
