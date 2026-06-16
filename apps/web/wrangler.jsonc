@@ -8,8 +8,14 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  "vars": {
+    // Base URL da apps/api (Eden treaty, server-side). Domínio custom da API.
+    "API_URL": "https://api.sleag.com.br"
+  },
   // Custom domain: a Cloudflare cria o DNS + cert SSL automaticamente
   // (a zona sleag.com.br precisa estar nesta conta).
   "routes": [{ "pattern": "app.sleag.com.br", "custom_domain": true }],
+  // Mantém o *.workers.dev ativo junto do custom domain (fallback/testes).
+  "workers_dev": true,
   "dev": { "port": 8788 }
 }

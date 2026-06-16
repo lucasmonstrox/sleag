@@ -7,9 +7,14 @@
   "compatibility_date": "2026-06-01",
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
-    // Origem do app web (CORS). Ajustar para o domínio custom quando existir.
-    "CORS_ORIGIN": "https://sleag-web.joao-galiano-silva.workers.dev"
+    // Origem do app web (CORS) — domínio custom do apps/web.
+    "CORS_ORIGIN": "https://app.sleag.com.br"
   },
+  // Custom domain: a Cloudflare cria o DNS + cert SSL automaticamente
+  // (a zona sleag.com.br precisa estar nesta conta).
+  "routes": [{ "pattern": "api.sleag.com.br", "custom_domain": true }],
+  // Mantém o *.workers.dev ativo junto do custom domain (fallback/testes).
+  "workers_dev": true,
   "dev": {
     "port": 8787
   }
