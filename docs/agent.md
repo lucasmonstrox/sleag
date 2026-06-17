@@ -1677,3 +1677,782 @@ apps/web/features/
 | **Total** | **8 semanas** | | |
 
 Fases 2, 3, e 4 podem ser paralelizadas parcialmente (times diferentes ou desenvolvedor trabalhando em camadas diferentes). O caminho critico e Fase 1 -> Fase 3 -> Fase 6.
+
+---
+
+## 5. SISTEMA DE RECOMENDAÇÃO
+
+O sistema de recomendação é o motor que transforma dados brutos em **sugestões acionáveis** para o seller. Não é só "produtos similares" — é um sistema multi-estratégia que combina 4 abordagens e faz ensemble no final.
+
+### 5.1 As 4 Estratégias de Recomendação
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    RECOMMENDATION ENGINE                         │
+│                                                                   │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  │
+│  │ Content-Based    │  │ Collaborative   │  │ Graph-Based      │  │
+│  │ (embedding cos)  │  │ (co-occurrence) │  │ (path traversal) │  │
+│  └────────┬────────┘  └────────┬────────┘  └────────┬────────┘  │
+│           │                    │                    │            │
+│           └────────────────────┼────────────────────┘            │
+│                                │                                  │
+│                     ┌──────────┴──────────┐                       │
+│                     │  ENSEMBLE LAYER      │                       │
+│                     │  (weighted blend +   │                       │
+│                     │   diversity re-rank) │                       │
+│                     └──────────┬──────────┘                       │
+│                                │                                  │
+│  ┌─────────────────┐           │           ┌─────────────────┐   │
+│  │ Real-Time        │◄──────────┴──────────►│ Contextual       │   │
+│  │ (user behavior)  │                       │ (tenant profile) │   │
+│  └─────────────────┘                       └─────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+#### 5.1.1 Content-Based: "Parecido com o que você já gosta"
+
+Usa embeddings (pgvector) para encontrar produtos semelhantes por características intrínsecas.
+
+```sql
+-- Função RPC: content_based_recommendations
+CREATE OR REPLACE FUNCTION public.content_based_recommendations(
+  seed_product_ids text[],
+  exclude_product_ids text[] DEFAULT '{}',
+  category_filter text DEFAULT NULL,
+  min_commission numeric DEFAULT 0,
+  max_results int DEFAULT 20
+)
+RETURNS TABLE(
+  product_id text,
+  name text,
+  category text,
+  similarity real,
+  score numeric,
+  commission_rate numeric,
+  sales_1d int
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  RETURN QUERY
+  WITH seed_embedding AS (
+    -- Média dos embeddings dos produtos seed (centroide)
+    SELECT AVG(embedding)::vector AS centroid
+    FROM public.products
+    WHERE product_id = ANY(seed_product_ids)
+      AND embedding IS NOT NULL
+  ),
+  candidates AS (
+    SELECT 
+      p.product_id, p.name, c.name AS category,
+      1.0 - (p.embedding <=> se.centroid) AS similarity,
+      COALESCE(ps.score, 0) AS score,
+      p.commission_rate,
+      COALESCE(pds.sales_1d, 0) AS sales_1d
+    FROM public.products p
+    CROSS JOIN seed_embedding se
+    LEFT JOIN public.categories c ON c.id = p.category_id
+    LEFT JOIN LATERAL (
+      SELECT score FROM public.product_scores WHERE product_id = p.product_id AND region = 'BR'
+      ORDER BY dt DESC LIMIT 1
+    ) ps ON true
+    LEFT JOIN LATERAL (
+      SELECT sales_1d FROM public.product_daily_snapshots WHERE product_id = p.product_id AND region = 'BR'
+      ORDER BY dt DESC LIMIT 1
+    ) pds ON true
+    WHERE p.product_id != ALL(exclude_product_ids)
+      AND p.product_id != ALL(seed_product_ids)
+      AND p.embedding IS NOT NULL
+      AND (category_filter IS NULL OR p.category_id = category_filter)
+      AND p.commission_rate >= min_commission
+  )
+  SELECT * FROM candidates
+  ORDER BY similarity DESC
+  LIMIT max_results;
+END;
+$$;
+```
+
+**Features do embedding:** nome do produto + nome da categoria + faixa de preço + margem + descrição (via LLM no sync). Dimensão: 768 (Workers AI `@cf/baai/bge-base-en-v1.5`).
+
+#### 5.1.2 Collaborative Filtering: "Quem gosta disso também gosta daquilo"
+
+Baseado em co-ocorrência — produtos que aparecem juntos nos mesmos criadores, mesmas lojas, mesmos vídeos.
+
+```sql
+-- Função RPC: collaborative_recommendations
+-- Usa o grafo (graph_edges) para achar padrões de co-ocorrência
+CREATE OR REPLACE FUNCTION public.collaborative_recommendations(
+  seed_product_ids text[],
+  exclude_product_ids text[] DEFAULT '{}',
+  max_results int DEFAULT 20
+)
+RETURNS TABLE(
+  product_id text,
+  name text,
+  score real,           -- força da co-ocorrência
+  shared_creators int,  -- quantos criadores promovem ambos
+  shared_shops int,     -- quantas lojas vendem ambos
+  shared_videos int,    -- quantos vídeos apresentam ambos
+  shared_hashtags int   -- quantas hashtags compartilham
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  RETURN QUERY
+  WITH seed_entities AS (
+    -- Todas as entidades conectadas aos produtos seed via graph_edges
+    SELECT target_type, target_ref, COUNT(*) AS cnt
+    FROM public.graph_edges
+    WHERE source_type = 'product'
+      AND source_ref = ANY(seed_product_ids)
+      AND relation IN ('promotes', 'sells', 'appears_in', 'uses_hashtag')
+    GROUP BY target_type, target_ref
+  ),
+  co_occurring AS (
+    SELECT 
+      ge.source_ref AS candidate_product_id,
+      se.target_type,
+      COUNT(*) AS shared_count
+    FROM public.graph_edges ge
+    JOIN seed_entities se ON ge.target_type = se.target_type AND ge.target_ref = se.target_ref
+    WHERE ge.source_type = 'product'
+      AND ge.source_ref != ALL(seed_product_ids)
+      AND ge.source_ref != ALL(exclude_product_ids)
+      AND ge.relation IN ('promotes', 'sells', 'appears_in', 'uses_hashtag')
+    GROUP BY ge.source_ref, se.target_type
+  ),
+  scored AS (
+    SELECT 
+      candidate_product_id,
+      SUM(shared_count) AS total_score,
+      SUM(CASE WHEN target_type = 'creator' THEN shared_count ELSE 0 END) AS shared_creators,
+      SUM(CASE WHEN target_type = 'shop' THEN shared_count ELSE 0 END) AS shared_shops,
+      SUM(CASE WHEN target_type = 'video' THEN shared_count ELSE 0 END) AS shared_videos,
+      SUM(CASE WHEN target_type = 'hashtag' THEN shared_count ELSE 0 END) AS shared_hashtags
+    FROM co_occurring
+    GROUP BY candidate_product_id
+  )
+  SELECT 
+    s.candidate_product_id AS product_id,
+    p.name,
+    s.total_score::real AS score,
+    s.shared_creators,
+    s.shared_shops,
+    s.shared_videos,
+    s.shared_hashtags
+  FROM scored s
+  JOIN public.products p ON p.product_id = s.candidate_product_id
+  ORDER BY s.total_score DESC
+  LIMIT max_results;
+END;
+$$;
+```
+
+**Força do sinal:** Quanto mais entidades compartilhadas (criadores, lojas, hashtags), mais forte a recomendação. Produtos que aparecem nos mesmos criadores de alto GMV têm peso maior.
+
+#### 5.1.3 Graph-Based: "Navegue o grafo para descobrir"
+
+Usa o grafo de conhecimento para recomendações por caminhos semânticos, não só similaridade.
+
+```
+Caminhos de recomendação:
+
+1. Produto → Criador → Outros produtos do mesmo criador
+   "Criador X promove A e B — se você olhou A, talvez B"
+
+2. Produto → Hashtag → Outros produtos com a mesma hashtag
+   "Produtos com #skincarebrasil que estão em alta"
+
+3. Produto → Categoria → Produtos emergentes na mesma categoria
+   "Protetor solar → Categoria Beleza → Hidratantes bombando"
+
+4. Produto → Vídeo → Comentários → Hashtags mencionadas → Produtos
+   "Nos comentários do vídeo desse produto, falam de X"
+```
+
+```sql
+-- Função RPC: graph_path_recommendations
+-- Recomenda por caminhos de 2 hops no grafo
+CREATE OR REPLACE FUNCTION public.graph_path_recommendations(
+  seed_product_id text,
+  path_strategy text DEFAULT 'creator',  -- 'creator', 'hashtag', 'category', 'comments'
+  max_results int DEFAULT 10
+)
+RETURNS TABLE(
+  product_id text,
+  name text,
+  path_explanation text,  -- "Via criador @fulano" ou "Via hashtag #skincare"
+  hop_count int,
+  score real
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  -- Strategy 1: seed_product → creator → other_products
+  IF path_strategy = 'creator' THEN
+    RETURN QUERY
+    WITH creator_path AS (
+      SELECT DISTINCT ge.target_ref AS creator_id
+      FROM public.graph_edges ge
+      WHERE ge.source_type = 'product' 
+        AND ge.source_ref = seed_product_id
+        AND ge.relation = 'promoted_by'
+    ),
+    other_products AS (
+      SELECT 
+        ge.source_ref AS pid,
+        ge.target_ref AS cid,
+        COUNT(*) OVER (PARTITION BY ge.source_ref) AS path_count
+      FROM public.graph_edges ge
+      WHERE ge.source_type = 'product'
+        AND ge.target_ref IN (SELECT creator_id FROM creator_path)
+        AND ge.relation = 'promoted_by'
+        AND ge.source_ref != seed_product_id
+    )
+    SELECT 
+      op.pid,
+      p.name,
+      'Via criador ' || c.unique_id AS path_explanation,
+      2::int AS hop_count,
+      op.path_count::real AS score
+    FROM other_products op
+    JOIN public.products p ON p.product_id = op.pid
+    LEFT JOIN public.creators c ON c.creator_id = op.cid
+    ORDER BY score DESC
+    LIMIT max_results;
+  
+  -- Strategy 2: seed_product → hashtag → other_products
+  ELSIF path_strategy = 'hashtag' THEN
+    -- ...similar pattern com graph_edges relation='uses_hashtag'
+  END IF;
+END;
+$$;
+```
+
+#### 5.1.4 Contextual: "Para o seu perfil específico"
+
+Personaliza recomendações baseado no perfil do tenant (seller):
+
+```typescript
+// apps/api/src/agent/tools/recommend-for-me.ts
+const recommendForMeTool = tool({
+  description: "Recomenda produtos personalizados para o seller logado, " +
+    "considerando o nicho dele, canais conectados, e histórico de interesse.",
+  inputSchema: z.object({
+    intent: z.string().optional().describe("O que você quer fazer? Ex: 'repor estoque', 'entrar em novo nicho'"),
+    budget: z.enum(["baixo", "medio", "alto"]).optional(),
+    maxResults: z.number().optional().default(10),
+  }),
+  execute: async ({ intent, budget, maxResults }) => {
+    // 1. Carrega perfil do tenant
+    const profile = await getTenantProfile(ctx.tenantId) // nicho, canais, score
+    
+    // 2. Define pesos das estratégias por perfil
+    const weights = {
+      content: profile.hasHistory ? 0.30 : 0.15,   // +peso se tem histórico
+      collaborative: profile.hasChannels ? 0.35 : 0.10, // +peso se tem canais conectados
+      graph: 0.25,
+      contextual: 0.30,
+    }
+    
+    // 3. Roda as 4 estratégias em paralelo
+    const [contentRecs, collabRecs, graphRecs, contextualRecs] = await Promise.all([
+      getContentBased(profile.interests, { budget, limit: 30 }),
+      getCollaborative(profile.viewedProductIds, { limit: 30 }),
+      getGraphBased(profile.interests[0], { limit: 30 }),
+      getContextual(profile, intent, { limit: 30 }),
+    ])
+    
+    // 4. Ensemble: weighted merge + diversity re-rank
+    return ensembleMerge(
+      [contentRecs, collabRecs, graphRecs, contextualRecs],
+      weights,
+      { diversityFactor: 0.3, maxResults }
+    )
+  }
+})
+```
+
+### 5.2 Ensemble & Diversity Re-Ranking
+
+O problema de recomendar só por similaridade é que você acaba com 20 variações do mesmo produto. O ensemble layer resolve isso:
+
+```typescript
+function ensembleMerge(
+  resultSets: RecommendationResult[][],
+  weights: Record<string, number>,
+  options: { diversityFactor: number; maxResults: number }
+): RecommendationResult[] {
+  // 1. Normaliza scores de cada estratégia (min-max scaling)
+  const normalized = resultSets.map(set => normalizeScores(set))
+  
+  // 2. Weighted merge — produto pode aparecer em múltiplas listas
+  const merged = new Map<string, { product: Product; score: number; sources: string[] }>()
+  for (const [i, results] of normalized.entries()) {
+    const strategy = ['content', 'collaborative', 'graph', 'contextual'][i]
+    const weight = weights[strategy]
+    for (const r of results) {
+      const existing = merged.get(r.product_id)
+      if (existing) {
+        existing.score += r.score * weight
+        existing.sources.push(strategy)
+      } else {
+        merged.set(r.product_id, { product: r, score: r.score * weight, sources: [strategy] })
+      }
+    }
+  }
+  
+  // 3. Diversity re-rank: MMR (Maximal Marginal Relevance)
+  // Penaliza produtos muito similares aos já selecionados
+  const ranked = mmrRerank(
+    Array.from(merged.values()),
+    options.diversityFactor, // λ=0.3 → 30% diversidade, 70% relevância
+    options.maxResults
+  )
+  
+  return ranked
+}
+```
+
+### 5.3 Tipos de Recomendação por Contexto
+
+| Contexto | Estratégia | Exemplo |
+|----------|-----------|---------|
+| **Product Detail Page** | Content + Collaborative | "Quem viu este também viu..." |
+| **Dashboard Home** | Contextual + Real-time | "Para você, baseado no seu nicho" |
+| **Após busca vazia** | Content (fuzzy) | "Nenhum resultado exato, mas talvez..." |
+| **"Complete o kit"** | Graph (path) | Produtos complementares na mesma categoria |
+| **"Entre em novo nicho"** | Collaborative + Emerging | Nichos adjacentes com alta margem |
+| **Alerta ativado** | Content-based | "Produto similar ao que você monitora" |
+
+### 5.4 Real-Time Behavioral Signals
+
+Captura sinais de comportamento para refinar recomendações sem precisar de histórico longo:
+
+```sql
+-- Tabela de sinais comportamentais (efêmera, TTL 30 dias)
+CREATE TABLE public.behavioral_signals (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id text NOT NULL,
+  product_id text NOT NULL,
+  signal_type text NOT NULL,  -- 'view', 'click', 'save', 'share', 'dwell_30s'
+  signal_weight real NOT NULL DEFAULT 1.0,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  expires_at timestamptz NOT NULL DEFAULT (now() + interval '30 days')
+);
+CREATE INDEX behavioral_signals_tenant_idx ON public.behavioral_signals (tenant_id, created_at DESC);
+
+-- Função: produtos com mais sinais recentes do tenant
+CREATE OR REPLACE FUNCTION public.recently_interested_products(
+  p_tenant_id text,
+  p_window_hours int DEFAULT 72,
+  p_limit int DEFAULT 50
+)
+RETURNS TABLE(product_id text, interest_score real)
+LANGUAGE sql
+AS $$
+  SELECT 
+    product_id,
+    SUM(signal_weight * 
+      CASE signal_type 
+        WHEN 'dwell_30s' THEN 3.0
+        WHEN 'save' THEN 2.5
+        WHEN 'click' THEN 1.5
+        WHEN 'share' THEN 2.0
+        ELSE 1.0
+      END *
+      -- Decaimento temporal: sinais recentes valem mais
+      (1.0 - EXTRACT(EPOCH FROM (now() - created_at)) / EXTRACT(EPOCH FROM interval '72 hours'))
+    )::real AS interest_score
+  FROM public.behavioral_signals
+  WHERE tenant_id = p_tenant_id
+    AND created_at > now() - make_interval(hours => p_window_hours)
+  GROUP BY product_id
+  ORDER BY interest_score DESC
+  LIMIT p_limit;
+$$;
+```
+
+---
+
+## 6. CLUSTERIZAÇÃO
+
+Clusterização é a descoberta **não supervisionada** de grupos naturais no mercado. Diferente da recomendação (que sugere itens), a clusterização **revela estrutura** — nichos emergentes que a taxonomia oficial não captura, criadores com estilos semelhantes, anomalias.
+
+### 6.1 Estratégia de Clusterização
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                CLUSTERING PIPELINE                        │
+│                                                            │
+│  [Raw Data] → [Feature Engineering] → [Dim Reduction]     │
+│                                          ↓                 │
+│                                    [Clustering]            │
+│                                    (HDBSCAN / K-Means)     │
+│                                          ↓                 │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐       │
+│  │ Produtos     │  │ Criadores    │  │ Nichos       │       │
+│  │ (atributos + │  │ (estilo +    │  │ (produtos +  │       │
+│  │  embedding)  │  │  audiência)  │  │  criadores)  │       │
+│  └─────────────┘  └─────────────┘  └─────────────┘       │
+│                                                            │
+│  ┌──────────────────────────────────────────────────┐     │
+│  │ Aplicações:                                       │     │
+│  │ • Naming: LLM dá nome descritivo a cada cluster   │     │
+│  │ • Trending: detectar clusters em aceleração       │     │
+│  │ • Gaps: clusters sem produtos → oportunidade      │     │
+│  │ • Anomaly: produtos fora de qualquer cluster      │     │
+│  └──────────────────────────────────────────────────┘     │
+└──────────────────────────────────────────────────────────┘
+```
+
+### 6.2 Clusterização de Produtos
+
+Agrupa produtos por similaridade semântica + atributos estruturados para descobrir **micro-nichos** que a taxonomia oficial do TikTok não captura.
+
+```sql
+-- Tabela de clusters de produtos
+CREATE TABLE public.product_clusters (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  cluster_label text NOT NULL,          -- ex: "protetor solar premium FPS 50+"
+  cluster_size int NOT NULL DEFAULT 0,
+  centroid_embedding vector(768),
+  centroid_attrs jsonb NOT NULL,        -- {avg_price: 89.90, median_margin: 0.32, top_category: "Beleza"}
+  top_product_ids text[],
+  cohesion_score real,                   -- quão coeso é o cluster (silhouette)
+  created_at date NOT NULL DEFAULT now(),
+  region text NOT NULL DEFAULT 'BR'
+);
+```
+
+**Feature vector para clustering de produtos:**
+
+```typescript
+// apps/worker/src/sync/clustering.ts
+function buildProductFeatureVector(product: MarketProductDetail): number[] {
+  // Combina embedding semântico (768d) + features estruturadas (12d)
+  const semantic = product.embedding // 768 dimensões — origem: nome+descrição via Workers AI
+  
+  const structured = [
+    product.avg_price / 1000,                    // normalizado 0-1
+    product.commission_rate,                     // já está 0-1
+    product.sales_1d / 10000,                    // normalizado
+    product.gmv_1d / 100000,                     // normalizado
+    product.sales_growth_7d,                     // delta %
+    product.video_count / 100,                   // normalizado
+    product.creator_count / 50,                  // normalizado
+    product.review_rating / 5,                   // 0-1
+    product.has_free_shipping ? 1 : 0,
+    product.is_local ? 1 : 0,                    // local vs cross-border
+    product.momentum_score / 100,                // z-score normalizado
+    product.days_since_first_seen / 365,         // maturidade
+  ]
+  
+  // Concatena: 768 + 12 = 780 dimensões
+  // Mas pro clustering, reduzimos dimensionalidade (PCA/UMAP)
+  return [...semantic, ...structured]
+}
+```
+
+**Algoritmo:** HDBSCAN (superior a K-Means para dados de mercado porque:
+- Não precisa especificar K (número de clusters) — descobre automaticamente
+- Lida bem com outliers (produtos únicos não forçados a cluster algum)
+- Clusters de densidade variável (nichos pequenos vs grandes categorias))
+
+```sql
+-- Função RPC que chama Python via PL/Python ou processa via SQL aproximado
+-- Versão SQL aproximada (K-Means simplificado com pgvector):
+CREATE OR REPLACE FUNCTION public.assign_product_clusters(
+  min_cluster_size int DEFAULT 5,
+  similarity_threshold real DEFAULT 0.75
+)
+RETURNS TABLE(cluster_id int, product_id text, product_name text, similarity_score real)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  seed_product record;
+  cluster_idx int := 0;
+BEGIN
+  -- Estratégia: leader-follower clustering em SQL puro
+  -- Para cada produto não clusterizado com score alto, cria um cluster
+  -- e atrai produtos similares
+  
+  FOR seed_product IN 
+    SELECT product_id, name, embedding 
+    FROM public.products 
+    WHERE embedding IS NOT NULL 
+      AND score > 50  -- só clusteriza produtos relevantes
+      AND product_id NOT IN (SELECT product_id FROM public.product_cluster_members)
+    ORDER BY score DESC
+  LOOP
+    cluster_idx := cluster_idx + 1;
+    
+    -- Atrai vizinhos dentro do threshold
+    RETURN QUERY
+    SELECT 
+      cluster_idx,
+      p.product_id,
+      p.name,
+      (1.0 - (p.embedding <=> seed_product.embedding))::real AS similarity_score
+    FROM public.products p
+    WHERE p.embedding IS NOT NULL
+      AND 1.0 - (p.embedding <=> seed_product.embedding) > similarity_threshold
+      AND p.product_id NOT IN (SELECT product_id FROM public.product_cluster_members)
+    ORDER BY similarity_score DESC
+    LIMIT 50;
+    
+    -- Marca como clusterizado
+    INSERT INTO public.product_cluster_members (cluster_id, product_id, membership_score)
+    SELECT cluster_idx, p.product_id, (1.0 - (p.embedding <=> seed_product.embedding))::real
+    FROM public.products p
+    WHERE p.embedding IS NOT NULL
+      AND 1.0 - (p.embedding <=> seed_product.embedding) > similarity_threshold;
+    
+  END LOOP;
+END;
+$$;
+```
+
+### 6.3 Clusterização de Criadores
+
+Agrupa criadores por **estilo de conteúdo** + **audiência** + **performance** para identificar personas:
+
+```
+Clusters típicos de criadores:
+
+1. "Micro-influenciadores de beleza" — 5k-50k seguidores, 80% produtos beleza, alta taxa de engajamento
+2. "Live sellers generalistas" — foco em lives, múltiplas categorias, alto GMV por live
+3. "Reviewers técnicos" — vídeos longos, poucos produtos, alto engajamento por review
+4. "Virais de moda" — posts frequentes, picos de views, produtos de moda rápida
+5. "Embaixadores de marca" — promovem 1-2 lojas consistentemente, vídeos regulares
+```
+
+```typescript
+// Feature vector para clustering de criadores
+function buildCreatorFeatureVector(creator: CreatorDetail): number[] {
+  return [
+    // Dimensão: perfil
+    creator.followers_count / 1_000_000,
+    creator.following_count / 10_000,
+    creator.video_count / 1_000,
+    creator.interaction_rate,
+    creator.verified ? 1 : 0,
+    
+    // Dimensão: conteúdo
+    creator.avg_video_duration_seconds / 120,
+    creator.posts_per_week / 7,
+    creator.live_streams_per_week / 7,
+    creator.avg_video_views / 100_000,
+    
+    // Dimensão: vendas
+    creator.total_gmv / 1_000_000,
+    creator.products_promoted / 100,
+    creator.avg_commission_rate,
+    creator.sales_per_video / 100,
+    
+    // Dimensão: nicho (one-hot das top 5 categorias)
+    ...categoryOneHot(creator.top_categories, 20), // 20 categorias L1
+    
+    // Dimensão: audiência
+    ...audienceDistributionVector(creator.audience_regions, 10), // 10 regiões
+  ]
+}
+```
+
+### 6.4 Detecção de Nichos Emergentes (Cluster Trending)
+
+O valor real da clusterização não é o snapshot — é a **trajetória** dos clusters:
+
+```sql
+-- Detecta clusters que estão crescendo em tamanho ou GMV
+CREATE OR REPLACE FUNCTION public.detect_emerging_niches(
+  min_growth_rate real DEFAULT 0.3,  -- 30% de crescimento em 7 dias
+  min_cluster_size int DEFAULT 5
+)
+RETURNS TABLE(
+  cluster_id int,
+  cluster_label text,
+  current_size int,
+  size_7d_ago int,
+  growth_rate real,
+  current_gmv numeric,
+  gmv_7d_ago numeric,
+  gmv_growth real,
+  top_products jsonb,
+  opportunity_score real  -- 0-100: quão boa é a oportunidade
+)
+LANGUAGE sql
+AS $$
+  WITH cluster_snapshots AS (
+    SELECT 
+      cluster_id,
+      date_trunc('day', snapshot_at)::date AS snapshot_date,
+      COUNT(*) AS member_count,
+      SUM(gmv_1d) AS total_gmv,
+      AVG(commission_rate) AS avg_margin,
+      AVG(score) AS avg_score
+    FROM public.product_cluster_snapshots
+    WHERE snapshot_at > now() - interval '14 days'
+    GROUP BY cluster_id, date_trunc('day', snapshot_at)::date
+  ),
+  growth AS (
+    SELECT 
+      c_now.cluster_id,
+      c_now.member_count AS current_size,
+      COALESCE(c_prev.member_count, 0) AS size_7d_ago,
+      c_now.total_gmv AS current_gmv,
+      COALESCE(c_prev.total_gmv, 0) AS gmv_7d_ago,
+      c_now.avg_margin,
+      c_now.avg_score
+    FROM cluster_snapshots c_now
+    LEFT JOIN cluster_snapshots c_prev 
+      ON c_now.cluster_id = c_prev.cluster_id 
+      AND c_prev.snapshot_date = c_now.snapshot_date - 7
+    WHERE c_now.snapshot_date = current_date
+      AND c_now.member_count >= min_cluster_size
+  )
+  SELECT 
+    g.cluster_id,
+    pc.cluster_label,
+    g.current_size,
+    g.size_7d_ago,
+    CASE WHEN g.size_7d_ago > 0 
+      THEN (g.current_size::real - g.size_7d_ago) / g.size_7d_ago 
+      ELSE 1.0 END AS growth_rate,
+    g.current_gmv,
+    g.gmv_7d_ago,
+    CASE WHEN g.gmv_7d_ago > 0 
+      THEN (g.current_gmv - g.gmv_7d_ago) / g.gmv_7d_ago 
+      ELSE 1.0 END AS gmv_growth,
+    pc.top_product_ids,
+    -- Opportunity score: growth * margin * score quality
+    LEAST(100, (
+      COALESCE(g.gmv_growth, 0) * 40 +
+      g.avg_margin * 30 +
+      g.avg_score * 0.3
+    ))::real AS opportunity_score
+  FROM growth g
+  JOIN public.product_clusters pc ON pc.id = g.cluster_id
+  WHERE CASE WHEN g.size_7d_ago > 0 
+    THEN (g.current_size::real - g.size_7d_ago) / g.size_7d_ago 
+    ELSE 1.0 END >= min_growth_rate
+  ORDER BY opportunity_score DESC;
+$$;
+```
+
+### 6.5 Cluster Naming com LLM
+
+Clusters numéricos não significam nada pro usuário. Um LLM dá nome descritivo:
+
+```typescript
+// apps/worker/src/sync/clustering.ts
+async function nameCluster(cluster: ProductCluster): Promise<string> {
+  const sample = cluster.top_product_ids.slice(0, 5)
+  const products = await db.getProductsByIds(sample)
+  
+  const prompt = `Dê um nome curto e descritivo (4-8 palavras) para este grupo de produtos 
+    do TikTok Shop Brasil. O nome deve ser compreensível para um seller.
+    
+    Produtos: ${products.map(p => `- ${p.name} (R$${p.avg_price}, margem ${p.commission_rate}%)`).join('\n')}
+    Categoria predominante: ${cluster.centroid_attrs.top_category}
+    Preço médio: R$${cluster.centroid_attrs.avg_price}
+    Margem média: ${cluster.centroid_attrs.median_margin}%
+    
+    Nome do nicho:`
+  
+  const { text } = await generateText({
+    model: deepseekV4Pro,
+    prompt,
+    maxTokens: 20,
+  })
+  
+  return text.trim()
+}
+```
+
+### 6.6 Aplicações de Clusterização no Produto
+
+| Feature | Usa Clusterização Para |
+|---------|----------------------|
+| **Descobrir Nichos** | Mostrar clusters emergentes como "nichos", não categorias oficiais |
+| **Product Detail** | "Faz parte do nicho X (Y produtos, crescendo Z% essa semana)" |
+| **Análise de Criador** | "Este criador pertence ao cluster Y — comparado com a média do cluster..." |
+| **Benchmark** | "Seu produto está no nicho X — comparado com a mediana do nicho: preço, margem, vendas" |
+| **Gap Detection** | Clusters crescendo onde há poucos produtos → oportunidade de entrada |
+| **Anomalia** | Produto com features muito distantes de qualquer cluster → outlier (investigar) |
+| **Search** | "Busque em nichos similares a X" — expande busca semanticamente |
+
+---
+
+## 7. ROADMAP ATUALIZADO (COM RECOMENDAÇÃO E CLUSTERIZAÇÃO)
+
+### Novas Fases
+
+| Fase | Semanas | O que entrega |
+|------|---------|--------------|
+| **Fase 1-6** | 1-8 | (inalterado — ver roadmap original acima) |
+| **Fase 7: Recomendação** | 8-10 | Content-based + Collaborative + Graph-based + Ensemble com diversity re-rank. Tabela `behavioral_signals`. Tool `recommend-for-me` no agente. Widgets de recomendação no dashboard e product detail. |
+| **Fase 8: Clusterização** | 10-12 | HDBSCAN/Leader-Follower em SQL. `product_clusters` + `creator_clusters`. LLM naming. Detecção de nichos emergentes. UI de exploração de nichos. Tool `explore-niches` no agente. |
+
+### Estimativa de Esforço Atualizada
+
+| Fase | Semanas | Complexidade | Dependências |
+|------|---------|-------------|--------------|
+| Fase 1-6 | 8 | (inalterado) | — |
+| Fase 7 | 2 | Média-Alta (4 estratégias, ensemble) | Fases 3 (embeddings), 4 (grafo) |
+| Fase 8 | 2 | Média (SQL clustering, LLM naming) | Fases 3 (embeddings), 7 (usa recs) |
+| **Total** | **12 semanas** | | |
+
+### Novos Arquivos
+
+| Fase | Novos Arquivos | Modificados |
+|------|----------------|-------------|
+| Fase 7 | `apps/api/src/agent/tools/recommend-for-me.ts`, `apps/api/src/agent/tools/find-similar.ts`, `apps/api/src/recommendations/ensemble.ts`, `apps/api/src/recommendations/content-based.ts`, `apps/api/src/recommendations/collaborative.ts`, `apps/api/src/recommendations/graph-based.ts` | `apps/api/src/index.ts`, `supabase/migrations/0012_*.sql` |
+| Fase 8 | `apps/worker/src/sync/clustering.ts`, `apps/api/src/agent/tools/explore-niches.ts`, `apps/api/src/clustering/leader-follower.sql` | `supabase/migrations/0013_*.sql`, `apps/web/features/descoberta/` |
+
+---
+
+## 8. ARQUITETURA FINAL DO SUPER AGENTE
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                     SUPER AGENTE SLEAG v2                         │
+│                                                                   │
+│  ┌──────────────┐  ┌──────────────┐  ┌───────────────────────┐  │
+│  │ SYNC ENGINE   │  │ KNOWLEDGE     │  │ RECOMMENDATION        │  │
+│  │ (EchoTik→DB) │  │ GRAPH         │  │ ENGINE                │  │
+│  │ diário        │  │ (graph_edges) │  │ (4 estratégias)       │  │
+│  └──────┬───────┘  └──────┬───────┘  └───────────┬───────────┘  │
+│         │                 │                       │               │
+│  ┌──────┴───────┐  ┌──────┴───────┐  ┌───────────┴───────────┐  │
+│  │ MEMÓRIA       │  │ EMBEDDINGS   │  │ CLUSTERING            │  │
+│  │ Episódica     │  │ pgvector     │  │ (nichos + criadores)  │  │
+│  │ Semântica     │  │ (768d)       │  │ + LLM naming          │  │
+│  │ Procedural     │  │              │  │ + trend detection     │  │
+│  │ Trabalho      │  │              │  │                       │  │
+│  └──────┬───────┘  └──────┬───────┘  └───────────┬───────────┘  │
+│         │                 │                       │               │
+│         └─────────────────┼───────────────────────┘               │
+│                           │                                       │
+│  ┌────────────────────────┴──────────────────────────────────┐   │
+│  │ AGENTE LLM (DeepSeek) — ~15 tools                          │   │
+│  │                                                            │   │
+│  │ DESCOBERTA          ANÁLISE            AÇÃO                │   │
+│  │ • search_products   • analyze_creator  • recommend_for_me  │   │
+│  │ • detect_emerging   • compare_creators • semantic_alert    │   │
+│  │ • find_similar      • cross_reference  • manage_monitoring │   │
+│  │ • explore_niches    • trace_content    • schedule_report   │   │
+│  │ • category_dive     • entity_timeline  • backfill_sync     │   │
+│  └────────────────────────────────────────────────────────────┘   │
+│                           │                                       │
+│  ┌────────────────────────┴──────────────────────────────────┐   │
+│  │ UI — Widgets Interativos                                    │   │
+│  │ • Knowledge Graph (ReactFlow)  • Niche Explorer             │   │
+│  │ • Entity Timeline              • Recommendation Cards       │   │
+│  │ • Semantic Search              • Tool Output Widgets        │   │
+│  │ • Working Memory Panel         • Alert Builder (NL)         │   │
+│  └────────────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────────┘
+```
